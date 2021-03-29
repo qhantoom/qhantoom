@@ -1,0 +1,10 @@
+[workspace]
+members = [
+  "src/bootstrap",
+  "compiler/qhantoom",
+]
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
