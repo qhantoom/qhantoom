@@ -12,7 +12,7 @@ a language that has a taste for designing secure applications.
 
 ```
 fun main := {
-  fun fibonacci: \ (uint) -> Vec<uint> = (n) {
+  fun fibonacci: Fun(uint) -> Vec<uint> = (n) {
     mut x1 := [1, 1];
 
     for 2.=n = i {
@@ -58,5 +58,5 @@ about the `syntax`, checkout this page [here](doc/syntax.md)
 
 | run     | cmd                                         |
 |---------|---------------------------------------------|
-| compile | `cargo run compile samples/entry/simple.qh` |
+| compile | `cargo run compile <filename>`              |
 | repl    | `cargo run repl`                            |

@@ -1,2 +1,17 @@
 [workspace]
-members = []
+members = [
+	"src/bootstrap",
+	"compiler/qhantoom",
+	"compiler/qhantoom-lab",
+]
+
+exclude = [
+	"examples/**/*",
+	"target/**/*",
+	"Cargo.lock",
+]
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"

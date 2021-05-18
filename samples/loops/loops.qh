@@ -1,0 +1,4 @@
+fun main := () {
+  for nums = (num) {}
+  for 0.=4 = (num) {}
+}

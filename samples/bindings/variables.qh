@@ -1,0 +1,18 @@
+fun main := () {
+  # immutable
+  val a: str = "abc";
+  val b: str = "def";
+  val c: str = a + b; # concat strings
+
+  val d: int = 1;
+  val e: int = 2;
+  val f: int = d + e; # add integers
+
+  val g: int = 100;
+  val h: int = 1_000_000;
+  val i: int = g + h; # add integers
+
+  val j: float = 1.2345;
+  val k: float = 1e4;
+  val l: float = j + k; # add floats
+}

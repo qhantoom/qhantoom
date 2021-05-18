@@ -4,7 +4,7 @@ defining a relevant syntax that makes semantically meaningful is not easy. many 
 
 my choices in terms of syntax focus on the perfectible points detected in certain programming languages. these choices only concern me and in no way represent the procedure to follow.
 
-inspirations: [`elm`](https://en.wikipedia.org/wiki/Elm_(programming_language)), [`erlang`](https://en.wikipedia.org/wiki/Erlang_(programming_language)), [`fjölnir`](https://en.wikipedia.org/wiki/Fj%C3%B6lnir_(programming_language)), [`haskell`](https://en.wikipedia.org/wiki/Haskell_(programming_language)), [`hermes`](https://en.wikipedia.org/wiki/Hermes_(programming_language)) [`icon`](https://en.wikipedia.org/wiki/Icon_(programming_language)), [`jai`](https://en.wikipedia.org/wiki/Draft:Jai_(programming_language)), [`planc`](https://en.wikipedia.org/wiki/PLANC), [`rust`](https://en.wikipedia.org/wiki/Rust_(programming_language))
+inspirations: [elm](https://en.wikipedia.org/wiki/Elm_(programming_language)), [erlang](https://en.wikipedia.org/wiki/Erlang_(programming_language)), [fjölnir](https://en.wikipedia.org/wiki/Fj%C3%B6lnir_(programming_language)), [haskell](https://en.wikipedia.org/wiki/Haskell_(programming_language)), [hermes](https://en.wikipedia.org/wiki/Hermes_(programming_language)) [icon](https://en.wikipedia.org/wiki/Icon_(programming_language)), [jai](https://en.wikipedia.org/wiki/Draft:Jai_(programming_language)), [planc](https://en.wikipedia.org/wiki/PLANC), [rust](https://en.wikipedia.org/wiki/Rust_(programming_language))
 
 ## Tokens
 
@@ -444,19 +444,19 @@ bench tokenization_benchmark = () {
 **c**
 
 ```
-ext fun cos: \ (uint) -> (uint);
+ext fun cos: Fun(uint) -> (uint);
 ```
 
 **javascript**
 
 ```
-exp fun cos: \ (uint) -> (uint);
+exp fun cos: Fun(uint) -> (uint);
 ```
 
 **rust**
 
 ```
-mod fun cos: \ (uint) -> uint;
+mod fun cos: Fun(uint) -> uint;
 ```
 
 ## WebAssembly

@@ -1,0 +1,11 @@
+fun add: Fun(uint, uint) -> uint = (x, y) { x + y }
+fun sub: Fun(uint, uint) -> uint = (x, y) { x - y }
+fun mul: Fun(uint, uint) -> uint = (x, y) { x * y }
+fun div: Fun(uint, uint) -> uint = (x, y) { x / y }
+
+fun main := () {
+  add(1, 2);
+  sub(3, 4);
+  mul(3, 4);
+  div(3, 4);
+}
