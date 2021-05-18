@@ -75,16 +75,8 @@ chan    continue    else    enum    exp     ext
 false   fun         for     if      load    loop
 match   mock        mod     mut     pack    pub
 ref     return      Self    self    set     spawn
-struct  test        type    unit    val     var
-wasm    where       while
-```
-
-## Whitespaces
-
-**spaces**
-
-```
-var x := 0;
+struct  test        type    unit    val     imu
+wasm    where       while   _
 ```
 
 ## Data Types
@@ -99,8 +91,8 @@ var x := 0;
 ```
 u8    u16   u32   u64   uint
 s8    s16   s32   s64   sint
-f32   f64   b''   Fun() 
-bool char   str
+f32   f64   Fun 
+bool  char  str
 ```
 
 **type operators**
@@ -163,7 +155,7 @@ val a, b, c := 0;
 +   -   *   /   %   !   .   :   &   <   >   =   |   
 ++  --  **  //  %%  !!  ..  ::  &&  <<  >>  ==  ||  
 +=  -=  *=  /=  %=  !=  .=  :=  &=  <=  >=
-?   \   ->  =>  _   
+?   \   ->  =>  
 ```
 
 ## Branches

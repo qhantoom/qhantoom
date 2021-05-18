@@ -2,10 +2,10 @@
 
 **compiler**
 
-* [*] front | `tokenizer`, `parser`, `analyzer`, `interpreter`, `transformer` - *wip*
+* [x] front | `tokenizer`, `parser`, `analyzer`, `interpreter`, `transformer` - *wip*
 * [ ] middle | `ir` - *needs help*
 * [ ] back | `converter`, `bytecoder`, `assembler` - *needs help*
-* [ ] builtins | `core`, `std`, `ogl`, `wgl` 
+* [ ] library | `core`, `std`, `ogl`, `wgl` 
 * [ ] data-structures | `array`, `hash`, `struct`, `tuple`
 
 **optimizations**
@@ -16,7 +16,7 @@
 
 **tools**
 
-* [*] repl | `--interactive` - *wip*
+* [x] repl | `--interactive` - *wip*
 * [ ] vscode extension
 * [ ] package manager
-* [*] qhantoom-lab - *wip*
+* [x] qhantoom-lab - *wip*

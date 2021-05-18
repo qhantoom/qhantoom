@@ -1,8 +1,6 @@
 [workspace]
 members = [
-	"src/bootstrap",
 	"compiler/qhantoom",
-	"compiler/qhantoom-lab",
 ]
 
 exclude = [

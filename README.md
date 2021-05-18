@@ -1,6 +1,6 @@
 # qhantoom
 
-> *a programming language in progress..*
+> *a programming language under development..*
 
 ## About
 
@@ -39,20 +39,25 @@ fun main := {
 
 ## Language Design
 
-about the `roadmap`, checkout this page [here](doc/roadmap.md)      
-about the `syntax`, checkout this page [here](doc/syntax.md)      
+about the `roadmap`, checkout this page [here](https://github.com/qhantoom/qhantoom/blob/main/src/doc/roadmap.md)      
+about the `syntax`, checkout this page [here](https://github.com/qhantoom/qhantoom/blob/main/src/doc/syntax.md)      
 <!-- qhantoom lab == online repl -->
 
 ## Development
 
 [Rust](https://www.rust-lang.org/tools/install) and [Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html) must be installed on your machine before.
 
-**bin**
+**clone**
 
-| run     | cmd                                             |
-|---------|-------------------------------------------------|
-| clone   | `git clone https://github.com/qurity/qoeur.git` |
-| build    | `cd qhantoom && cargo build --release`         |
+```
+$ git clone https://github.com/qhantoom/qhantoom.git
+```
+
+**build**
+
+```
+$ cargo build --release
+```
 
 **start**
 

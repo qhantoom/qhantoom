@@ -1,0 +1,10 @@
+as      async     await   bench   bind      bool
+break   capsule   chan    char    continue  else
+enum    exp       ext     f32     f64       false
+fun     Fun       for     if      load      loop
+match   me        Me      mock    mod       mut
+pack    pub       ref     return  s8        s16
+s32     s64       set     sint    spawn     str
+struct  test      true    type    u8        u16
+u32     u64       uint    unit    val       imu
+wasm    where     while   _
