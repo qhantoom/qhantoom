@@ -269,11 +269,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "mwa"
-version = "0.1.0"
-source = "git+https://github.com/monsieurbadia/mwa#e07a2a91b3c9cc8d937f3f1d10ed0ee8ae3bb2c5"
-
-[[package]]
 name = "num-traits"
 version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -349,7 +344,15 @@ name = "qhantoom"
 version = "0.0.0"
 dependencies = [
  "criterion",
- "mwa",
+]
+
+[[package]]
+name = "qhantoom-lab"
+version = "0.1.0"
+dependencies = [
+ "qhantoom",
+ "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]

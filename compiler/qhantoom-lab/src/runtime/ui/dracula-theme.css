@@ -1,0 +1,36 @@
+.CodeMirror {
+	height: 100%;
+	width: 100%;
+	background: #15161B;
+	color: #ffffff;
+	font-size: 12px;
+	font-family: 'Fira Code', monospace;
+}
+
+.CodeMirror:last-child {
+	border-left: 1px solid hsl(230deg 20% 20%);
+}
+
+.CodeMirror-gutters {
+	background: #15161B;
+  color: #f8f8f2 !important;
+	border: none;
+	border-right: 1px solid hsl(230deg 20% 20%);
+}
+
+.cm-s-default .CodeMirror-cursor { border-left: solid thin #f8f8f0; }
+.cm-s-default span.cm-comment { color: #6272a4; }
+.cm-s-default span.cm-string, .cm-s-default span.cm-string-2 { color: #f1fa8c; }
+.cm-s-default span.cm-number { color: #bd93f9; }
+.cm-s-default span.cm-variable { color: #50fa7b; }
+.cm-s-default span.cm-variable-2 { color: white; }
+.cm-s-default span.cm-def { color: #50fa7b; }
+.cm-s-default span.cm-operator { color: #ff79c6; }
+.cm-s-default span.cm-keyword { color: #ff79c6; }
+.cm-s-default span.cm-atom { color: #bd93f9; }
+.cm-s-default span.cm-meta { color: #f8f8f2; }
+.cm-s-default span.cm-tag { color: #ff79c6; }
+.cm-s-default span.cm-attribute { color: #50fa7b; }
+.cm-s-default span.cm-qualifier { color: #50fa7b; }
+.cm-s-default span.cm-property { color: #66d9ef; }
+.cm-s-default span.cm-builtin { color: #50fa7b; }

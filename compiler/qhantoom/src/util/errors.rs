@@ -29,3 +29,23 @@ pub fn error_at(msg: &str, span: Span) {
 fn print_error(stderr: &mut io::Stderr) {
   write!(stderr, "error").ok();
 }
+
+// #[inline]
+// pub fn info(msg) {
+//   console.log(msg)
+// }
+
+// #[inline]
+// pub fn success(msg) {
+//   console.log(msg)
+// }
+
+// #[inline]
+// pub fn warn(msg) {
+//   console.warn(msg)
+// }
+
+// #[inline]
+// pub fn error(msg) {
+//   console.error(msg)
+// }

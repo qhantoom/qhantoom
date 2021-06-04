@@ -2,8 +2,6 @@ use std::fs;
 use std::io;
 use std::path::Path;
 
-use mwa::string::strbuf;
-
 #[inline]
 pub fn readfile(path: &Path) -> Result<String, String> {
   match fs::read_to_string(path) {
@@ -16,7 +14,7 @@ pub fn readfile(path: &Path) -> Result<String, String> {
 pub fn readline<'a>(icon: &str) -> Result<String, String> {
   let stdin = io::stdin();
   let mut stdout = io::stdout();
-  let mut buf = strbuf![];
+  let mut buf = String::new();
 
   print!("\n{} ", icon);
 

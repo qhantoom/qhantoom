@@ -1,10 +1,12 @@
 # qhantoom
 
-> *a programming language under development..*
+> *a fresh wind to design safe and optimised applications*
 
 ## About
 
-a language that has a taste for designing secure applications.
+under development | under development | under development 
+
+[roadmap](https://github.com/qhantoom/qhantoom/blob/main/src/doc/roadmap.md) — [syntax](https://github.com/qhantoom/qhantoom/blob/main/src/doc/syntax.md) — [how-to](#) — [lab](#)
 
 ## Usage
 
@@ -12,7 +14,7 @@ a language that has a taste for designing secure applications.
 
 ```
 fun main := {
-  fun fibonacci: Fun(uint) -> Vec<uint> = (n) {
+  fun fibonacci: (uint) -> Vec<uint> = (n) {
     mut x1 := [1, 1];
 
     for 2.=n = i {
@@ -35,13 +37,15 @@ fun main := {
 * syntax from saturn
 * small binaries size
 * fast compilation time
-* backend | `cranelift`
+* backend | `cranelift`, `llvm`
 
-## Language Design
+## Tools
 
-about the `roadmap`, checkout this page [here](https://github.com/qhantoom/qhantoom/blob/main/src/doc/roadmap.md)      
-about the `syntax`, checkout this page [here](https://github.com/qhantoom/qhantoom/blob/main/src/doc/syntax.md)      
-<!-- qhantoom lab == online repl -->
+**qhantoom: how-to**
+
+<p align="left">
+  <a href="https://qhantoom.dev"><img width="500px" height="auto" src="src/misc/qhantoom-lab-preview.gif"/></a>
+</p>
 
 ## Development
 

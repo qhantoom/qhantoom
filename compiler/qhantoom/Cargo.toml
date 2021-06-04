@@ -10,8 +10,5 @@ name = "qhantoom"
 path = "src/lib.rs"
 doctest = false
 
-[dependencies]
-mwa = { git = "https://github.com/monsieurbadia/mwa" }
-
 [dev-dependencies]
 criterion = "0.3.4"

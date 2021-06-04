@@ -2,8 +2,6 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fmt;
 
-use mwa::string::strbuf;
-
 thread_local!(static SYMBOLS: RefCell<Vec<String>> = RefCell::new(vec![]));
 
 pub type SymbolIndex = u32;
@@ -75,7 +73,7 @@ impl Symgen {
     }
 
     let symbol = Symbol(symbols.len() as u32);
-    let buf = strbuf![buf];
+    let buf = String::from(buf);
 
     table.insert(buf.clone(), symbol);
     symbols.push(buf);

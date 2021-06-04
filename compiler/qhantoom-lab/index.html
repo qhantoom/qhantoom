@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>qhantoom lab</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Open+Sans&display=swap" rel="stylesheet">
+    <link preload rel="stylesheet" href="./src/runtime/lib/codemirror/lib/codemirror.css">
+    <link preload rel="stylesheet" href="./src/runtime/ui/global.css">
+    <link preload rel="stylesheet" href="./src/runtime/ui/monokai-theme.css">
+    <script src="./src/runtime/lib/codemirror/lib/codemirror.js"></script>
+    <script src="./src/runtime/lib/codemirror/addon/mode/simple.js"></script>
+    <script src="./src/runtime/lib/codemirror/mode/javascript/javascript.js"></script>
+    <script src="./src/runtime/lib/codemirror/mode/rust/rust.js"></script>
+    <script src="./src/runtime/lib/codemirror/mode/qhantoom/qhantoom.js"></script>
+  </head>
+  <body>
+    <div id="root">
+      <header class="header">
+        <nav class="navigation">
+          <a
+            class="link"
+            href="https://qhantoom.dev">
+            <h1 class="title">qhantoom</h1>
+          </a>
+          <label class="switcher">
+            <input id="GLSLReportsButtonThemeDarkMode" type="checkbox">
+            <span class="slider round"></span>
+          </label>
+        </nav>
+      </header>
+      <section class="environment">
+        <aside>
+          <div class="box-content">
+            <h2 class="subtitle">how to</h2>
+          </div>
+          <ul id="howto" class="sidebar sidebar--howto"></ul>
+        </aside>
+        <main class="main">
+          <div class="editor">
+            <div class="editor-input-layout">
+              <header class="editor-input-header">
+                <nav class="editor-input-tabs">
+                  <button class="button button--tabs" onclick="">main.qh</button>
+                </nav>
+              </header>
+              <div class="box">
+                <textarea
+                  name="editorInput"
+                  id="editorInput"
+                  class="editor-input">
+                </textarea>
+              </div>
+            </div>
+            <div class="editor-output-layout">
+              <header class="editor-output-header">
+                <nav class="editor-output-nav">
+                  <select
+                    id="editorOutputDebug"
+                    name="editorOutputDebug"
+                    class="select select--debug">
+                  </select>
+                </nav>
+              </header>
+              <div class="box">
+                <textarea
+                  name="editorOutput"
+                  id="editorOutput"
+                  class="editor-output">
+                </textarea>
+                <div id="iframeBox" class="iframe-box"></div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </section>
+      <footer class="footer">
+        <div class="box flex">
+          <div class="column"></div>
+          <div class="column">
+            <ul class="config">
+              <li class="config-item">Spaces: 2</li>
+              <li class="config-item">UTF-8</li>
+              <li class="config-item">LF</li>
+            </ul>
+          </div>
+        </div>
+      </footer>
+    </div>
+    <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
+  </body>
+</html>

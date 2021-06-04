@@ -1,0 +1,26 @@
+[package]
+name = "qhantoom-lab"
+version = "0.1.0"
+authors = ["monsieurbadia <iammonsieurbadia@gmail.com>"]
+edition = "2018"
+
+[lib]
+name = "qhantoom_lab"
+crate-type = ["cdylib"]
+path = "src/system/lib.rs"
+
+[dependencies]
+qhantoom = {path = "../qhantoom"}
+wasm-bindgen = "0.2.74"
+
+[dependencies.web-sys]
+version = "0.3.4"
+features = [
+  'console',
+  # 'Document',
+  # 'HtmlElement',
+  # 'HtmlInputElement',
+  # 'MessageEvent',
+  # 'Window',
+  # 'Worker',
+]

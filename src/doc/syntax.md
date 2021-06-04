@@ -145,8 +145,8 @@ val c := a == b;
 **multiple assignments**
 
 ```
-val a, b, c: s8 = 0;
-val a, b, c := 0;
+val x y z: s8 = 0;
+val x y z := 0;
 ```
 
 ## Operators
@@ -213,16 +213,16 @@ while 0 < 1 {}
 
 ```
 # function declaration
-fun sqrt: Fun(u8) -> u8 = () { x * x }
+fun sqrt: (u8) -> u8 = () { x * x }
 
 # closure expression
-val sqrt: Fun(u8) -> u8 = () { x * x }
+val sqrt: (u8) -> u8 = () { x * x }
 
 # closure expression
-mut sqrt: Fun(u8) -> u8 = () { x * x }
+mut sqrt: (u8) -> u8 = () { x * x }
 
 # arrow function expression
-mut sqrt: \ u8 -> u8 = \ n -> x * x;
+mut sqrt: u8 -> u8 = \ n -> x * x;
 ```
 
 ## Arrays
@@ -240,7 +240,7 @@ struct Button {
 }
 
 set Button {
-  fun new: Fun(str) -> Button = (name) {
+  fun new: (str) -> Button = (name) {
     Button {
       id = 0,
       name = name,
@@ -261,7 +261,7 @@ val button: Button = new::Button("button-name");
 **factorial**
 
 ```
-fun factorial: Fun(uint) -> uint = (i) {
+fun factorial: (uint) -> uint = (i) {
   if i <= 1 {
     return 1;
   }
@@ -276,7 +276,7 @@ fun factorial: Fun(uint) -> uint = (i) {
 
 ```
 capsule Vec2 {
-  fun mul: Fun(uint) -> (uint);
+  fun mul: (uint) -> (uint);
 }
 
 struct Point {
@@ -285,7 +285,7 @@ struct Point {
 }
 
 set Vec2 for Point {
-  fun mul: Fun(uint) -> (uint) = () {}
+  fun mul: (uint) -> (uint) = () {}
 }
 ```
 
@@ -436,19 +436,19 @@ bench tokenization_benchmark = () {
 **c**
 
 ```
-ext fun cos: Fun(uint) -> (uint);
+ext fun cos: (uint) -> uint;
 ```
 
 **javascript**
 
 ```
-exp fun cos: Fun(uint) -> (uint);
+exp fun cos: (uint) -> uint;
 ```
 
 **rust**
 
 ```
-mod fun cos: Fun(uint) -> uint;
+mod fun cos: (uint) -> uint;
 ```
 
 ## WebAssembly

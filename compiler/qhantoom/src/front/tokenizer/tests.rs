@@ -3,44 +3,34 @@
 #[cfg(test)]
 mod unit_tests {
   use crate::front::tokenizer::{
-    tokenize_capsule_from_file,
-    tokenize_capsule_from_source,
+    tokenize_capsule_from_file, tokenize_capsule_from_source,
   };
-  
-  use mwa::path::to;
 
-  macro run_or_die {
-    ($e:expr) => {
-      match $e {
-        Ok(e) => e,
-        Err(e) => panic!("{} - {}", stringify!($e), e),
-      }
-    },
+  macro run_or_die($e:expr) {
+    match $e {
+      Ok(e) => e,
+      Err(e) => panic!("{} - {}", stringify!($e), e),
+    }
   }
 
   #[test]
   fn tokenize_empty() {
-    let path = to!(abs: "../../samples/tokens/empty.qh");
+    let curpath = format!("../../samples/tokens/empty.qh");
+    let path = std::path::Path::new(&curpath);
     let tokens_from_file = run_or_die!(tokenize_capsule_from_file(&path));
 
     let src = r#""#;
     let tokens_from_source = run_or_die!(tokenize_capsule_from_source(&src));
 
-    assert_eq!(
-      tokens_from_file.is_empty(),
-      tokens_from_source.is_empty(),
-    );
-    
-    assert_eq!(
-      tokens_from_file.len(),
-      tokens_from_source.len(),
-    );
+    assert_eq!(tokens_from_file.is_empty(), tokens_from_source.is_empty());
+    assert_eq!(tokens_from_file.len(), tokens_from_source.len());
   }
 
   #[test]
   fn tokenize_operators() {
-    let path = to!(abs: "../../samples/tokens/operators.qh");
-    let tokens_from_file = run_or_die!(tokenize_capsule_from_file(&path));
+    let filename = format!("../../samples/tokens/operators.qh");
+    let pathname = std::path::Path::new(&filename);
+    let tokens_from_file = run_or_die!(tokenize_capsule_from_file(&pathname));
 
     let src = r#"
       +   -   *   /   %   !   .   :   &   <   >   =   |
@@ -55,7 +45,7 @@ mod unit_tests {
       !tokens_from_file.is_empty(),
       !tokens_from_source.is_empty(),
     );
-    
+
     assert_eq!(
       tokens_from_file.len(),
       tokens_from_source.len(),
@@ -64,8 +54,9 @@ mod unit_tests {
 
   #[test]
   fn tokenize_ints() {
-    let path = to!(abs: "../../samples/tokens/ints.qh");
-    let tokens_from_file = run_or_die!(tokenize_capsule_from_file(&path));
+    let filename = format!("../../samples/tokens/ints.qh");
+    let pathname = std::path::Path::new(&filename);
+    let tokens_from_file = run_or_die!(tokenize_capsule_from_file(&pathname));
 
     let src = r#"1 123 123_000 1e4"#;
     let tokens_from_source = run_or_die!(tokenize_capsule_from_source(&src));
@@ -74,7 +65,7 @@ mod unit_tests {
       !tokens_from_file.is_empty(),
       !tokens_from_source.is_empty(),
     );
-    
+
     assert_eq!(
       tokens_from_file.len(),
       tokens_from_source.len(),
@@ -83,8 +74,9 @@ mod unit_tests {
 
   #[test]
   fn tokenize_floats() {
-    let path = to!(abs: "../../samples/tokens/floats.qh");
-    let tokens_from_file = run_or_die!(tokenize_capsule_from_file(&path));
+    let filename = format!("../../samples/tokens/floats.qh");
+    let pathname = std::path::Path::new(&filename);
+    let tokens_from_file = run_or_die!(tokenize_capsule_from_file(&pathname));
 
     let src = r#"1.0 123.456 123_456"#;
     let tokens_from_source = run_or_die!(tokenize_capsule_from_source(&src));
@@ -102,8 +94,9 @@ mod unit_tests {
 
   #[test]
   fn tokenize_idents() {
-    let path = to!(abs: "../../samples/tokens/idents.qh");
-    let tokens_from_file = run_or_die!(tokenize_capsule_from_file(&path));
+    let filename = format!("../../samples/tokens/idents.qh");
+    let pathname = std::path::Path::new(&filename);
+    let tokens_from_file = run_or_die!(tokenize_capsule_from_file(&pathname));
 
     let src = r#"
       square    cosinus   degrees
@@ -117,7 +110,7 @@ mod unit_tests {
       !tokens_from_file.is_empty(),
       !tokens_from_source.is_empty(),
     );
-    
+
     assert_eq!(
       tokens_from_file.len(),
       tokens_from_source.len(),
@@ -126,8 +119,9 @@ mod unit_tests {
 
   #[test]
   fn tokenize_keywords() {
-    let path = to!(abs: "../../samples/tokens/keywords.qh");
-    let tokens_from_file = run_or_die!(tokenize_capsule_from_file(&path));
+    let filename = format!("../../samples/tokens/keywords.qh");
+    let pathname = std::path::Path::new(&filename);
+    let tokens_from_file = run_or_die!(tokenize_capsule_from_file(&pathname));
 
     let src = r#"
       as      async     await   bench   bind      bool
@@ -139,7 +133,7 @@ mod unit_tests {
       s32     s64       set     sint    spawn     str
       struct  test      true    type    u8        u16
       u32     u64       uint    unit    val       imu
-      wasm    where     while   _    
+      wasm    where     while   _
     "#;
 
     let tokens_from_source = run_or_die!(tokenize_capsule_from_source(&src));
@@ -148,7 +142,7 @@ mod unit_tests {
       !tokens_from_file.is_empty(),
       !tokens_from_source.is_empty(),
     );
-    
+
     assert_eq!(
       tokens_from_file.len(),
       tokens_from_source.len(),
@@ -156,59 +150,62 @@ mod unit_tests {
   }
 
   // #[test]
-  // fn tokenize_comment_line() {
-  //   let path = to!(abs: "../../samples/tokens/comment_line.qh");
-  //   let tokens_from_file = run_or_die!(tokenize_capsule_from_file(&path));
+  fn tokenize_comment_line() {
+    let filename = format!("../../samples/tokens/comment_line.qh");
+    let pathname = std::path::Path::new(&filename);
+    let tokens_from_file = run_or_die!(tokenize_capsule_from_file(&pathname));
 
-  //   let src = r#"# this is a line comment"#;
-  //   let tokens_from_source = run_or_die!(tokenize_capsule_from_source(&src));
+    let src = r#"# this is a line comment"#;
+    let tokens_from_source = run_or_die!(tokenize_capsule_from_source(&src));
 
-  //   assert_eq!(
-  //     !tokens_from_file.is_empty(),
-  //     !tokens_from_source.is_empty(),
-  //   );
-    
-  //   assert_eq!(
-  //     tokens_from_file.len(),
-  //     tokens_from_source.len(),
-  //   );
-  // }
+    assert_eq!(
+      !tokens_from_file.is_empty(),
+      !tokens_from_source.is_empty(),
+    );
 
-  // #[test]
-  // fn tokenize_strings() {
-  //   let path = to!(abs: "../../samples/tokens/strings.qh");
-  //   let tokens_from_file = run_or_die!(tokenize_capsule_from_file(&path));
-
-  //   let src = r#""hello, world! 👽""#;
-  //   let tokens_from_source = run_or_die!(tokenize_capsule_from_source(&src));
-
-  //   assert_eq!(
-  //     !tokens_from_file.is_empty(),
-  //     !tokens_from_source.is_empty(),
-  //   );
-    
-  //   assert_eq!(
-  //     tokens_from_file.len(),
-  //     tokens_from_source.len(),
-  //   );
-  // }
+    assert_eq!(
+      tokens_from_file.len(),
+      tokens_from_source.len(),
+    );
+  }
 
   // #[test]
-  // fn tokenize_char_ascii() {
-  //   let path = to!(abs: "../../samples/tokens/char_ascii.qh");
-  //   let tokens_from_file = run_or_die!(tokenize_capsule_from_file(&path));
+  fn tokenize_strings() {
+    let filename = format!("../../samples/tokens/strings.qh");
+    let pathname = std::path::Path::new(&filename);
+    let tokens_from_file = run_or_die!(tokenize_capsule_from_file(&pathname));
 
-  //   let src = r#"'a' 'b' 'c' 'd'"#;
-  //   let tokens_from_source = run_or_die!(tokenize_capsule_from_source(&src));
+    let src = r#""hello, world! 👽""#;
+    let tokens_from_source = run_or_die!(tokenize_capsule_from_source(&src));
 
-  //   assert_eq!(
-  //     !tokens_from_file.is_empty(),
-  //     !tokens_from_source.is_empty(),
-  //   );
-    
-  //   assert_eq!(
-  //     tokens_from_file.len(),
-  //     tokens_from_source.len(),
-  //   );
-  // }
+    assert_eq!(
+      !tokens_from_file.is_empty(),
+      !tokens_from_source.is_empty(),
+    );
+
+    assert_eq!(
+      tokens_from_file.len(),
+      tokens_from_source.len(),
+    );
+  }
+
+  // #[test]
+  fn tokenize_char_ascii() {
+    let filename = format!("../../samples/tokens/char_ascii.qh");
+    let pathname = std::path::Path::new(&filename);
+    let tokens_from_file = run_or_die!(tokenize_capsule_from_file(&pathname));
+
+    let src = r#"'a' 'b' 'c' 'd'"#;
+    let tokens_from_source = run_or_die!(tokenize_capsule_from_source(&src));
+
+    assert_eq!(
+      !tokens_from_file.is_empty(),
+      !tokens_from_source.is_empty(),
+    );
+
+    assert_eq!(
+      tokens_from_file.len(),
+      tokens_from_source.len(),
+    );
+  }
 }
