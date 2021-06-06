@@ -242,8 +242,10 @@ textarea {
   list-style: none;
 }
 .config-item {
+  margin: 0 10px 0 0;
+  height: 20px;
   font-size: 10px;
-  margin-right: 10px;
+  line-height: 20px;
 }
 .switcher {
   margin-right: 30px;
