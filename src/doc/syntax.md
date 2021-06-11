@@ -1,10 +1,14 @@
 # qhantoom compiler: syntax
 
-defining a relevant syntax that makes semantically meaningful is not easy. many programming language designers neglect these aspects completely. in general, a syntax should be simple, consistent, intuitive and flexible (a bit like legos).
+defining a relevant syntax that makes semantic sense is not easy. many programming language designers neglect this aspect completely. I have often read and heard that syntax: "who cares". I have a strong focus on design, that's one of the reasons why I don't agree with this kind of statements. my naive vision is probably misleading me. But I think that a syntax must be simple, coherent, intuitive and above all flexible *(a bit like LEGOS).*   
 
-my choices in terms of syntax focus on the perfectible points detected in certain programming languages. these choices only concern me and in no way represent the procedure to follow.
+Semantics is the most important thing in a language *(semantic is king)* but design also plays an important role because it's the design that carries the semantics. one can't go without the other, for example it's like making a song by focusing on the content without thinking about the form. It's by doing this that you miss out on a hit or a banger. It is this balance between the two that makes a programming language taste good.    
 
-inspirations: [elm](https://en.wikipedia.org/wiki/Elm_(programming_language)), [erlang](https://en.wikipedia.org/wiki/Erlang_(programming_language)), [fjölnir](https://en.wikipedia.org/wiki/Fj%C3%B6lnir_(programming_language)), [haskell](https://en.wikipedia.org/wiki/Haskell_(programming_language)), [hermes](https://en.wikipedia.org/wiki/Hermes_(programming_language)) [icon](https://en.wikipedia.org/wiki/Icon_(programming_language)), [jai](https://en.wikipedia.org/wiki/Draft:Jai_(programming_language)), [planc](https://en.wikipedia.org/wiki/PLANC), [rust](https://en.wikipedia.org/wiki/Rust_(programming_language))
+The syntax of `qhantoom` is intended to be similar to the highway code. It should allow the programmer to write clear instructions. Allowing better distinction and implementation of certain functional paradigms for the uninitiated.   
+
+The idea is that a symbol has only one use depending on its context. This avoids things like: ```Math.cos(2) === Math.cos`2``` returns `true` in `javascript`. Having two different ways of declaring the call of a function is confusing. And that's what I want to avoid with my compiler.    
+
+My syntax choices are focused on the areas of improvement that I have found in some programming languages. These choices are mine alone and are not the way to go.    
 
 ## Tokens
 
@@ -21,8 +25,7 @@ fun main := () {
 ```
 fun
 main
-:
-=
+:=
 (
 )
 {
@@ -109,9 +112,9 @@ type Symbol = s32;
 
 ## Bindings
 
-`imu` - immutable constant keyword    
-`val` - immutable local keyword   
-`mut` - mutable local keyword   
+`imu` - immutable global variable keyword    
+`val` - immutable local variable keyword   
+`mut` - mutable local variable keyword   
 
 **constants**
 
@@ -196,7 +199,7 @@ loop {}
 
 ```
 for nums = (num) {}
-for 0.=4 = (num) {}
+for 0..4 = (num) {}
 ```
 
 **while**
@@ -213,16 +216,16 @@ while 0 < 1 {}
 
 ```
 # function declaration
-fun sqrt: (u8) -> u8 = () { x * x }
+fun sqrt: (u8) -> u8 = (x) { x * x }
 
 # closure expression
-val sqrt: (u8) -> u8 = () { x * x }
+val sqrt: (u8) -> u8 = (x) { x * x }
 
 # closure expression
-mut sqrt: (u8) -> u8 = () { x * x }
+mut sqrt: (u8) -> u8 = (x) { x * x }
 
 # arrow function expression
-mut sqrt: u8 -> u8 = \ n -> x * x;
+mut sqrt: u8 -> u8 = \ x -> x * x;
 ```
 
 ## Arrays
@@ -232,6 +235,8 @@ mut sqrt: u8 -> u8 = \ n -> x * x;
 ```
 
 ## Structures
+
+`struct`
 
 ```
 struct Button {
@@ -292,7 +297,6 @@ set Vec2 for Point {
 ## Modules
 
 `bind` - set module keyword   
-`pack` - set module keyword   
 `load` - get module keyword   
 
 **bind | pack**
@@ -301,14 +305,6 @@ set Vec2 for Point {
 pub bind ident;
 pub bind ident;
 bind ident;
-```
-
-or
-
-```
-pub pack ident;
-pub pack ident;
-pack ident;
 ```
 
 **load**
@@ -429,9 +425,9 @@ bench tokenization_benchmark = () {
 
 ## FFI
 
-`ext` - call c function keyword   
-`exp` - call javascript function keyword    
-`mod` - call rust function keyword    
+`ext` - call a **c** function keyword   
+`exp` - call a **javascript** function keyword    
+`mod` - call a **rust** function keyword    
 
 **c**
 
