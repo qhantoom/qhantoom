@@ -1,0 +1,18 @@
+[package]
+name = "bootstrap"
+version = "0.0.0"
+authors = ["monsieurbadia <iam@monsieurbadia.com>"]
+edition = "2018"
+
+[lib]
+name = "bootstrap"
+path = "lib.rs"
+doctest = false
+
+[[bin]]
+name = "bootstrap"
+path = "bin/main.rs"
+doctest = false
+
+[dependencies]
+qhantoom = { path = "../../compiler/qhantoom" }

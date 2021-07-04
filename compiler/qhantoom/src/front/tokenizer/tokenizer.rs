@@ -3,7 +3,7 @@ use std::path::Path;
 use std::str::{CharIndices, FromStr};
 
 use crate::util::ascii::*;
-use crate::util::string::string;
+use crate::util::string::strbuf;
 
 use crate::util::reader;
 use crate::util::session::session;
@@ -47,6 +47,7 @@ pub struct Tokenizer<'a> {
 impl<'a> Iterator for Tokenizer<'a> {
   type Item = Token;
 
+  #[inline]
   fn next(&mut self) -> Option<Token> {
     let t = self.advance_token();
 
@@ -63,7 +64,7 @@ impl<'a> Tokenizer<'a> {
   pub fn new(input: &'a str) -> Self {
     Self {
       input: input.char_indices(),
-      buffer: string![""],
+      buffer: strbuf![""],
       next: None,
       span: SPAN_ZERO,
       current_char: '\0',
@@ -219,10 +220,10 @@ impl<'a> Tokenizer<'a> {
 
   #[inline]
   fn scan_number_kind_from(&mut self, base: u32) -> TokenKind {
-    let num = &self.buffer.replace("_", "");
+    let number = &self.buffer.replace("_", "");
 
-    if let Ok(n) = u64::from_str_radix(num, base) {
-      if (base == 8 && n <= i32::MAX as u64)
+    if let Ok(n) = u64::from_str_radix(number, base) {
+      if (base == 8 && n <= i8::MAX as u64)
         || (base == 10 && n <= i32::MAX as u64 + 1)
         || (base == 16 && n <= i32::MAX as u64)
       {
@@ -230,7 +231,7 @@ impl<'a> Tokenizer<'a> {
       }
     }
 
-    if let Ok(n) = f64::from_str(num) {
+    if let Ok(n) = f64::from_str(number) {
       if n <= f32::MAX as f64 + 1.0 {
         return TokenKind::FloatNumber(n as f32);
       }
@@ -446,7 +447,6 @@ macro go {
     let kind = $me.scan_comment_line();
 
     $me.buffer.truncate(0);
-    print!("\nOOOOO: {:?}", kind);
 
     return $me.reset(kind);
   }),

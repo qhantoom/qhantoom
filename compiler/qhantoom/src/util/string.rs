@@ -1,4 +1,4 @@
-pub macro string {
+pub macro strbuf {
   () => ( String::new() ),
   ( $elmt:expr ) => ( String::from($elmt) ),
   ( $($x:expr,)* ) => ({

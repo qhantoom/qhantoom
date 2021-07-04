@@ -1,0 +1,5 @@
+fun main := () {
+  val x: uint = "hello";
+  val y: uint = " , world";
+  val x: uint = x ++ y;
+}

@@ -1,0 +1,5 @@
+fun sqrt: (uint) -> uint = (x) {x * x}
+
+fun main := () {
+  sqrt(7);
+}

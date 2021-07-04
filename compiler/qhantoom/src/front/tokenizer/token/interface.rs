@@ -204,7 +204,7 @@ impl TokenKind {
       "pack" => Some(Pack),
       "pub" => Some(Pub),
       "ref" => Some(Ref),
-      "ret" => Some(Ret),
+      "return" => Some(Ret),
       "spawn" => Some(Spawn),
       "struct" => Some(Struct),
       "test" => Some(Test),

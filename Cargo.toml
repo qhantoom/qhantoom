@@ -1,11 +1,12 @@
 [workspace]
 members = [
+	"src/bootstrap",
 	"compiler/qhantoom",
-	"compiler/qhantoom-lab",
+	"compiler/qhantoom-ui",
 ]
 
 exclude = [
-	"examples/**/*",
+	"samples/**/*",
 	"target/**/*",
 	"Cargo.lock",
 ]

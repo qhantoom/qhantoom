@@ -1,0 +1,5 @@
+fun main := () {
+  val x: s8 = 10;
+  val y: s8 = 10;
+  val c: s8 = x + y;
+}

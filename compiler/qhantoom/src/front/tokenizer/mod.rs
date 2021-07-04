@@ -1,7 +1,7 @@
 mod interface;
 #[cfg(test)]
 mod tests;
-pub mod token;
+mod token;
 mod tokenizer;
 
 pub use self::interface::*;

@@ -6,7 +6,7 @@ Semantics is the most important thing in a language *(semantic is king)* but des
 
 The syntax of `qhantoom` is intended to be similar to the highway code. It should allow the programmer to write clear instructions. Allowing better distinction and implementation of certain functional paradigms for the uninitiated.   
 
-The idea is that a symbol has only one use depending on its context. This avoids things like: ```Math.cos(2) === Math.cos`2``` returns `true` in `javascript`. Having two different ways of declaring the call of a function is confusing. And that's what I want to avoid with my compiler.    
+The idea is that a symbol has only one use depending on its context. This avoids things like: ``` Math.cos(2) === Math.cos`2` ``` returns `true` in `javascript`. Having two different ways of declaring the call of a function is confusing. And that's what I want to avoid with my compiler.    
 
 My syntax choices are focused on the areas of improvement that I have found in some programming languages. These choices are mine alone and are not the way to go.    
 

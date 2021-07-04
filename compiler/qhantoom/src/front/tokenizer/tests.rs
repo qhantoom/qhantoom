@@ -41,15 +41,9 @@ mod unit_tests {
 
     let tokens_from_source = run_or_die!(tokenize_capsule_from_source(&src));
 
-    assert_eq!(
-      !tokens_from_file.is_empty(),
-      !tokens_from_source.is_empty(),
-    );
+    assert_eq!(!tokens_from_file.is_empty(), !tokens_from_source.is_empty(),);
 
-    assert_eq!(
-      tokens_from_file.len(),
-      tokens_from_source.len(),
-    );
+    assert_eq!(tokens_from_file.len(), tokens_from_source.len(),);
   }
 
   #[test]
@@ -61,15 +55,9 @@ mod unit_tests {
     let src = r#"1 123 123_000 1e4"#;
     let tokens_from_source = run_or_die!(tokenize_capsule_from_source(&src));
 
-    assert_eq!(
-      !tokens_from_file.is_empty(),
-      !tokens_from_source.is_empty(),
-    );
+    assert_eq!(!tokens_from_file.is_empty(), !tokens_from_source.is_empty(),);
 
-    assert_eq!(
-      tokens_from_file.len(),
-      tokens_from_source.len(),
-    );
+    assert_eq!(tokens_from_file.len(), tokens_from_source.len(),);
   }
 
   #[test]
@@ -81,15 +69,9 @@ mod unit_tests {
     let src = r#"1.0 123.456 123_456"#;
     let tokens_from_source = run_or_die!(tokenize_capsule_from_source(&src));
 
-    assert_eq!(
-      !tokens_from_file.is_empty(),
-      !tokens_from_source.is_empty(),
-    );
+    assert_eq!(!tokens_from_file.is_empty(), !tokens_from_source.is_empty(),);
 
-    assert_eq!(
-      tokens_from_file.len(),
-      tokens_from_source.len(),
-    );
+    assert_eq!(tokens_from_file.len(), tokens_from_source.len(),);
   }
 
   #[test]
@@ -106,15 +88,9 @@ mod unit_tests {
 
     let tokens_from_source = run_or_die!(tokenize_capsule_from_source(&src));
 
-    assert_eq!(
-      !tokens_from_file.is_empty(),
-      !tokens_from_source.is_empty(),
-    );
+    assert_eq!(!tokens_from_file.is_empty(), !tokens_from_source.is_empty(),);
 
-    assert_eq!(
-      tokens_from_file.len(),
-      tokens_from_source.len(),
-    );
+    assert_eq!(tokens_from_file.len(), tokens_from_source.len(),);
   }
 
   #[test]
@@ -138,15 +114,9 @@ mod unit_tests {
 
     let tokens_from_source = run_or_die!(tokenize_capsule_from_source(&src));
 
-    assert_eq!(
-      !tokens_from_file.is_empty(),
-      !tokens_from_source.is_empty(),
-    );
+    assert_eq!(!tokens_from_file.is_empty(), !tokens_from_source.is_empty(),);
 
-    assert_eq!(
-      tokens_from_file.len(),
-      tokens_from_source.len(),
-    );
+    assert_eq!(tokens_from_file.len(), tokens_from_source.len(),);
   }
 
   // #[test]
@@ -158,15 +128,9 @@ mod unit_tests {
     let src = r#"# this is a line comment"#;
     let tokens_from_source = run_or_die!(tokenize_capsule_from_source(&src));
 
-    assert_eq!(
-      !tokens_from_file.is_empty(),
-      !tokens_from_source.is_empty(),
-    );
+    assert_eq!(!tokens_from_file.is_empty(), !tokens_from_source.is_empty(),);
 
-    assert_eq!(
-      tokens_from_file.len(),
-      tokens_from_source.len(),
-    );
+    assert_eq!(tokens_from_file.len(), tokens_from_source.len(),);
   }
 
   // #[test]
@@ -178,15 +142,9 @@ mod unit_tests {
     let src = r#""hello, world! 👽""#;
     let tokens_from_source = run_or_die!(tokenize_capsule_from_source(&src));
 
-    assert_eq!(
-      !tokens_from_file.is_empty(),
-      !tokens_from_source.is_empty(),
-    );
+    assert_eq!(!tokens_from_file.is_empty(), !tokens_from_source.is_empty(),);
 
-    assert_eq!(
-      tokens_from_file.len(),
-      tokens_from_source.len(),
-    );
+    assert_eq!(tokens_from_file.len(), tokens_from_source.len(),);
   }
 
   // #[test]
@@ -198,14 +156,8 @@ mod unit_tests {
     let src = r#"'a' 'b' 'c' 'd'"#;
     let tokens_from_source = run_or_die!(tokenize_capsule_from_source(&src));
 
-    assert_eq!(
-      !tokens_from_file.is_empty(),
-      !tokens_from_source.is_empty(),
-    );
+    assert_eq!(!tokens_from_file.is_empty(), !tokens_from_source.is_empty(),);
 
-    assert_eq!(
-      tokens_from_file.len(),
-      tokens_from_source.len(),
-    );
+    assert_eq!(tokens_from_file.len(), tokens_from_source.len(),);
   }
 }

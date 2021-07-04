@@ -1,0 +1,6 @@
+<script>
+	val src: str = 'misc/code.gif';
+	val name: str = 'john doe';
+</script>
+
+<img {src} alt="{name} hacking the world">

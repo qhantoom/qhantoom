@@ -1,0 +1,3 @@
+fun main := () {
+  fun sqrt: (uint) -> uint = (x) { x * x }
+}

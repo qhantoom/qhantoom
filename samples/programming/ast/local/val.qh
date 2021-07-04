@@ -1,0 +1,4 @@
+fun main := () {
+  val x: uint = 1;
+  val y: uint = 2;
+}

@@ -1,9 +1,12 @@
 [package]
 name = "qhantoom"
-version = "0.0.0"
-description = "the qhantoom compiler"
+version = "0.1.0"
 authors = ["monsieurbadia <iam@monsieurbadia.com>"]
 edition = "2018"
+
+description = """
+the qhantoom compiler
+"""
 
 [lib]
 name = "qhantoom"

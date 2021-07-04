@@ -17,7 +17,7 @@ fun main := {
   fun fibonacci: (uint) -> Vec<uint> = (n) {
     mut x1 := [1, 1];
 
-    for 2.=n = i {
+    for 2..n = i {
       val x2 := x1[i - 1] + x1[i - 2];
       x1.push(x2);
     }
@@ -44,7 +44,7 @@ fun main := {
 **qhantoom: how-to**
 
 <p align="left">
-  <a href="https://qhantoom.dev"><img width="500px" height="auto" src="src/misc/qhantoom-lab-preview.gif"/></a>
+  <a href="https://qhantoom.dev"><img width="500px" height="auto" src="src/misc/img/qhantoom-lab-preview.gif"/></a>
 </p>
 
 ## Development

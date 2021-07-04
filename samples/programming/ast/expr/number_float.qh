@@ -1,0 +1,5 @@
+fun main := () {
+  val x: f32 = 1.0;
+  val y: f32 = 3.5;
+  val z: f32 = 2.3;
+}

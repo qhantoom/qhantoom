@@ -1,0 +1,4 @@
+fun main := () {
+  val x: bool = true;
+  val y: bool = false;
+}
