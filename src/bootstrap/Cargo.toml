@@ -16,3 +16,4 @@ doctest = false
 
 [dependencies]
 qhantoom = { path = "../../compiler/qhantoom" }
+qhantoom-ui = { path = "../../compiler/qhantoom-ui" }

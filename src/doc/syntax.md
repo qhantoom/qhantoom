@@ -119,21 +119,21 @@ type Symbol = s32;
 **constants**
 
 ```
-imu SQRT: s8 = 0;
+imu SQRT : s8 = 0;
 imu SQRT := 0;
 ```
 
 **immutables**
 
 ```
-val x: s8 = 0;
+val x : s8 = 0;
 val x := 0;
 ```
 
 **mutables**
 
 ```
-mut y: s8 = 0;
+mut y : s8 = 0;
 mut y := 1;
 ```
 
@@ -148,7 +148,7 @@ val c := a == b;
 **multiple assignments**
 
 ```
-val x y z: s8 = 0;
+val x y z : s8 = 0;
 val x y z := 0;
 ```
 
@@ -225,7 +225,7 @@ val sqrt: (u8) -> u8 = (x) { x * x }
 mut sqrt: (u8) -> u8 = (x) { x * x }
 
 # arrow function expression
-mut sqrt: u8 -> u8 = \ x -> x * x;
+mut sqrt: \ u8 -> u8 = \ x -> x * x;
 ```
 
 ## Arrays
@@ -290,7 +290,7 @@ struct Point {
 }
 
 set Vec2 for Point {
-  fun mul: (uint) -> (uint) = () {}
+  fun mul: (uint) -> (uint) = (x) { x * x }
 }
 ```
 

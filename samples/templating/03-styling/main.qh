@@ -1,8 +1,0 @@
-<style>
-  p {
-    color: blue;
-    font-size: 20px;
-  }
-</style>
-
-<p>styled!</p>

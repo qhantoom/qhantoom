@@ -1,5 +1,0 @@
-<script>
-  val name: str = "world";
-</script>
-
-<h1>hello, {name}!</h1>

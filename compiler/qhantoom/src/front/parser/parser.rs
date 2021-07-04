@@ -323,21 +323,17 @@ impl<'a> Parser<'a> {
 
   fn parse_expr(&mut self) -> Result<Box<Expr>, String> {
     match self.current.kind() {
-      // TokenKind::Comment(..) => self.parse_comment_expr(),
       TokenKind::OpenBrace => self.parse_hash_expr(),
       TokenKind::OpenBracket => self.parse_array_expr(),
       TokenKind::OpenParen => self.parse_group_expr(),
       TokenKind::Ident(..) => self.parse_ident_expr(),
       TokenKind::False | True => self.parse_bool_expr(),
-      // TokenKind::For => self.parse_for_loop_expr(),
-      // TokenKind::If => self.parse_if_else_expr(),
       TokenKind::Loop => self.parse_infinite_loop_expr(),
       TokenKind::While => self.parse_while_loop_expr(),
       TokenKind::FloatNumber(..) => self.parse_float_expr(),
       TokenKind::IntNumber(..) => self.parse_int_expr(),
       TokenKind::StrBuffer(..) => self.parse_str_expr(),
       TokenKind::CharAscii(..) => self.parse_char_expr(),
-      // TokenKind::OpenParen => self.parse_closure_expr(),
       TokenKind::Sub | TokenKind::Bang => self.parse_unop_expr(),
       _ => Err(format!("to unary error: {:?}", &self.current.kind())),
     }
@@ -387,87 +383,12 @@ impl<'a> Parser<'a> {
     Ok(ast::make_binop_expr(lhs, op, rhs, SPAN_ZERO))
   }
 
-  // fn parse_if_else_expr(&mut self) -> Result<Box<Expr>, String> {
-  //   self.next();
-
-  //   let condition = self.parse_expr_by_precedence(&Precedence::Lowest)?;
-
-  //   self.expect_first(&TokenKind::OpenBrace)?;
-
-  //   let consequence = self.parse_block_stmt()?;
-
-  //   let alternative = if self.is_first(&TokenKind::Else) {
-  //     self.next();
-  //     self.expect_first(&TokenKind::OpenBrace)?;
-
-  //     Some(self.parse_block_stmt()?)
-  //   } else {
-  //     None
-  //   };
-
-  //   Ok(ast::make_if_else_expr(
-  //     condition,
-  //     consequence,
-  //     alternative,
-  //     SPAN_ZERO,
-  //   ))
-  // }
-
   #[inline]
   fn parse_array_expr(&mut self) -> Result<Box<Expr>, String> {
     let expr = self.parse_until(&TokenKind::CloseBracket)?;
 
     Ok(ast::make_array_expr(expr, SPAN_ZERO))
   }
-
-  // fn parse_closure_expr(&mut self) -> Result<Box<Expr>, String> {
-  //   let args = self.parse_args()?;
-
-  //   self.expect_first(&TokenKind::Arrow)?;
-
-  //   let ty = self.parse_ty()?;
-
-  //   self.expect_first(&TokenKind::OpenBrace)?;
-
-  //   let block = self.parse_block_stmt()?;
-
-  //   Ok(ast::make_closure_expr(, args, ty, block, SPAN_ZERO))
-  // }
-
-  // fn parse_comment_expr(&mut self) -> Result<Box<Expr>, String> {
-  //   match self.current.kind() {
-  //     TokenKind::Comment(Line) => {
-  //       let value = self.current.text();
-
-  //       Ok(InsKind::Comment(Line, value))
-  //     }
-  //     _ => Err(format!("comment error: {}", self.current.literal)),
-  //   }
-  // }
-
-  // pub fn parse_for_loop_expr(&mut self) -> Result<Box<Expr>, String> {
-  //   self.is_first(&TokenKind::OpenBracket);
-
-  //   let iterable = self.parse_array_expr()?;
-
-  //   self.next();
-  //   self.expect_first(&Operator(OperatorKind::Or))?;
-  //   self.expect_first(&Identifier)?;
-
-  //   let variable = self.parse_ident_expr()?;
-
-  //   self.expect_first(&Operator(OperatorKind::Or))?;
-  //   self.next();
-  //   self.expect_first(&TokenKind::OpenBrace)?;
-
-  //   let block = self.parse_block_stmt()?;
-
-  //   Ok(InsKind::Loop(LoopKind::For(
-  //     Box::new(Instruction::new(iterable)),
-  //     Box::new(Instruction::new(variable)),
-  //     block,
-  //   )))
-  // }
 
   fn parse_group_expr(&mut self) -> Result<Box<Expr>, String> {
     self.next();
@@ -537,9 +458,9 @@ impl<'a> Parser<'a> {
 
   #[inline]
   fn parse_bool_expr(&mut self) -> Result<Box<Expr>, String> {
-    let is_true = self.current.is(TokenKind::True);
+    let boolean = self.current.is(TokenKind::True);
 
-    Ok(ast::make_bool_expr(is_true, SPAN_ZERO))
+    Ok(ast::make_bool_expr(boolean, SPAN_ZERO))
   }
 
   fn parse_char_expr(&mut self) -> Result<Box<Expr>, String> {
@@ -583,7 +504,6 @@ impl<'a> Parser<'a> {
       TokenKind::Bool => Ok(TyKind::Bool),
       TokenKind::Char => Ok(TyKind::Char),
       TokenKind::Uint => Ok(TyKind::Uint),
-      // TokenKind::Int => Ok(TyKind::Int),
       TokenKind::Str => Ok(TyKind::Str),
       _ => Err(format!("parse ty error expr.")),
     }?;

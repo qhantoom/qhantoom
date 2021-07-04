@@ -1,6 +1,4 @@
-use super::scope::Scopemap;
-use super::value;
-use super::value::{Fun, Value, ValueKind};
+use std::path::Path;
 
 use crate::front::parser::ast::{
   BinopKind, Capsule, Expr, ExprKind, FunDecl, Item, ItemKind, Local, Mod, Stmt,
@@ -13,7 +11,9 @@ use crate::front::parser::{
 
 use crate::util::symbol::Symbol;
 
-use std::path::Path;
+use super::scope::Scopemap;
+use super::value;
+use super::value::{Fun, Value, ValueKind};
 
 #[inline]
 pub fn interpret_capsule_from_file(

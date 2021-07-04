@@ -2,7 +2,6 @@
 members = [
 	"src/bootstrap",
 	"compiler/qhantoom",
-	"compiler/qhantoom-ui",
 ]
 
 exclude = [
