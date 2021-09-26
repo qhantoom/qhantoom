@@ -1,4 +1,0 @@
-fun main := () {
-  mut x: uint = 10;
-  mut y: uint = 20;
-}

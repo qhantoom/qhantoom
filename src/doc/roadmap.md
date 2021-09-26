@@ -1,12 +1,28 @@
-# qhantoom compiler: roadmap
+# Roadmap
 
 **compiler**
 
-* [ ] front           | `tokenizer`, `parser`, `analyzer`, `interpreter`, `transpiler` - *wip*
-* [ ] middle          | `transformer` - *needs help*
-* [ ] back            | `converter`, `bytecoder`, `assembler` - *needs help*
-* [ ] library         | `core`, `std`, `ogl`, `wgl` 
-* [ ] data-structures | `array`, `hash`, `struct`, `tuple`
+* [ ] front-end
+  * [x] `tokenizer`
+  * [x] `parser`
+  * [ ] `analyzer` | *wip*
+  * [ ] `interpreter`
+  * [ ] `transpiler`
+
+* [ ] middle-end | *needs help*
+* [ ] back-end | *needs help*
+
+* [ ] library
+  * [ ] `core`
+  * [ ] `std`
+  * [ ] `ogl`
+  * [ ] `wgl`
+
+* [ ] data-structures
+  * [ ] `array`
+  * [ ] `hash`
+  * [ ] `tuple`
+  * [ ] `struct`
 
 **optimizations**
 
@@ -14,9 +30,15 @@
 * [ ] function call inlining
 * [ ] expression optimization
 
+**linter**
+
+* [ ] unused variables
+* [ ] unused arguments
+* [ ] unused modules
+
 **tools**
 
-* [ ] repl | `--interactive` - *wip*
+* [ ] repl | *wip*
 * [ ] vscode extension
 * [ ] package manager
-* [ ] qhantoom-dev - *wip*
+* [ ] qhantoom.dev | *wip*

@@ -1,0 +1,5 @@
+fun main := () {
+  val foo : uint = 3;
+  val bar : uint = 39;
+  val foobar : uint = foo + bar;
+}

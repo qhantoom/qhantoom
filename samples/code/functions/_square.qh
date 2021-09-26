@@ -1,0 +1,5 @@
+fun square : (uint) -> uint = (x) { x * x }
+
+fun main := () {
+  square(2)
+}

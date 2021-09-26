@@ -1,0 +1,5 @@
+-- this is a line comments
+
+fun main := () {
+  -- this is a line comments
+}

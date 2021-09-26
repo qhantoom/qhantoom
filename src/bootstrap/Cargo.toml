@@ -1,19 +1,15 @@
 [package]
 name = "bootstrap"
-version = "0.0.0"
-authors = ["monsieurbadia <iam@monsieurbadia.com>"]
+version = "0.1.0"
 edition = "2018"
-
-[lib]
-name = "bootstrap"
-path = "lib.rs"
-doctest = false
 
 [[bin]]
 name = "bootstrap"
 path = "bin/main.rs"
-doctest = false
+
+[lib]
+name = "bootstrap"
+path = "lib.rs"
 
 [dependencies]
-qhantoom = { path = "../../compiler/qhantoom" }
-qhantoom-ui = { path = "../../compiler/qhantoom-ui" }
+qhantoomc = { path = "../../compiler/qhantoomc" }

@@ -1,6 +1,6 @@
-use bootstrap::cmd::Cmd;
+use bootstrap::cmd;
 
 fn main() {
   let args = std::env::args().skip(1).collect::<Vec<_>>();
-  Cmd::run(args);
+  cmd::run(args);
 }

@@ -1,3 +1,0 @@
-fun main := () {
-  val sqrt: \ uint -> uint = \ -> {x * x};
-}

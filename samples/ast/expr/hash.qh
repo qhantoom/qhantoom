@@ -1,6 +1,0 @@
-fun main := () {
-  val x: Hash<str, str> = {
-    "firstname": "john",
-    "lastname": "doe",
-  };
-}

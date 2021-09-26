@@ -1,21 +1,15 @@
-pub struct Cmd;
+// run a command
+#[inline]
+pub fn run(args: Vec<String>) {
+  command(args)
+}
 
-impl Cmd {
-  pub fn run(args: Vec<String>) {
-    let cmds = args.clone();
-
-    if cmds.contains(&"repl".into()) {
-      match crate::repl::run(&cmds) {
-        Ok(_) => return,
-        Err(_) => panic!("repl error"),
-      }
-    }
-
-    if cmds.contains(&"compile".into()) {
-      match crate::compiler::run(cmds) {
-        Ok(_) => std::process::exit(0),
-        Err(_) => std::process::exit(2),
-      }
-    }
+// launch a command to run with arguments
+#[inline]
+fn command(args: Vec<String>) {
+  match args {
+    arg if arg.contains(&"compile".into()) => crate::compile::run(arg),
+    arg if arg.contains(&"repl".into()) => crate::repl::run(&arg),
+    _ => crate::help::run(),
   }
 }

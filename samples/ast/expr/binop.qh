@@ -1,3 +1,0 @@
-fun main := () {
-  val x: uint = 3 + 39;
-}

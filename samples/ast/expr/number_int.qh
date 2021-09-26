@@ -1,5 +1,0 @@
-fun main := () {
-  val x: uint = 10;
-  val y: uint = 20;
-  val z: uint = 30;
-}

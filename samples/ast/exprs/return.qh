@@ -1,0 +1,7 @@
+fun a := () {
+  return;
+}
+
+fun main := () {
+  return 0;
+}

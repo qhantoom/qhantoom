@@ -1,0 +1,9 @@
+fun main := () {
+  fun factorial: (uint) -> uint = (n) {
+    if n <= 1 {
+      return 1;
+    }
+
+    n * factorial(n - 1)
+  }
+}
