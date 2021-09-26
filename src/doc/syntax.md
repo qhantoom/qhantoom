@@ -218,6 +218,8 @@ set Button {
 
 ## Actions
 
+actions are simply interfaces that allow a new behaviour to be assigned 
+
 ```
 action Vec2 {
   fun mul: (uint) -> uint;
