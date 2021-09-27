@@ -136,8 +136,8 @@ val c := a == b;
 **multiple assignments**
 
 ```
-val x y z : s8 = 0;
-val x y z := 0;
+val x, y, z, : s8 = 0;
+val x, y, z, := 0;
 ```
 
 ## Functions
@@ -237,8 +237,8 @@ set Vec2 for Point {
 
 ## Modules
 
-`bind` - set module keyword
-`load` - get module keyword
+`bind` - set module keyword   
+`load` - get module keyword   
 
 **bind**
 
@@ -282,6 +282,14 @@ enum MyEnum {
   TupleEnum(),
   StructEnum { x: uint },
 }
+```
+
+## Macros
+
+```
+macro foo = () {}
+
+#foo();
 ```
 
 ## Asynchronous
