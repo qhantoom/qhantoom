@@ -1,11 +1,10 @@
 use super::runtime::Runtime;
-use super::value::{VALUE_VOID, Fun, Local as VLocal, Ty, Value};
+use super::value::{Fun, Local as VLocal, Ty, Value, VALUE_VOID};
 
 use crate::front::parser::parse_stmts;
 
 use crate::front::parser::ast::{
-  self, BinopKind, Expr, ExprKind, FunDecl, Local, Stmt, StmtKind,
-  UnopKind,
+  self, BinopKind, Expr, ExprKind, FunDecl, Local, Stmt, StmtKind, UnopKind,
 };
 
 // interpret a program from a code source
@@ -13,9 +12,7 @@ use crate::front::parser::ast::{
 pub fn interpret(
   runtime: &mut Runtime,
   src: &str,
-)
-  -> Result<Box<Value>, String>
-{
+) -> Result<Box<Value>, String> {
   let stmts = parse_stmts(src)?;
   let mut interpreter = Interpreter::new(runtime);
 
@@ -29,18 +26,14 @@ pub struct Interpreter<'a> {
 impl<'a> Interpreter<'a> {
   #[inline]
   pub fn new(runtime: &'a mut Runtime) -> Self {
-    Self {
-      runtime: runtime,
-    }
+    Self { runtime: runtime }
   }
 
   #[inline]
   pub fn interpret(
     &mut self,
-    stmts: &Vec<Box<Stmt>>
-  )
-    -> Result<Box<Value>, String>
-  {
+    stmts: &Vec<Box<Stmt>>,
+  ) -> Result<Box<Value>, String> {
     let mut value = box VALUE_VOID;
 
     for stmt in stmts {
@@ -55,12 +48,7 @@ impl<'a> Interpreter<'a> {
   }
 
   #[inline]
-  fn interpret_stmt(
-    &mut self,
-    stmt: &Stmt,
-  )
-    -> Result<Box<Value>, String>
-  {
+  fn interpret_stmt(&mut self, stmt: &Stmt) -> Result<Box<Value>, String> {
     match stmt.kind() {
       StmtKind::Expr(ref expr) => self.interpret_expr(expr),
       _ => todo!(),
@@ -68,22 +56,14 @@ impl<'a> Interpreter<'a> {
   }
 
   #[inline]
-  fn interpret_expr(
-    &mut self,
-    expr: &Expr,
-  )
-    -> Result<Box<Value>, String>
-  {
+  fn interpret_expr(&mut self, expr: &Expr) -> Result<Box<Value>, String> {
     match expr.kind() {
       ExprKind::Int(ref expr) => Ok(box Value::Int(*expr)),
       ExprKind::Float(ref expr) => Ok(box Value::Float(*expr)),
       ExprKind::Bool(ref expr) => Ok(box Value::Bool(*expr)),
       ExprKind::Char(ref expr) => Ok(box Value::Char(*expr)),
       ExprKind::Str(ref expr) => Ok(box Value::Str(expr.to_owned())),
-      ExprKind::Unop {
-        ref op,
-        ref rhs,
-      } => self.interpret_unop_expr(op, rhs),
+      ExprKind::Unop { ref op, ref rhs } => self.interpret_unop_expr(op, rhs),
       ExprKind::Binop {
         ref lhs,
         ref op,
@@ -103,9 +83,7 @@ impl<'a> Interpreter<'a> {
     &mut self,
     op: &UnopKind,
     rhs: &Box<Expr>,
-  )
-    -> Result<Box<Value>, String>
-  {
+  ) -> Result<Box<Value>, String> {
     let rhs = self.interpret_expr(rhs)?;
 
     match op {
@@ -119,9 +97,7 @@ impl<'a> Interpreter<'a> {
     &mut self,
     op: &UnopKind,
     rhs: &Box<Value>,
-  )
-    -> Result<Box<Value>, String>
-  {
+  ) -> Result<Box<Value>, String> {
     match rhs.kind() {
       Value::Int(ref num) => Ok(box Value::Int(-num.to_owned())),
       Value::Float(ref num) => Ok(box Value::Float(-num.to_owned())),
@@ -134,9 +110,7 @@ impl<'a> Interpreter<'a> {
     &mut self,
     op: &UnopKind,
     rhs: &Box<Value>,
-  )
-    -> Result<Box<Value>, String>
-  {
+  ) -> Result<Box<Value>, String> {
     match rhs.kind() {
       Value::Bool(ref boolean) => Ok(box Value::Bool(!boolean.to_owned())),
       Value::Int(ref num) => Ok(box Value::Bool(*num == 0)),
@@ -150,31 +124,29 @@ impl<'a> Interpreter<'a> {
     lhs: &Box<Expr>,
     op: &BinopKind,
     rhs: &Box<Expr>,
-  )
-    -> Result<Box<Value>, String>
-  {
+  ) -> Result<Box<Value>, String> {
     let lhs = self.interpret_expr(lhs)?;
     let rhs = self.interpret_expr(rhs)?;
 
     match (*lhs, *rhs) {
       (Value::Int(ref lhs), Value::Int(ref rhs)) => {
         self.interpret_int_binop(lhs, op, rhs)
-      },
+      }
       (Value::Float(ref lhs), Value::Float(ref rhs)) => {
         self.interpret_float_binop(lhs, op, rhs)
-      },
+      }
       (Value::Bool(ref lhs), Value::Bool(ref rhs)) => {
         self.interpret_bool_binop(lhs, op, rhs)
-      },
+      }
       (Value::Char(ref lhs), Value::Char(ref rhs)) => {
         self.interpret_char_binop(lhs, op, rhs)
       }
       (Value::Str(ref lhs), Value::Str(ref rhs)) => {
         self.interpret_str_binop(lhs, op, rhs)
-      },
-      (lhs, rhs) => Err(
-        format!("unsupported binop: {:?} {:?} {:?}", lhs, op, rhs)
-      ),
+      }
+      (lhs, rhs) => {
+        Err(format!("unsupported binop: {:?} {:?} {:?}", lhs, op, rhs))
+      }
     }
   }
 
@@ -184,9 +156,7 @@ impl<'a> Interpreter<'a> {
     lhs: &i32,
     op: &BinopKind,
     rhs: &i32,
-  )
-    -> Result<Box<Value>, String>
-  {
+  ) -> Result<Box<Value>, String> {
     let value = match op {
       BinopKind::Add => Value::Int(lhs + rhs),
       BinopKind::Sub => Value::Int(lhs - rhs),
@@ -210,9 +180,7 @@ impl<'a> Interpreter<'a> {
     lhs: &f32,
     op: &BinopKind,
     rhs: &f32,
-  )
-    -> Result<Box<Value>, String>
-  {
+  ) -> Result<Box<Value>, String> {
     let value = match op {
       BinopKind::Add => Value::Float(lhs + rhs),
       BinopKind::Sub => Value::Float(lhs - rhs),
@@ -236,13 +204,14 @@ impl<'a> Interpreter<'a> {
     lhs: &bool,
     op: &BinopKind,
     rhs: &bool,
-  )
-    -> Result<Box<Value>, String>
-  {
+  ) -> Result<Box<Value>, String> {
     match op {
       BinopKind::Eq => Ok(box Value::Bool(lhs == rhs)),
       BinopKind::Ne => Ok(box Value::Bool(lhs != rhs)),
-      _ => Err(format!("unsupported bool binop: {:?} {:?} {:?}", lhs, op, rhs)),
+      _ => Err(format!(
+        "unsupported bool binop: {:?} {:?} {:?}",
+        lhs, op, rhs,
+      )),
     }
   }
 
@@ -252,13 +221,14 @@ impl<'a> Interpreter<'a> {
     lhs: &char,
     op: &BinopKind,
     rhs: &char,
-  )
-    -> Result<Box<Value>, String>
-  {
+  ) -> Result<Box<Value>, String> {
     match op {
       BinopKind::Eq => Ok(box Value::Bool(lhs == rhs)),
       BinopKind::Ne => Ok(box Value::Bool(lhs != rhs)),
-      _ => Err(format!("unsupported char binop: {:?} {:?} {:?}", lhs, op, rhs)),
+      _ => Err(format!(
+        "unsupported char binop: {:?} {:?} {:?}",
+        lhs, op, rhs,
+      )),
     }
   }
 
@@ -268,14 +238,15 @@ impl<'a> Interpreter<'a> {
     lhs: &str,
     op: &BinopKind,
     rhs: &str,
-  )
-    -> Result<Box<Value>, String>
-  {
+  ) -> Result<Box<Value>, String> {
     match op {
       BinopKind::Add => Ok(box Value::Str(format!("{}{}", lhs, rhs))),
       BinopKind::Eq => Ok(box Value::Bool(lhs == rhs)),
       BinopKind::Ne => Ok(box Value::Bool(lhs != rhs)),
-      _ => Err(format!("unsupported str binop: {:?} {:?} {:?}", lhs, op, rhs)),
+      _ => Err(format!(
+        "unsupported str binop: {:?} {:?} {:?}",
+        lhs, op, rhs,
+      )),
     }
   }
 
@@ -285,9 +256,7 @@ impl<'a> Interpreter<'a> {
     condition: &Box<ast::Expr>,
     consequence: &Box<ast::Block>,
     alternative: &Option<Box<ast::Block>>,
-  )
-    -> Result<Box<Value>, String>
-  {
+  ) -> Result<Box<Value>, String> {
     let condition = self.interpret_expr(condition)?;
 
     if condition.as_bool() {

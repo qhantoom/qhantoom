@@ -1,5 +1,5 @@
-pub mod token;
 mod interface;
+pub mod token;
 mod tokenizer;
 
 #[cfg(test)]

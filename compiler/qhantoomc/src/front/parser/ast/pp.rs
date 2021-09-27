@@ -1,15 +1,17 @@
 use std::fmt;
 
 use super::ast::{
-  BinopKind, Block, Expr, ExprKind, FunDecl, Item, ItemKind, Stmt,
-  StmtKind, Ty, TyKind, UnopKind,
+  BinopKind, Block, Expr, ExprKind, FunDecl, Item, ItemKind, Stmt, StmtKind,
+  Ty, TyKind, UnopKind,
 };
 
 pub struct CommaSep<'a, T: 'a>(pub &'a [T]);
 
 impl<'a, T: fmt::Display> fmt::Display for CommaSep<'a, T> {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let exprs = self.0.iter()
+    let exprs = self
+      .0
+      .iter()
       .map(|a| a.to_string())
       .collect::<Vec<String>>()
       .join(", ");
@@ -24,13 +26,14 @@ impl fmt::Display for Item {
       ItemKind::Fun(ref fun) => write!(
         f,
         "fun {} : {} = ({}) {}",
-        fun.ident, fun.ty, CommaSep(&fun.args), fun.block,
+        fun.ident,
+        fun.ty,
+        CommaSep(&fun.args),
+        fun.block,
       ),
-      ItemKind::Imu(ref local) => write!(
-        f,
-        "imu {} : {} = {};",
-        local.ident, local.ty, local.value,
-      ),
+      ItemKind::Imu(ref local) => {
+        write!(f, "imu {} : {} = {};", local.ident, local.ty, local.value,)
+      }
     }
   }
 }
@@ -49,23 +52,20 @@ impl fmt::Display for Stmt {
       StmtKind::Fun(ref fun) => write!(
         f,
         "fun {} : {} = ({}) {}",
-        fun.ident, fun.ty, CommaSep(&fun.args), fun.block,
+        fun.ident,
+        fun.ty,
+        CommaSep(&fun.args),
+        fun.block,
       ),
-      StmtKind::Imu(ref local) => write!(
-        f,
-        "imu {} : {} = {};",
-        local.ident, local.ty, local.value,
-      ),
-      StmtKind::Val(ref local) => write!(
-        f,
-        "val {} : {} = {};",
-        local.ident, local.ty, local.value,
-      ),
-      StmtKind::Mut(ref local) => write!(
-        f,
-        "mut {} : {} = {};",
-        local.ident, local.ty, local.value,
-      ),
+      StmtKind::Imu(ref local) => {
+        write!(f, "imu {} : {} = {};", local.ident, local.ty, local.value,)
+      }
+      StmtKind::Val(ref local) => {
+        write!(f, "val {} : {} = {};", local.ident, local.ty, local.value,)
+      }
+      StmtKind::Mut(ref local) => {
+        write!(f, "mut {} : {} = {};", local.ident, local.ty, local.value,)
+      }
       StmtKind::Return(None) => write!(f, "return;"),
       StmtKind::Return(Some(ref expr)) => write!(f, "return {};", expr),
       StmtKind::Expr(ref expr) => write!(f, "{}", expr),
@@ -86,39 +86,29 @@ impl fmt::Display for Expr {
       ExprKind::Index { ref lhs, ref rhs } => write!(f, "({}[{}])", lhs, rhs),
       ExprKind::Assign { ref lhs, ref rhs } => write!(f, "{} = {};", lhs, rhs),
       ExprKind::Unop { ref op, ref rhs } => write!(f, "({}{})", op, rhs),
-      ExprKind::Binop { ref lhs, ref op, ref rhs } => write!(
-        f,
-        "({} {} {})",
-        lhs, op, rhs,
-      ),
-      ExprKind::Call { ref callee, ref args } => write!(
-        f,
-        "{}({})",
-        callee, CommaSep(args),
-      ),
+      ExprKind::Binop {
+        ref lhs,
+        ref op,
+        ref rhs,
+      } => write!(f, "({} {} {})", lhs, op, rhs),
+      ExprKind::Call {
+        ref callee,
+        ref args,
+      } => write!(f, "{}({})", callee, CommaSep(args)),
       ExprKind::If {
         ref condition,
         ref consequence,
         alternative: None,
-      } => write!(
-        f,
-        "if {} {}",
-        condition, consequence,
-      ),
+      } => write!(f, "if {} {}", condition, consequence),
       ExprKind::If {
         ref condition,
         ref consequence,
         alternative: Some(ref alternative),
-      } => write!(
-        f,
-        "if {} {} else {}",
-        condition, consequence, alternative,
-      ),
-      ExprKind::While { ref condition, ref block } => write!(
-        f,
-        "while {} {}",
-        condition, block,
-      ),
+      } => write!(f, "if {} {} else {}", condition, consequence, alternative),
+      ExprKind::While {
+        ref condition,
+        ref block,
+      } => write!(f, "while {} {}", condition, block),
       ExprKind::Loop { ref block } => write!(f, "loop {}", block),
     }
   }
@@ -145,11 +135,9 @@ impl fmt::Display for Ty {
       TyKind::Void => write!(f, "void"),
       TyKind::Dynamic => write!(f, "dynamic"),
       TyKind::Array(ref ty) => write!(f, "[{}]", ty),
-      TyKind::Fun(ref tys, ref ret_ty) => write!(
-        f,
-        "({}) -> {}",
-        CommaSep(tys), ret_ty,
-      ),
+      TyKind::Fun(ref tys, ref ret_ty) => {
+        write!(f, "({}) -> {}", CommaSep(tys), ret_ty,)
+      }
     }
   }
 }

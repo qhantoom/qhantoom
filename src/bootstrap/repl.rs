@@ -28,11 +28,9 @@ fn processing(
   runtime: &mut Runtime,
   _args: &[String],
   line: &str,
-)
-  -> Result<(), String>
-{
+) -> Result<(), String> {
   if line.is_empty() {
-    return Ok(())
+    return Ok(());
   }
 
   exit_if_possible(line);

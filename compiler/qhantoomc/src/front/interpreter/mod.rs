@@ -1,6 +1,6 @@
+mod interpreter;
 pub mod runtime;
 pub mod value;
-mod interpreter;
 
 #[cfg(test)]
 mod tests;

@@ -17,9 +17,7 @@ impl Token {
 
   #[inline]
   pub fn new(kind: TokenKind) -> Self {
-    Self {
-      kind: kind,
-    }
+    Self { kind: kind }
   }
 
   #[inline]

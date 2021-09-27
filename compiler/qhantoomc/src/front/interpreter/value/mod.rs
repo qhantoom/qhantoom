@@ -1,3 +1,3 @@
 mod value;
 
-pub use value::{VALUE_VOID, Fun, Ty, Local, Value};
+pub use value::{Fun, Local, Ty, Value, VALUE_VOID};

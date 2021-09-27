@@ -5,7 +5,7 @@ use super::token::{Token, TokenKind};
 
 use crate::util::ascii::{
   is_id_continue, is_id_start, is_number_continue, is_number_start,
-  is_whitespace
+  is_whitespace,
 };
 
 // tokenize a string into a vector of tokens
@@ -63,11 +63,11 @@ impl<'a> Tokenizer<'a> {
 
     loop {
       let token = self.next();
-  
+
       if token.is_eof() {
         break tokens.push(token);
       }
-  
+
       tokens.push(token);
     }
 
@@ -85,36 +85,92 @@ impl<'a> Tokenizer<'a> {
         // c if is_whitespace(c) => {}
 
         // one character tokens
-        '\0' => { return Some(TokenKind::EOF); }
-        '\n' => { return Some(TokenKind::Newline); }
-        '\\' => { return Some(TokenKind::BackSlash); }
-        '(' => { return Some(TokenKind::OpenParen); }
-        ')' => { return Some(TokenKind::CloseParen); }
-        '{' => { return Some(TokenKind::OpenBrace); }
-        '}' => { return Some(TokenKind::CloseBrace); }
-        '[' => { return Some(TokenKind::OpenBracket); }
-        ']' => { return Some(TokenKind::CloseBracket); }
-        ',' => { return Some(TokenKind::Comma); }
-        ';' => { return Some(TokenKind::Semicolon); }
-        '?' => { return Some(TokenKind::Question); }
-        '@' => { return Some(TokenKind::At); }
+        '\0' => {
+          return Some(TokenKind::EOF);
+        }
+        '\n' => {
+          return Some(TokenKind::Newline);
+        }
+        '\\' => {
+          return Some(TokenKind::BackSlash);
+        }
+        '(' => {
+          return Some(TokenKind::OpenParen);
+        }
+        ')' => {
+          return Some(TokenKind::CloseParen);
+        }
+        '{' => {
+          return Some(TokenKind::OpenBrace);
+        }
+        '}' => {
+          return Some(TokenKind::CloseBrace);
+        }
+        '[' => {
+          return Some(TokenKind::OpenBracket);
+        }
+        ']' => {
+          return Some(TokenKind::CloseBracket);
+        }
+        ',' => {
+          return Some(TokenKind::Comma);
+        }
+        ';' => {
+          return Some(TokenKind::Semicolon);
+        }
+        '?' => {
+          return Some(TokenKind::Question);
+        }
+        '@' => {
+          return Some(TokenKind::At);
+        }
 
         // n characters tokens
-        '+' => { self.state = TokenizerState::StartAdd; }
-        '-' => { self.state = TokenizerState::StartSub; }
-        '*' => { self.state = TokenizerState::StartMul; }
-        '/' => { self.state = TokenizerState::StartDiv; }
-        '%' => { self.state = TokenizerState::StartMod; }
-        '=' => { self.state = TokenizerState::StartAssign; }
-        '&' => { self.state = TokenizerState::StartAnd; }
-        '!' => { self.state = TokenizerState::StartBang; }
-        '|' => { self.state = TokenizerState::StartPipe; }
-        '.' => { self.state = TokenizerState::StartDot; }
-        ':' => { self.state = TokenizerState::StartColon; }
-        '<' => { self.state = TokenizerState::StartLt; }
-        '>' => { self.state = TokenizerState::StartGt; }
-        '"' => { self.state = TokenizerState::StartString; }
-        '\'' => { self.state = TokenizerState::StartChar; }
+        '+' => {
+          self.state = TokenizerState::StartAdd;
+        }
+        '-' => {
+          self.state = TokenizerState::StartSub;
+        }
+        '*' => {
+          self.state = TokenizerState::StartMul;
+        }
+        '/' => {
+          self.state = TokenizerState::StartDiv;
+        }
+        '%' => {
+          self.state = TokenizerState::StartMod;
+        }
+        '=' => {
+          self.state = TokenizerState::StartAssign;
+        }
+        '&' => {
+          self.state = TokenizerState::StartAnd;
+        }
+        '!' => {
+          self.state = TokenizerState::StartBang;
+        }
+        '|' => {
+          self.state = TokenizerState::StartPipe;
+        }
+        '.' => {
+          self.state = TokenizerState::StartDot;
+        }
+        ':' => {
+          self.state = TokenizerState::StartColon;
+        }
+        '<' => {
+          self.state = TokenizerState::StartLt;
+        }
+        '>' => {
+          self.state = TokenizerState::StartGt;
+        }
+        '"' => {
+          self.state = TokenizerState::StartString;
+        }
+        '\'' => {
+          self.state = TokenizerState::StartChar;
+        }
 
         // numbers
         c if is_number_start(c) => {
@@ -134,7 +190,7 @@ impl<'a> Tokenizer<'a> {
 
         // unexpected character
         _ => self.err(&format!("unknown character: {}", c)),
-      }
+      },
       // read_start_add_state
       TokenizerState::StartAdd => match c {
         '=' => {
@@ -144,7 +200,7 @@ impl<'a> Tokenizer<'a> {
         c => {
           return self.reset_back(c, TokenKind::Add);
         }
-      }
+      },
       // read_start_sub_state
       TokenizerState::StartSub => match c {
         '=' => {
@@ -161,7 +217,7 @@ impl<'a> Tokenizer<'a> {
         c => {
           return self.reset_back(c, TokenKind::Sub);
         }
-      }
+      },
       // read_start_mul_state
       TokenizerState::StartMul => match c {
         '=' => {
@@ -171,7 +227,7 @@ impl<'a> Tokenizer<'a> {
         c => {
           return self.reset_back(c, TokenKind::Mul);
         }
-      }
+      },
       // read_start_div_state
       TokenizerState::StartDiv => match c {
         '=' => {
@@ -181,7 +237,7 @@ impl<'a> Tokenizer<'a> {
         c => {
           return self.reset_back(c, TokenKind::Div);
         }
-      }
+      },
       // read_start_mod_state
       TokenizerState::StartMod => match c {
         '=' => {
@@ -191,7 +247,7 @@ impl<'a> Tokenizer<'a> {
         c => {
           return self.reset_back(c, TokenKind::Mod);
         }
-      }
+      },
       // read_start_assign_state
       TokenizerState::StartAssign => match c {
         '=' => {
@@ -205,7 +261,7 @@ impl<'a> Tokenizer<'a> {
         c => {
           return self.reset_back(c, TokenKind::Assign);
         }
-      }
+      },
       // read_start_and_state
       TokenizerState::StartAnd => match c {
         '=' => {
@@ -219,7 +275,7 @@ impl<'a> Tokenizer<'a> {
         c => {
           return self.reset_back(c, TokenKind::And);
         }
-      }
+      },
       // read_start_bang_state
       TokenizerState::StartBang => match c {
         '=' => {
@@ -229,7 +285,7 @@ impl<'a> Tokenizer<'a> {
         c => {
           return self.reset_back(c, TokenKind::Not);
         }
-      }
+      },
       // read_start_pipe_state
       TokenizerState::StartPipe => match c {
         '=' => {
@@ -243,7 +299,7 @@ impl<'a> Tokenizer<'a> {
         c => {
           return self.reset_back(c, TokenKind::Pipe);
         }
-      }
+      },
       // read_start_dot_state
       TokenizerState::StartDot => match c {
         '=' => {
@@ -252,12 +308,12 @@ impl<'a> Tokenizer<'a> {
         }
         '.' => {
           self.state = TokenizerState::Idle;
-          return Some(TokenKind::DotDot); 
+          return Some(TokenKind::DotDot);
         }
         c => {
           return self.reset_back(c, TokenKind::Dot);
         }
-      }
+      },
       // read_start_colon_state
       TokenizerState::StartColon => match c {
         '=' => {
@@ -267,7 +323,7 @@ impl<'a> Tokenizer<'a> {
         c => {
           return self.reset_back(c, TokenKind::Colon);
         }
-      }
+      },
       // read_start_lt_state
       TokenizerState::StartLt => match c {
         '=' => {
@@ -281,7 +337,7 @@ impl<'a> Tokenizer<'a> {
         c => {
           return self.reset_back(c, TokenKind::Lt);
         }
-      }
+      },
       // read_start_gt_state
       TokenizerState::StartGt => match c {
         '=' => {
@@ -295,7 +351,7 @@ impl<'a> Tokenizer<'a> {
         c => {
           return self.reset_back(c, TokenKind::Gt);
         }
-      }
+      },
       // read_start_char_state
       TokenizerState::StartChar => {
         self.state = TokenizerState::InnerChar;
@@ -310,7 +366,7 @@ impl<'a> Tokenizer<'a> {
           self.state = TokenizerState::InnerChar;
           self.buffer.push(c);
         }
-      }
+      },
       // read_end_char_state
       TokenizerState::EndChar => {
         if self.buffer.len() == 1 {
@@ -339,8 +395,8 @@ impl<'a> Tokenizer<'a> {
         _ => {
           self.state = TokenizerState::InnerString;
           self.buffer.push(c);
-        },
-      }
+        }
+      },
       // read_escape_string_state
       TokenizerState::EscapeString => match c {
         '"' | '\\' => {
@@ -360,7 +416,7 @@ impl<'a> Tokenizer<'a> {
           self.buffer.push('\t');
         }
         _ => self.err(&format!("invalid escape sequence: {}", c)),
-      }
+      },
       // read_end_string_state
       TokenizerState::EndString => {
         self.state = TokenizerState::Idle;
@@ -379,10 +435,12 @@ impl<'a> Tokenizer<'a> {
 
           return self.reset_back(c, TokenKind::Int(0));
         }
-      }
+      },
       // read_number_state
       TokenizerState::Number => match c {
-        '0'..='9' => { self.buffer.push(c); }
+        '0'..='9' => {
+          self.buffer.push(c);
+        }
         c => {
           let num = self.buffer.to_owned();
           let num = num.parse::<u64>().unwrap();
@@ -390,7 +448,7 @@ impl<'a> Tokenizer<'a> {
 
           return self.reset_back(c, TokenKind::Int(num));
         }
-      }
+      },
       // read_identifier_state
       TokenizerState::Identifier => match c {
         c if is_id_continue(c) => {
@@ -406,7 +464,7 @@ impl<'a> Tokenizer<'a> {
 
           return self.reset_back(c, TokenKind::Identifier(buffer));
         }
-      }
+      },
       // read_comment_line_state
       TokenizerState::CommentLine => {
         if c == '\n' || c == '\0' {

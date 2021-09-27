@@ -8,7 +8,7 @@ pub fn check(pkg: &Pkg) {
   }
 }
 
-// check if the item is main function 
+// check if the item is main function
 #[inline]
 pub fn is_main(item: &Item) -> bool {
   if let ItemKind::Fun(ref fun) = item.kind() {

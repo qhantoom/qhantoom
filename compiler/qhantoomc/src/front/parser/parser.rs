@@ -1,14 +1,14 @@
 use std::mem;
 
 use super::ast::{
-  BinopKind, Block, Expr, ExprKind, FunDecl, Local, Item, ItemKind, Pkg,
-  Stmt, StmtKind, Ty, TyKind, UnopKind,
+  BinopKind, Block, Expr, ExprKind, FunDecl, Item, ItemKind, Local, Pkg, Stmt,
+  StmtKind, Ty, TyKind, UnopKind,
 };
 
 use super::interface::Precedence;
 
+use crate::front::tokenizer::token::{Token, TokenKind, TOKEN_EOF};
 use crate::front::tokenizer::Tokenizer;
-use crate::front::tokenizer::token::{TOKEN_EOF, Token, TokenKind};
 
 // parse a source into an AST
 #[inline]
@@ -121,7 +121,7 @@ impl<'a> Parser<'a> {
         _ => match self.parse_stmt() {
           Ok(stmt) => stmts.push(stmt),
           Err(_) => {}
-        }
+        },
       }
 
       self.next();
@@ -190,7 +190,7 @@ impl<'a> Parser<'a> {
       ident: box Expr::new(ident),
       ty,
       args,
-      block
+      block,
     }))
   }
 
@@ -220,9 +220,9 @@ impl<'a> Parser<'a> {
   #[inline]
   fn parse_stmt(&mut self) -> Result<Box<Stmt>, String> {
     match self.current.kind() {
-      TokenKind::Imu
-      | TokenKind::Mut
-      | TokenKind::Val => self.parse_local_stmt(),
+      TokenKind::Imu | TokenKind::Mut | TokenKind::Val => {
+        self.parse_local_stmt()
+      }
       TokenKind::Fun => self.parse_fun_decl_stmt(),
       TokenKind::Return => self.parse_return_stmt(),
       _ => self.parse_expr_stmt(),
@@ -289,7 +289,7 @@ impl<'a> Parser<'a> {
       ident: box Expr::new(ident),
       ty,
       args,
-      block
+      block,
     })))
   }
 
@@ -337,30 +337,24 @@ impl<'a> Parser<'a> {
     self.expect_first(&TokenKind::Semicolon)?;
     // return local statement
     match kw.kind() {
-      TokenKind::Imu => Ok(box Stmt::new(
-        StmtKind::Imu(box Local {
-          ident: box Expr::new(ident),
-          immutable: true,
-          ty,
-          value: value,
-        }
-      ))),
-      TokenKind::Val => Ok(box Stmt::new(
-        StmtKind::Val(box Local {
-          ident: box Expr::new(ident),
-          immutable: true,
-          ty,
-          value: value,
-        }
-      ))),
-      _ => Ok(box Stmt::new(
-        StmtKind::Mut(box Local {
-          ident: box Expr::new(ident),
-          immutable: false,
-          ty,
-          value: value,
-        }
-      ))),
+      TokenKind::Imu => Ok(box Stmt::new(StmtKind::Imu(box Local {
+        ident: box Expr::new(ident),
+        immutable: true,
+        ty,
+        value: value,
+      }))),
+      TokenKind::Val => Ok(box Stmt::new(StmtKind::Val(box Local {
+        ident: box Expr::new(ident),
+        immutable: true,
+        ty,
+        value: value,
+      }))),
+      _ => Ok(box Stmt::new(StmtKind::Mut(box Local {
+        ident: box Expr::new(ident),
+        immutable: false,
+        ty,
+        value: value,
+      }))),
     }
   }
 
@@ -417,7 +411,11 @@ impl<'a> Parser<'a> {
     // parse the right hand side of the expression
     let rhs = self.parse_expr_by_precedence(&precedence)?;
     // return the binary expression
-    Ok(ExprKind::Binop { lhs: box Expr::new(lhs), op, rhs })
+    Ok(ExprKind::Binop {
+      lhs: box Expr::new(lhs),
+      op,
+      rhs,
+    })
   }
 
   #[inline]
@@ -445,7 +443,10 @@ impl<'a> Parser<'a> {
     // parse args list
     let args = self.parse_until(&TokenKind::CloseParen)?;
     // return call expression
-    Ok(ExprKind::Call { callee: box Expr::new(lhs), args })
+    Ok(ExprKind::Call {
+      callee: box Expr::new(lhs),
+      args,
+    })
   }
 
   #[inline]
@@ -458,7 +459,10 @@ impl<'a> Parser<'a> {
     // check if the next token is ']'
     self.expect_first(&TokenKind::CloseBracket)?;
     // return index expression
-    Ok(ExprKind::Index { lhs: box Expr::new(lhs), rhs })
+    Ok(ExprKind::Index {
+      lhs: box Expr::new(lhs),
+      rhs,
+    })
   }
 
   #[inline]
@@ -484,7 +488,7 @@ impl<'a> Parser<'a> {
   fn parse_float_expr(&mut self) -> Result<ExprKind, String> {
     match self.current.kind() {
       TokenKind::Float(ref num) => Ok(ExprKind::Float(*num as f32)),
-      _ => Err(format!("parse float literal expression error"))
+      _ => Err(format!("parse float literal expression error")),
     }
   }
 
