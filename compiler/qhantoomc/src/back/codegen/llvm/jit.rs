@@ -27,7 +27,7 @@ use llvm_sys::prelude::{
   LLVMBuilderRef, LLVMContextRef, LLVMModuleRef, LLVMValueRef,
 };
 
-// note: this is a bit of a hack, but it's the easiest way to get the LLVM
+// note: this is a bit of a hack, but it's the easiest way to get the LLVM jit
 // i am following instructions from https://blog.ulysse.io/post/a-toy-front-end-for-llvm-written-in-rust
 
 pub struct Jit {
@@ -124,7 +124,7 @@ impl Jit {
         ref rhs,
       } => self.codegen_binop_expr(lhs, op, rhs),
       ExprKind::Unop { ref op, ref rhs } => self.codegen_unop_expr(op, rhs),
-      ExprKind::Identifier(ref expr) => self.codegen_identifier_expr(expr),
+      ExprKind::Ident(ref expr) => self.codegen_ident_expr(expr),
       ExprKind::Assign {
         ref lhs,
         ref rhs,
@@ -255,9 +255,9 @@ impl Jit {
   }
 
   #[inline]
-  unsafe fn codegen_identifier_expr(
-    &mut self
-    expr: &Box<Expr>,
+  unsafe fn codegen_ident_expr(
+    &mut self,
+    expr: &String,
   ) -> LLVMValueRef {
     todo!()
   }
