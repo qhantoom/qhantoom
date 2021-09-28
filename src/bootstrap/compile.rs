@@ -61,7 +61,9 @@ fn compiling(args: Vec<String>) {
   // check the AST
   // front::analyzer::maincheck::check(&ast);
 
-  unsafe { qhantoomc::back::codegen::codegen_with_llvm(&file); }
+  unsafe {
+    qhantoomc::back::codegen::codegen_with_llvm(&file);
+  }
 
   // transform AST into bytecode
   // write bytecode to file
