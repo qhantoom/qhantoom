@@ -19,7 +19,7 @@ pub unsafe fn codegen_with_llvm(code: &str) {
 #[inline]
 pub unsafe fn codegen_with_cranelift(code: &str) {
   let ast = parse(code).unwrap();
-  let jit = CraneliftJit {};
+  let jit = CraneliftJit::new();
   let mut codegen = Codegen::new(jit);
 
   codegen.codegen(ast);
