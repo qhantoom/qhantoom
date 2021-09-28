@@ -27,7 +27,6 @@ impl Drop for Context {
 impl Context {
   #[inline]
   pub unsafe fn new(name: &str) -> Self {
-    // set up a context, module and builder in that context.
     let context = LLVMContextCreate();
     let module = LLVMModuleCreateWithName(cstr!(name));
     let builder = LLVMCreateBuilderInContext(context);

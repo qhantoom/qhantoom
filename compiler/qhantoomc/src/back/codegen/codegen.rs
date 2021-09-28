@@ -9,7 +9,8 @@ use crate::front::parser::parse;
 #[inline]
 pub unsafe fn codegen_with_llvm(code: &str) {
   let ast = parse(code).unwrap();
-  let mut codegen = Codegen::new(box LLVMJit::new("example_module"));
+  let jit = LLVMJit::new("example_module");
+  let mut codegen = Codegen::new(jit);
 
   codegen.codegen(ast);
 }
@@ -18,7 +19,8 @@ pub unsafe fn codegen_with_llvm(code: &str) {
 #[inline]
 pub unsafe fn codegen_with_cranelift(code: &str) {
   let ast = parse(code).unwrap();
-  let mut codegen = Codegen::new(box CraneliftJit {});
+  let jit = CraneliftJit {};
+  let mut codegen = Codegen::new(jit);
 
   codegen.codegen(ast);
 }
@@ -35,8 +37,8 @@ where
   T: CodeGenerator,
 {
   #[inline]
-  pub fn new(jit: Box<T>) -> Self {
-    Self { jit: jit }
+  pub fn new(jit: T) -> Self {
+    Self { jit: box jit }
   }
 
   #[inline]
