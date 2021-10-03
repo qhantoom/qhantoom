@@ -18,7 +18,8 @@ use llvm_sys::core::{
   LLVMBuildRet, LLVMBuildRetVoid, LLVMBuildSub, LLVMBuildUDiv, LLVMConstInt,
   LLVMConstReal, LLVMDoubleTypeInContext, LLVMFunctionType,
   LLVMInt1TypeInContext, LLVMInt32TypeInContext, LLVMInt64TypeInContext,
-  LLVMPositionBuilderAtEnd, LLVMPrintModuleToFile,
+  LLVMPositionBuilderAtEnd, LLVMPrintModuleToFile, LLVMGetInsertBlock,
+  LLVMBuildPhi, LLVMAddIncoming,
 };
 
 use llvm_sys::LLVMIntPredicate::LLVMIntNE;
@@ -279,7 +280,8 @@ impl Jit {
     alternative: &Option<Box<Block>>,
   ) -> LLVMValueRef {
     let condition_value = self.codegen_expr(condition);
-    let zero = self.codegen_int_expr(0);
+    let int_type = LLVMInt64TypeInContext(self.context.current);
+    let zero = LLVMConstInt(int_type, 0, 0);
 
     let name = cstr!("is_nonzero");
     let is_nonzero = LLVMBuildICmp(
@@ -292,7 +294,7 @@ impl Jit {
 
     let entry_name = cstr!("entry");
 
-    let condition_block = LLVMAppendBasicBlockInContext(
+    let consequence_block = LLVMAppendBasicBlockInContext(
       self.context.current,
       self.main_function,
       entry_name,
@@ -313,28 +315,44 @@ impl Jit {
     LLVMBuildCondBr(
       self.context.builder,
       is_nonzero,
-      condition_block,
+      consequence_block,
       alternative_block,
     );
 
-    LLVMPositionBuilderAtEnd(self.context.builder, condition_block);
+    LLVMPositionBuilderAtEnd(self.context.builder, consequence_block);
 
-    let mut condition_return = zero;
+    let mut consequence_return = zero;
+
     for stmt in &consequence.stmts {
-      condition_return = self.codegen_stmt(&stmt);
+      consequence_return = self.codegen_stmt(&stmt);
     }
+
     LLVMBuildBr(self.context.builder, merge_block);
+
+    let consequence_block = LLVMGetInsertBlock(self.context.builder);
 
     LLVMPositionBuilderAtEnd(self.context.builder, alternative_block);
 
     let mut alternative_return = zero;
+
     for stmt in &alternative.as_ref().unwrap().stmts {
       alternative_return = self.codegen_stmt(stmt);
     }
+
     LLVMBuildBr(self.context.builder, merge_block);
 
+    let alternative_block = LLVMGetInsertBlock(self.context.builder);
+
     LLVMPositionBuilderAtEnd(self.context.builder, merge_block);
-    zero
+
+    let phi_name = cstr!("iftmp");
+    let phi = LLVMBuildPhi(self.context.builder, int_type, phi_name);
+    let mut values = vec![consequence_return, alternative_return];
+    let mut blocks = vec![consequence_block, alternative_block];
+
+    LLVMAddIncoming(phi, values.as_mut_ptr(), blocks.as_mut_ptr(), 2);
+
+    phi
   }
 
   #[inline]
