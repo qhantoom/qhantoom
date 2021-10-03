@@ -48,6 +48,7 @@ pub enum TokenKind {
   DotAssign,
   NotAssign,
   ColonAssign,
+  ColonColon,
   DotDot,
   AndAnd,
   PipePipe,

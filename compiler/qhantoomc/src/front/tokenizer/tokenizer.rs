@@ -320,6 +320,10 @@ impl<'a> Tokenizer<'a> {
           self.state = TokenizerState::Idle;
           return Some(TokenKind::ColonAssign);
         }
+        ':' => {
+          self.state = TokenizerState::Idle;
+          return Some(TokenKind::ColonColon);
+        }
         c => {
           return self.reset_back(c, TokenKind::Colon);
         }
