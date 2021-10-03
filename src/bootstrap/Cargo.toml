@@ -1,15 +1,17 @@
 [package]
+edition = "2018"
 name = "bootstrap"
 version = "0.1.0"
-edition = "2018"
 
 [[bin]]
+doctest = false
 name = "bootstrap"
 path = "bin/main.rs"
 
 [lib]
+doctest = false
 name = "bootstrap"
 path = "lib.rs"
 
 [dependencies]
-qhantoomc = { path = "../../compiler/qhantoomc" }
+qhantoomc = {path = "../../compiler/qhantoomc"}

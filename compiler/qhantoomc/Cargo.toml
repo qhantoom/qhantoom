@@ -1,7 +1,12 @@
 [package]
+edition = "2018"
 name = "qhantoomc"
 version = "0.1.0"
-edition = "2018"
+
+[lib]
+doctest = false
+name = "qhantoomc"
+path = "src/lib.rs"
 
 [dependencies]
 llvm-sys = "110"
