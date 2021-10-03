@@ -2,3 +2,7 @@ fun a: () -> void = () {}
 
 fun b := () {}
 
+fun main := () {
+  a();
+  b();
+}

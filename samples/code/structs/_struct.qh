@@ -13,5 +13,5 @@ set Button {
 }
 
 fun main := () {
-  val btn = Button::new("btn-name");
+  val btn: Button = Button::new("btn-name");
 }

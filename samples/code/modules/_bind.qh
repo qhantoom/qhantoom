@@ -1,2 +1,4 @@
 pub bind matrix;
 pub bind opengl;
+
+fun main := () {}
