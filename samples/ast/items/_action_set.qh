@@ -1,0 +1,10 @@
+struct Point {
+  x: f32,
+  x: f32,
+}
+
+set Vec2 for Point {
+  fun mul: (uint) -> uint = (x) { x * x }
+}
+
+fun main := () {}

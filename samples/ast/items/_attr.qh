@@ -1,0 +1,4 @@
+|> inline.
+fun foo : () -> void = () {}
+
+fun main := () {}

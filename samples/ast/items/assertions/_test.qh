@@ -1,0 +1,7 @@
+fun main := () {}
+
+unit {
+  test tokenization_test = () {
+    -- test computation
+  }
+}

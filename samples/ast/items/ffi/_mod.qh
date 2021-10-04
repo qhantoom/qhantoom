@@ -1,0 +1,5 @@
+mod fun cos: (uint) -> uint;
+
+fun main := () {
+  cos(3)
+}

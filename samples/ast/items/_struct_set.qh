@@ -1,0 +1,15 @@
+struct Button {
+  id: uint,
+  name: str,
+}
+
+set Button {
+  fun new: (str) -> Button = (name) {
+    Button {
+      id = 0,
+      name = name,
+    }
+  }
+}
+
+fun main := () {}
