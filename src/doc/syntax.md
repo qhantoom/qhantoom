@@ -4,8 +4,8 @@
 
 `--` comment line symbol    
 
-`-*` - comment block scope start symbol   
-`*-` - comment block scope end symbol   
+`-#` - comment block scope start symbol   
+`#-` - comment block scope end symbol   
 
 `-!` - comment block doc scope start symbol   
 `!-` - comment block doc symbol   
@@ -287,7 +287,7 @@ enum MyEnum {
 ## Macros
 
 ```
-macro foo = () {}
+macro foo := () {}
 
 #foo();
 ```
@@ -307,6 +307,8 @@ async {
 
 `chan` - make channel keyword   
 `spawn` - make thread keyword   
+
+*still in research*
 
 ```
 chan (tx, rx) = 0;
