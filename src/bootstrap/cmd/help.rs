@@ -1,4 +1,4 @@
-// run the help command
+// run the `help` command
 #[inline]
 pub fn run() {
   usage();

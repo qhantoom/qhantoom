@@ -67,6 +67,7 @@ impl CodeGenerator for Jit {
     let zero = LLVMConstInt(int_type, 42, 0);
 
     let mut return_value = zero;
+
     // for item in pkg.items {
     //   return_value = self.generate_item(&item);
     // }

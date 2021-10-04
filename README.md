@@ -44,11 +44,15 @@ fun main := () {
 
 **clone**
 
-`$ git clone https://github.com/qhantoom/qhantoom.git`
+```
+$ git clone https://github.com/qhantoom/qhantoom.git
+```
 
 **build**
 
-`$ cargo build --release`
+```
+$ cargo build --release
+```
 
 **start**
 

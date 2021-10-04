@@ -1,8 +1,10 @@
+// run the `license` command
 #[inline]
 pub fn run() {
   license();
 }
 
+// print the license if found
 #[inline]
 pub fn license() {
   match crate::util::readfile("LICENSE") {

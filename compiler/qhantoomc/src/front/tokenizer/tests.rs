@@ -107,7 +107,9 @@ fn tokenize_ints_token() {
   run_test(6, tokens, expected);
 }
 
-// fn tokenize_floats_token() {}
+fn tokenize_floats_token() {}
+
+fn tokenize_hex_token() {}
 
 #[test]
 fn tokenize_chars_token() {

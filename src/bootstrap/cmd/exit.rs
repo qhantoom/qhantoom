@@ -1,4 +1,4 @@
-// run the exit command
+// run the `exit` command
 #[inline]
 pub fn run() {
   exit();

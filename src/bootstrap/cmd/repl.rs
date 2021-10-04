@@ -8,7 +8,7 @@ use qhantoomc::front::interpreter::{self, runtime::Runtime};
 
 use qute::prelude::*;
 
-// run the repl
+// run the `repl`command
 #[inline]
 pub fn run(args: &[String]) {
   match repl(args) {

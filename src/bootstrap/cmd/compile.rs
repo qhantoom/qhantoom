@@ -2,7 +2,7 @@ use std::any::Any;
 
 use qhantoomc::front;
 
-// run the compiler
+// run the `compile` command
 #[inline]
 pub fn run(args: Vec<String>) {
   match compile(args) {

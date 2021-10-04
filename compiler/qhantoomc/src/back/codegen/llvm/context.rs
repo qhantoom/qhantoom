@@ -15,6 +15,8 @@ pub struct Context {
 }
 
 impl Drop for Context {
+  // dispose llvm builder, module and context
+  #[inline]
   fn drop(&mut self) {
     unsafe {
       LLVMDisposeBuilder(self.builder);
@@ -25,6 +27,7 @@ impl Drop for Context {
 }
 
 impl Context {
+  // create a new context
   #[inline]
   pub unsafe fn new(name: &str) -> Self {
     let context = LLVMContextCreate();

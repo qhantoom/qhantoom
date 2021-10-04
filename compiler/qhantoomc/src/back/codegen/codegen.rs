@@ -34,11 +34,13 @@ impl<T> Codegen<T>
 where
   T: CodeGenerator,
 {
+  // create a new code generator
   #[inline]
   pub fn new(jit: T) -> Self {
     Self { jit: box jit }
   }
 
+  // generate intermediate representation code for the given ast
   #[inline]
   pub unsafe fn generate(&mut self, pkg: &Pkg) {
     self.jit.generate(pkg);
