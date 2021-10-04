@@ -1,5 +1,5 @@
-use super::tokenizer::tokenize;
 use super::token::{Token, TokenKind};
+use super::tokenizer::tokenize;
 
 #[test]
 fn tokenize_empty_token() {
@@ -14,11 +14,8 @@ fn tokenize_empty_token() {
 fn tokenize_comments_token() {
   let file = read_file("../../samples/tokens/comments.qh");
   let tokens = tokenize(&file).unwrap();
-  
-  let expected = vec![
-    TokenKind::CommentLine,
-    TokenKind::EOF,
-  ];
+
+  let expected = vec![TokenKind::CommentLine, TokenKind::EOF];
 
   run_test(2, tokens, expected);
 }
@@ -29,9 +26,12 @@ fn tokenize_delimiters_token() {
   let tokens = tokenize(&file).unwrap();
 
   let expected = vec![
-    TokenKind::OpenParen, TokenKind::CloseParen,
-    TokenKind::OpenBrace, TokenKind::CloseBrace,
-    TokenKind::OpenBracket, TokenKind::CloseBracket,
+    TokenKind::OpenParen,
+    TokenKind::CloseParen,
+    TokenKind::OpenBrace,
+    TokenKind::CloseBrace,
+    TokenKind::OpenBracket,
+    TokenKind::CloseBracket,
     TokenKind::EOF,
   ];
 
@@ -42,17 +42,17 @@ fn tokenize_delimiters_token() {
 fn tokenize_operators_token() {
   let file = read_file("../../samples/tokens/operators.qh");
   let tokens = tokenize(&file).unwrap();
-  
+
   let expected = vec![
-    TokenKind::Add, 
-    TokenKind::Sub, 
-    TokenKind::Mul, 
+    TokenKind::Add,
+    TokenKind::Sub,
+    TokenKind::Mul,
     TokenKind::Div,
-    TokenKind::Mod, 
-    TokenKind::Not, 
-    TokenKind::Assign, 
+    TokenKind::Mod,
+    TokenKind::Not,
+    TokenKind::Assign,
     TokenKind::And,
-    TokenKind::Pipe, 
+    TokenKind::Pipe,
     TokenKind::Lt,
     TokenKind::Gt,
     TokenKind::Dot,
@@ -138,7 +138,7 @@ fn tokenize_strings_token() {
   let expected = vec![
     TokenKind::StrBuffer("hello, world! 👽".into()),
     TokenKind::StrBuffer("yo la mif".into()),
-    TokenKind::StrBuffer("你好!".into()), 
+    TokenKind::StrBuffer("你好!".into()),
     TokenKind::StrBuffer("hello, \"world\"! 👽\nwesh la famille! 🤘".into()),
     TokenKind::EOF,
   ];
@@ -251,7 +251,7 @@ fn read_file(path: &str) -> String {
   }
 }
 
-fn run_test( len: usize, tokens: Vec<Token>, expected: Vec<TokenKind>) {
+fn run_test(len: usize, tokens: Vec<Token>, expected: Vec<TokenKind>) {
   assert_eq!(tokens.len(), len);
 
   for (i, token) in tokens.iter().enumerate() {

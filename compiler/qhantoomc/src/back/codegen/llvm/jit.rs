@@ -47,7 +47,7 @@ pub struct Jit {
 
 impl CodeGenerator for Jit {
   #[inline]
-  unsafe fn codegen(&mut self, pkg: &Pkg) {
+  unsafe fn generate(&mut self, pkg: &Pkg) {
     let int_type = LLVMInt64TypeInContext(self.context.current);
     let function_type = LLVMFunctionType(int_type, ptr::null_mut(), 0, 0);
 
@@ -68,7 +68,7 @@ impl CodeGenerator for Jit {
 
     let mut return_value = zero;
     // for item in pkg.items {
-    //   return_value = self.codegen_item(&item);
+    //   return_value = self.generate_item(&item);
     // }
 
     LLVMBuildRet(self.context.builder, return_value);
@@ -89,15 +89,15 @@ impl Jit {
   }
 
   #[inline]
-  unsafe fn codegen_item(&mut self, item: &Box<Item>) -> LLVMValueRef {
+  unsafe fn generate_item(&mut self, item: &Box<Item>) -> LLVMValueRef {
     match item.kind() {
-      ItemKind::Fun(ref fun) => self.codegen_fun_decl_item(fun),
+      ItemKind::Fun(ref fun) => self.generate_fun_decl_item(fun),
       _ => todo!(),
     }
   }
 
   #[inline]
-  unsafe fn codegen_fun_decl_item(&mut self, fun: &FunDecl) -> LLVMValueRef {
+  unsafe fn generate_fun_decl_item(&mut self, fun: &FunDecl) -> LLVMValueRef {
     let name = cstr!(&fun.name());
     let mut f = LLVMGetNamedFunction(self.context.module, name);
     let empty = LLVMCountBasicBlocks(f) == 0;
@@ -121,7 +121,7 @@ impl Jit {
     let mut ret_value = ptr::null_mut();
 
     for stmt in &fun.block.stmts {
-      ret_value = self.codegen_stmt(stmt);
+      ret_value = self.generate_stmt(stmt);
     }
 
     LLVMBuildRet(self.context.builder, ret_value);
@@ -137,21 +137,21 @@ impl Jit {
   }
 
   #[inline]
-  unsafe fn codegen_stmt(&mut self, stmt: &Box<Stmt>) -> LLVMValueRef {
+  unsafe fn generate_stmt(&mut self, stmt: &Box<Stmt>) -> LLVMValueRef {
     match stmt.kind() {
-      StmtKind::Return(ref expr) => self.codegen_return_stmt(expr),
-      StmtKind::Expr(ref expr) => self.codegen_expr(expr),
+      StmtKind::Return(ref expr) => self.generate_return_stmt(expr),
+      StmtKind::Expr(ref expr) => self.generate_expr(expr),
       _ => todo!(),
     }
   }
 
   #[inline]
-  unsafe fn codegen_return_stmt(
+  unsafe fn generate_return_stmt(
     &mut self,
     expr: &Option<Box<Expr>>,
   ) -> LLVMValueRef {
     if let Some(ref e) = expr {
-      let value = self.codegen_expr(e);
+      let value = self.generate_expr(e);
       return LLVMBuildRet(self.context.builder, value);
     }
 
@@ -159,154 +159,154 @@ impl Jit {
   }
 
   #[inline]
-  unsafe fn codegen_expr(&mut self, expr: &Box<Expr>) -> LLVMValueRef {
+  unsafe fn generate_expr(&mut self, expr: &Box<Expr>) -> LLVMValueRef {
     match expr.kind() {
-      ExprKind::Bool(ref expr) => self.codegen_bool_expr(*expr),
-      ExprKind::Int(ref expr) => self.codegen_int_expr(*expr),
-      ExprKind::Float(ref expr) => self.codegen_float_expr(*expr),
-      ExprKind::Char(ref expr) => self.codegen_char_expr(*expr),
+      ExprKind::Bool(ref expr) => self.generate_bool_expr(*expr),
+      ExprKind::Int(ref expr) => self.generate_int_expr(*expr),
+      ExprKind::Float(ref expr) => self.generate_float_expr(*expr),
+      ExprKind::Char(ref expr) => self.generate_char_expr(*expr),
       ExprKind::Binop {
         ref lhs,
         ref op,
         ref rhs,
-      } => self.codegen_binop_expr(lhs, op, rhs),
-      ExprKind::Unop { ref op, ref rhs } => self.codegen_unop_expr(op, rhs),
-      ExprKind::Ident(ref expr) => self.codegen_ident_expr(expr),
+      } => self.generate_binop_expr(lhs, op, rhs),
+      ExprKind::Unop { ref op, ref rhs } => self.generate_unop_expr(op, rhs),
+      ExprKind::Ident(ref expr) => self.generate_ident_expr(expr),
       ExprKind::Assign { ref lhs, ref rhs } => {
-        self.codegen_assign_expr(lhs, rhs)
+        self.generate_assign_expr(lhs, rhs)
       }
       ExprKind::If {
         ref condition,
         ref consequence,
         ref alternative,
-      } => self.codegen_if_expr(condition, consequence, alternative),
+      } => self.generate_if_expr(condition, consequence, alternative),
       _ => todo!(),
     }
   }
 
   #[inline]
-  unsafe fn codegen_bool_expr(&mut self, expr: bool) -> LLVMValueRef {
+  unsafe fn generate_bool_expr(&mut self, expr: bool) -> LLVMValueRef {
     let bool_type = LLVMInt1TypeInContext(self.context.current);
     LLVMConstInt(bool_type, expr as u64, 0)
   }
 
   #[inline]
-  unsafe fn codegen_int_expr(&mut self, expr: i32) -> LLVMValueRef {
+  unsafe fn generate_int_expr(&mut self, expr: i32) -> LLVMValueRef {
     let int_type = LLVMInt64TypeInContext(self.context.current);
     LLVMConstInt(int_type, expr as u64, 0)
   }
 
   #[inline]
-  unsafe fn codegen_float_expr(&mut self, expr: f32) -> LLVMValueRef {
+  unsafe fn generate_float_expr(&mut self, expr: f32) -> LLVMValueRef {
     let float_type = LLVMDoubleTypeInContext(self.context.current);
     LLVMConstReal(float_type, expr as f64)
   }
 
   #[inline]
-  unsafe fn codegen_char_expr(&mut self, expr: char) -> LLVMValueRef {
+  unsafe fn generate_char_expr(&mut self, expr: char) -> LLVMValueRef {
     let char_type = LLVMInt32TypeInContext(self.context.current);
     LLVMConstInt(char_type, expr as u64, 0)
   }
 
   #[inline]
-  unsafe fn codegen_binop_expr(
+  unsafe fn generate_binop_expr(
     &mut self,
     lhs: &Box<Expr>,
     op: &BinopKind,
     rhs: &Box<Expr>,
   ) -> LLVMValueRef {
     match op {
-      BinopKind::Add => self.codegen_binop_add(lhs, rhs),
-      BinopKind::Sub => self.codegen_binop_sub(lhs, rhs),
-      BinopKind::Mul => self.codegen_binop_mul(lhs, rhs),
-      BinopKind::Div => self.codegen_binop_div(lhs, rhs),
+      BinopKind::Add => self.generate_binop_add(lhs, rhs),
+      BinopKind::Sub => self.generate_binop_sub(lhs, rhs),
+      BinopKind::Mul => self.generate_binop_mul(lhs, rhs),
+      BinopKind::Div => self.generate_binop_div(lhs, rhs),
       _ => todo!(),
     }
   }
 
   #[inline]
-  unsafe fn codegen_binop_add(
+  unsafe fn generate_binop_add(
     &mut self,
     lhs: &Box<Expr>,
     rhs: &Box<Expr>,
   ) -> LLVMValueRef {
-    let lhs = self.codegen_expr(lhs);
-    let rhs = self.codegen_expr(rhs);
+    let lhs = self.generate_expr(lhs);
+    let rhs = self.generate_expr(rhs);
 
     let name = cstr!("addtmp");
     LLVMBuildAdd(self.context.builder, lhs, rhs, name)
   }
 
   #[inline]
-  unsafe fn codegen_binop_sub(
+  unsafe fn generate_binop_sub(
     &mut self,
     lhs: &Box<Expr>,
     rhs: &Box<Expr>,
   ) -> LLVMValueRef {
-    let lhs = self.codegen_expr(lhs);
-    let rhs = self.codegen_expr(rhs);
+    let lhs = self.generate_expr(lhs);
+    let rhs = self.generate_expr(rhs);
 
     let name = cstr!("subtmp");
     LLVMBuildSub(self.context.builder, lhs, rhs, name)
   }
 
   #[inline]
-  unsafe fn codegen_binop_mul(
+  unsafe fn generate_binop_mul(
     &mut self,
     lhs: &Box<Expr>,
     rhs: &Box<Expr>,
   ) -> LLVMValueRef {
-    let lhs = self.codegen_expr(lhs);
-    let rhs = self.codegen_expr(rhs);
+    let lhs = self.generate_expr(lhs);
+    let rhs = self.generate_expr(rhs);
 
     let name = cstr!("multmp");
     LLVMBuildMul(self.context.builder, lhs, rhs, name)
   }
 
   #[inline]
-  unsafe fn codegen_binop_div(
+  unsafe fn generate_binop_div(
     &mut self,
     lhs: &Box<Expr>,
     rhs: &Box<Expr>,
   ) -> LLVMValueRef {
-    let lhs = self.codegen_expr(lhs);
-    let rhs = self.codegen_expr(rhs);
+    let lhs = self.generate_expr(lhs);
+    let rhs = self.generate_expr(rhs);
 
     let name = cstr!("divtmp");
     LLVMBuildUDiv(self.context.builder, lhs, rhs, name)
   }
 
   #[inline]
-  unsafe fn codegen_unop_expr(
+  unsafe fn generate_unop_expr(
     &mut self,
     op: &UnopKind,
     rhs: &Box<Expr>,
   ) -> LLVMValueRef {
     match op {
-      UnopKind::Neg => self.codegen_neg_unop_expr(rhs),
-      UnopKind::Not => self.codegen_not_unop_expr(rhs),
+      UnopKind::Neg => self.generate_neg_unop_expr(rhs),
+      UnopKind::Not => self.generate_not_unop_expr(rhs),
     }
   }
 
   #[inline]
-  unsafe fn codegen_neg_unop_expr(&mut self, rhs: &Box<Expr>) -> LLVMValueRef {
-    let value = self.codegen_expr(rhs);
+  unsafe fn generate_neg_unop_expr(&mut self, rhs: &Box<Expr>) -> LLVMValueRef {
+    let value = self.generate_expr(rhs);
     LLVMBuildNeg(self.context.builder, value, cstr!("neg"))
   }
 
   #[inline]
-  unsafe fn codegen_not_unop_expr(&mut self, rhs: &Box<Expr>) -> LLVMValueRef {
-    let value = self.codegen_expr(rhs);
+  unsafe fn generate_not_unop_expr(&mut self, rhs: &Box<Expr>) -> LLVMValueRef {
+    let value = self.generate_expr(rhs);
     LLVMBuildNot(self.context.builder, value, cstr!("not"))
   }
 
   #[inline]
-  unsafe fn codegen_ident_expr(&mut self, expr: &String) -> LLVMValueRef {
+  unsafe fn generate_ident_expr(&mut self, expr: &String) -> LLVMValueRef {
     todo!()
   }
 
   #[inline]
-  unsafe fn codegen_assign_expr(
+  unsafe fn generate_assign_expr(
     &mut self,
     lhs: &Box<Expr>,
     rhs: &Box<Expr>,
@@ -315,13 +315,13 @@ impl Jit {
   }
 
   #[inline]
-  unsafe fn codegen_if_expr(
+  unsafe fn generate_if_expr(
     &mut self,
     condition: &Box<Expr>,
     consequence: &Box<Block>,
     alternative: &Option<Box<Block>>,
   ) -> LLVMValueRef {
-    let condition_value = self.codegen_expr(condition);
+    let condition_value = self.generate_expr(condition);
     let int_type = LLVMInt64TypeInContext(self.context.current);
     let zero = LLVMConstInt(int_type, 0, 0);
 
@@ -366,7 +366,7 @@ impl Jit {
     let mut consequence_return = zero;
 
     for stmt in &consequence.stmts {
-      consequence_return = self.codegen_stmt(&stmt);
+      consequence_return = self.generate_stmt(&stmt);
     }
 
     LLVMBuildBr(self.context.builder, merge_block);
@@ -378,7 +378,7 @@ impl Jit {
     let mut alternative_return = zero;
 
     for stmt in &alternative.as_ref().unwrap().stmts {
-      alternative_return = self.codegen_stmt(stmt);
+      alternative_return = self.generate_stmt(stmt);
     }
 
     LLVMBuildBr(self.context.builder, merge_block);

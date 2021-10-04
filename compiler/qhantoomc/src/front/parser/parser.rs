@@ -230,22 +230,6 @@ impl<'a> Parser<'a> {
   }
 
   #[inline]
-  fn parse_assign_expr(&mut self, lhs: ExprKind) -> Result<ExprKind, String> {
-    // SYNTAX: <ident> = <expr>
-    // move to the next token by skipping '='
-    self.next();
-    // parse expression
-    let value = self.parse_expr()?;
-    // check if the next token is ';'
-    self.expect_first(&TokenKind::Semicolon)?;
-    // return assign statement
-    Ok(ExprKind::Assign {
-      lhs: box Expr::new(lhs),
-      rhs: box Expr::new(value),
-    })
-  }
-
-  #[inline]
   fn parse_block_stmt(&mut self) -> Result<Box<Block>, String> {
     // SYNTAX: { <stmt>* }
     // create an array of statements
@@ -397,6 +381,22 @@ impl<'a> Parser<'a> {
       TokenKind::OpenParen => self.parse_call_expr(lhs),
       _ => self.parse_binop_expr(lhs),
     }
+  }
+
+  #[inline]
+  fn parse_assign_expr(&mut self, lhs: ExprKind) -> Result<ExprKind, String> {
+    // SYNTAX: <ident> = <expr>
+    // move to the next token by skipping '='
+    self.next();
+    // parse expression
+    let value = self.parse_expr()?;
+    // check if the next token is ';'
+    self.expect_first(&TokenKind::Semicolon)?;
+    // return assign statement
+    Ok(ExprKind::Assign {
+      lhs: box Expr::new(lhs),
+      rhs: box Expr::new(value),
+    })
   }
 
   #[inline]

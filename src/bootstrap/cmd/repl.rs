@@ -51,7 +51,7 @@ fn processing(
     _ => match interpreter::interpret(runtime, line) {
       Ok(value) => Ok(print!("🛰️  {}\n", value)),
       Err(e) => Err(format!("{}", e)),
-    }
+    },
   }
 }
 
@@ -60,7 +60,7 @@ fn processing(
 // qhantoomc v0.1.0 (Oct 03 2021, 20:05:01)
 // welcome {user} to qhantoom version 0.1.0 Darwin/x86_64
 // use "help", "copyright" or "license" for more information.
-// 📡 
+// 📡
 #[inline]
 pub fn banner() {
   let help_fmt = format!("{}", "\"help\"");
@@ -80,11 +80,7 @@ pub fn banner() {
 
   print!("\n");
 
-  print!(
-    "qhantoomc v{} ({})\n",
-    version::version(),
-    datetime_styled,
-  );
+  print!("qhantoomc v{} ({})\n", version::version(), datetime_styled,);
 
   print!(
     "welcome {} to qhantoom version {} {}/{}\n",
@@ -96,8 +92,6 @@ pub fn banner() {
 
   print!(
     "use {}, {} or {} for more information.\n",
-    help_styled,
-    copyright_styled,
-    license_styled,
+    help_styled, copyright_styled, license_styled,
   );
 }

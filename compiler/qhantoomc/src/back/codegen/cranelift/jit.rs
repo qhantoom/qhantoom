@@ -7,7 +7,7 @@ use crate::front::parser::ast::{BinopKind, Expr, Item, Pkg, Stmt};
 pub struct Jit {}
 
 impl CodeGenerator for Jit {
-  unsafe fn codegen(&mut self, pkg: &Pkg) {}
+  unsafe fn generate(&mut self, pkg: &Pkg) {}
 }
 
 impl Jit {
