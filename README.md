@@ -26,7 +26,7 @@ fun main := () {
     return f[n];
   }
 
-  #print(fibonacci(7));
+  #print("{}", fibonacci(7));
 }
 ```
 
