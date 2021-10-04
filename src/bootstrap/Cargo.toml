@@ -14,4 +14,7 @@ name = "bootstrap"
 path = "lib.rs"
 
 [dependencies]
+chrono = "0.4.19"
+platform-info = "0.1.0"
 qhantoomc = {path = "../../compiler/qhantoomc"}
+qute = "0.0.13"

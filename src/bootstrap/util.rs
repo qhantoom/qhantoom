@@ -2,6 +2,22 @@ use std::fs;
 use std::io;
 use std::path::Path;
 
+use chrono::{DateTime, FixedOffset, Utc};
+
+// TODO: detect current timezone
+// get the current date time
+#[inline]
+pub fn datetime() -> String {
+  let now = Utc::now();
+  let tz = FixedOffset::east(2 * 3600);
+  let utc_time = DateTime::<Utc>::from_utc(now.naive_utc(), Utc);
+
+  utc_time
+    .with_timezone(&tz)
+    .format("%B %d %Y, %H:%M:%S")
+    .to_string()
+}
+
 // read the file at the given path and return the contents as a string
 #[inline]
 pub fn readfile(pathname: &str) -> Result<String, String> {
@@ -28,4 +44,13 @@ pub fn readline<'a>(icon: &str) -> Result<String, String> {
   buf.truncate(buf.trim_end().len());
 
   Ok(buf)
+}
+
+// get the user name from the system
+#[inline]
+pub fn username() -> String {
+  const LOG_NAME: &str = "LOGNAME";
+  const LOG_INCOGNITO: &str = "johndoe";
+
+  std::env::var(LOG_NAME).unwrap_or(String::from(LOG_INCOGNITO))
 }

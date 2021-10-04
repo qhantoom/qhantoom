@@ -59,14 +59,13 @@ fn compiling(args: Vec<String>) {
   print!("\nast: {:#?}\n", ast);
 
   // check the AST
-  // front::analyzer::maincheck::check(&ast);
-
-  unsafe {
-    qhantoomc::back::codegen::codegen_with_llvm(&file);
-  }
+  front::analyzer::maincheck::check(&ast);
 
   // transform AST into bytecode
   // write bytecode to file
+  unsafe {
+    qhantoomc::back::codegen::codegen_with_llvm(&ast);
+  }
 
   // print success message
   print!("\ncompiled successfully..\n");

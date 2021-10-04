@@ -7,8 +7,7 @@ use crate::front::parser::parse;
 
 // code generation to machine code using llvm backend
 #[inline]
-pub unsafe fn codegen_with_llvm(code: &str) {
-  let ast = parse(code).unwrap();
+pub unsafe fn codegen_with_llvm(ast: &Pkg) {
   let jit = LLVMJit::new("example_module");
   let mut codegen = Codegen::new(jit);
 
@@ -17,8 +16,7 @@ pub unsafe fn codegen_with_llvm(code: &str) {
 
 // code generation to machine code using cranelift backend
 #[inline]
-pub unsafe fn codegen_with_cranelift(code: &str) {
-  let ast = parse(code).unwrap();
+pub unsafe fn codegen_with_cranelift(ast: &Pkg) {
   let jit = CraneliftJit::new();
   let mut codegen = Codegen::new(jit);
 
@@ -42,7 +40,7 @@ where
   }
 
   #[inline]
-  pub unsafe fn codegen(&mut self, pkg: Pkg) {
+  pub unsafe fn codegen(&mut self, pkg: &Pkg) {
     self.jit.codegen(pkg);
   }
 }

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::context::Context;
 
 use crate::back::codegen::interface::CodeGenerator;
@@ -12,14 +14,19 @@ use crate::util::cstring::cstr;
 use std::ffi::CString;
 use std::ptr;
 
+use llvm_sys::analysis::LLVMVerifierFailureAction::LLVMPrintMessageAction;
+use llvm_sys::analysis::LLVMVerifyFunction;
+
 use llvm_sys::core::{
-  LLVMAddFunction, LLVMAppendBasicBlockInContext, LLVMBuildAdd, LLVMBuildBr,
-  LLVMBuildCondBr, LLVMBuildICmp, LLVMBuildMul, LLVMBuildNeg, LLVMBuildNot,
+  LLVMAddFunction, LLVMAddIncoming, LLVMAppendBasicBlock,
+  LLVMAppendBasicBlockInContext, LLVMBuildAdd, LLVMBuildBr, LLVMBuildCondBr,
+  LLVMBuildICmp, LLVMBuildMul, LLVMBuildNeg, LLVMBuildNot, LLVMBuildPhi,
   LLVMBuildRet, LLVMBuildRetVoid, LLVMBuildSub, LLVMBuildUDiv, LLVMConstInt,
-  LLVMConstReal, LLVMDoubleTypeInContext, LLVMFunctionType,
-  LLVMInt1TypeInContext, LLVMInt32TypeInContext, LLVMInt64TypeInContext,
-  LLVMPositionBuilderAtEnd, LLVMPrintModuleToFile, LLVMGetInsertBlock,
-  LLVMBuildPhi, LLVMAddIncoming,
+  LLVMConstReal, LLVMCountBasicBlocks, LLVMDeleteFunction,
+  LLVMDoubleTypeInContext, LLVMFunctionType, LLVMGetInsertBlock,
+  LLVMGetNamedFunction, LLVMGetParam, LLVMInt1TypeInContext,
+  LLVMInt32TypeInContext, LLVMInt64TypeInContext, LLVMPositionBuilderAtEnd,
+  LLVMPrintModuleToFile,
 };
 
 use llvm_sys::LLVMIntPredicate::LLVMIntNE;
@@ -33,12 +40,14 @@ use llvm_sys::prelude::{
 
 pub struct Jit {
   context: Context,
+  functions: HashMap<String, LLVMValueRef>,
   main_function: LLVMValueRef,
+  variables: HashMap<String, LLVMValueRef>,
 }
 
 impl CodeGenerator for Jit {
   #[inline]
-  unsafe fn codegen(&mut self, pkg: Pkg) {
+  unsafe fn codegen(&mut self, pkg: &Pkg) {
     let int_type = LLVMInt64TypeInContext(self.context.current);
     let function_type = LLVMFunctionType(int_type, ptr::null_mut(), 0, 0);
 
@@ -73,7 +82,9 @@ impl Jit {
   pub unsafe fn new(mod_name: &str) -> Self {
     Self {
       context: Context::new(mod_name),
+      functions: HashMap::new(),
       main_function: ptr::null_mut(),
+      variables: HashMap::new(),
     }
   }
 
@@ -87,7 +98,42 @@ impl Jit {
 
   #[inline]
   unsafe fn codegen_fun_decl_item(&mut self, fun: &FunDecl) -> LLVMValueRef {
-    todo!()
+    let name = cstr!(&fun.name());
+    let mut f = LLVMGetNamedFunction(self.context.module, name);
+    let empty = LLVMCountBasicBlocks(f) == 0;
+
+    if !empty {
+      panic!("function already defined");
+    }
+
+    let name = cstr!("entry");
+    let bb = LLVMAppendBasicBlock(f, name);
+
+    LLVMPositionBuilderAtEnd(self.context.builder, bb);
+
+    let len = fun.args.len();
+
+    for i in 0..len {
+      let param = LLVMGetParam(f, i as u32);
+      self.variables.insert(fun.args[i].to_string(), param);
+    }
+
+    let mut ret_value = ptr::null_mut();
+
+    for stmt in &fun.block.stmts {
+      ret_value = self.codegen_stmt(stmt);
+    }
+
+    LLVMBuildRet(self.context.builder, ret_value);
+
+    let ok = LLVMVerifyFunction(f, LLVMPrintMessageAction);
+
+    if ok != 0 {
+      LLVMDeleteFunction(f);
+      panic!("function failed to verify");
+    }
+
+    f
   }
 
   #[inline]
@@ -126,10 +172,9 @@ impl Jit {
       } => self.codegen_binop_expr(lhs, op, rhs),
       ExprKind::Unop { ref op, ref rhs } => self.codegen_unop_expr(op, rhs),
       ExprKind::Ident(ref expr) => self.codegen_ident_expr(expr),
-      ExprKind::Assign {
-        ref lhs,
-        ref rhs,
-      } => self.codegen_assign_expr(lhs, rhs),
+      ExprKind::Assign { ref lhs, ref rhs } => {
+        self.codegen_assign_expr(lhs, rhs)
+      }
       ExprKind::If {
         ref condition,
         ref consequence,
@@ -256,10 +301,7 @@ impl Jit {
   }
 
   #[inline]
-  unsafe fn codegen_ident_expr(
-    &mut self,
-    expr: &String,
-  ) -> LLVMValueRef {
+  unsafe fn codegen_ident_expr(&mut self, expr: &String) -> LLVMValueRef {
     todo!()
   }
 
