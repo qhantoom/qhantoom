@@ -2,7 +2,7 @@
 pub enum TokenKind {
   EOF,
   Newline,
-  Int(u64),
+  Int(i64),
   Float(f64),
   CharAscii(char),
   StrBuffer(String),
@@ -10,6 +10,9 @@ pub enum TokenKind {
 
   // comments
   CommentLine,
+  CommentLineDoc,
+  CommentBlock,
+  CommentDocBlock,
 
   // operators
   Add,

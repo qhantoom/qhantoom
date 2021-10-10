@@ -7,6 +7,6 @@ pub fn run() {
 // abort the program
 #[inline]
 pub fn exit() -> ! {
-  println!("\nTriForce.. 👋\n");
+  print!("\nTriForce.. 👋\n");
   std::process::exit(0);
 }

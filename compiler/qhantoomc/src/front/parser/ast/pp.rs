@@ -1,8 +1,8 @@
 use std::fmt;
 
 use super::ast::{
-  BinopKind, Block, Expr, ExprKind, FunDecl, Item, ItemKind, Stmt, StmtKind,
-  Ty, TyKind, UnopKind,
+  BinopKind, Block, Expr, ExprKind, Function, Prototype, Stmt, StmtKind, Ty,
+  TyKind, UnopKind,
 };
 
 pub struct CommaSep<'a, T: 'a>(pub &'a [T]);
@@ -20,21 +20,23 @@ impl<'a, T: fmt::Display> fmt::Display for CommaSep<'a, T> {
   }
 }
 
-impl fmt::Display for Item {
+// fun ident : ty = (args) block
+impl fmt::Display for Function {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    match self.kind() {
-      ItemKind::Fun(ref fun) => write!(
-        f,
-        "fun {} : {} = ({}) {}",
-        fun.ident,
-        fun.ty,
-        CommaSep(&fun.args),
-        fun.block,
-      ),
-      ItemKind::Imu(ref local) => {
-        write!(f, "imu {} : {} = {};", local.ident, local.ty, local.value,)
-      }
-    }
+    write!(f, "fun {} {}", self.prototype, self.body)
+  }
+}
+
+// ext ident : ty = (args)
+impl fmt::Display for Prototype {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(
+      f,
+      "{} : {} = ({})",
+      self.name,
+      self.ty,
+      CommaSep(&self.args),
+    )
   }
 }
 
@@ -47,28 +49,8 @@ impl fmt::Display for Block {
 impl fmt::Display for Stmt {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match self.kind() {
-      StmtKind::Break => write!(f, "break"),
-      StmtKind::Continue => write!(f, "continue"),
-      StmtKind::Fun(ref fun) => write!(
-        f,
-        "fun {} : {} = ({}) {}",
-        fun.ident,
-        fun.ty,
-        CommaSep(&fun.args),
-        fun.block,
-      ),
-      StmtKind::Imu(ref local) => {
-        write!(f, "imu {} : {} = {};", local.ident, local.ty, local.value,)
-      }
-      StmtKind::Val(ref local) => {
-        write!(f, "val {} : {} = {};", local.ident, local.ty, local.value,)
-      }
-      StmtKind::Mut(ref local) => {
-        write!(f, "mut {} : {} = {};", local.ident, local.ty, local.value,)
-      }
-      StmtKind::Return(None) => write!(f, "return;"),
-      StmtKind::Return(Some(ref expr)) => write!(f, "return {};", expr),
-      StmtKind::Expr(ref expr) => write!(f, "{}", expr),
+      StmtKind::Expr(ref expr) => write!(f, "{:?}", expr),
+      _ => write!(f, "{:?}", self.kind()),
     }
   }
 }
@@ -150,6 +132,8 @@ impl fmt::Display for BinopKind {
       Self::Mul => write!(f, "*"),
       Self::Div => write!(f, "/"),
       Self::Mod => write!(f, "%"),
+      Self::And => write!(f, "&&"),
+      Self::Or => write!(f, "||"),
       Self::Lt => write!(f, "<"),
       Self::Gt => write!(f, ">"),
       Self::Le => write!(f, "<="),

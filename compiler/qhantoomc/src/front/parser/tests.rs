@@ -1,31 +1,8 @@
 use crate::front::parser::parse;
 
 use crate::front::parser::ast::{
-  Expr, ExprKind, Item, ItemKind, Local, Pkg, Ty, TyKind,
+  Expr, ExprKind, Local, Pkg, Ty, TyKind,
 };
-
-#[test]
-fn parse_imu_item() {
-  let file = read_file("../../samples/ast/items/imu.qh");
-  let ast = parse(&file).unwrap();
-
-  let expected = vec![Pkg {
-    items: vec![box Item {
-      kind: ItemKind::Imu(box Local {
-        ident: box Expr {
-          kind: ExprKind::Ident("LIMIT".into()),
-        },
-        immutable: true,
-        ty: box Ty { kind: TyKind::UInt },
-        value: box Expr {
-          kind: ExprKind::Int(4),
-        },
-      }),
-    }],
-  }];
-}
-
-fn parse_fun_decl_item() {}
 
 fn parse_imu_stmt() {}
 

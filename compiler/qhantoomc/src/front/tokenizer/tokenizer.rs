@@ -8,9 +8,11 @@ use crate::util::ascii::{
   is_whitespace,
 };
 
+use crate::util::error::{Error, Result};
+
 // tokenize a string into a vector of tokens
 #[inline]
-pub fn tokenize(src: &str) -> Result<Vec<Token>, String> {
+pub fn tokenize(src: &str) -> Result<Vec<Token>> {
   let mut source = src.to_owned();
   source.push_str("\0");
 
@@ -53,12 +55,12 @@ impl<'a> Tokenizer<'a> {
   }
 
   #[inline]
-  fn err(&self, msg: &str) {
-    panic!("{}", msg);
+  fn err(&self, error: Error) {
+    panic!("{}", error);
   }
 
   #[inline]
-  fn tokenize(&mut self) -> Result<Vec<Token>, String> {
+  fn tokenize(&mut self) -> Result<Vec<Token>> {
     let mut tokens = Vec::new();
 
     loop {
@@ -189,7 +191,7 @@ impl<'a> Tokenizer<'a> {
         }
 
         // unexpected character
-        _ => self.err(&format!("unknown character: {}", c)),
+        _ => self.err(Error::UnexpectedCharacter(c)),
       },
       // read_start_add_state
       TokenizerState::StartAdd => match c {
@@ -213,6 +215,12 @@ impl<'a> Tokenizer<'a> {
         }
         '-' => {
           self.state = TokenizerState::CommentLine;
+        }
+        '!' => {
+          self.state = TokenizerState::CommentLineDoc;
+        }
+        '%' => {
+          self.state = TokenizerState::StartCommentBlock;
         }
         c => {
           return self.reset_back(c, TokenKind::Sub);
@@ -381,7 +389,7 @@ impl<'a> Tokenizer<'a> {
           return self.reset_back(c, TokenKind::CharAscii(buffer));
         }
 
-        self.err(&format!("invalid char literal: {}", self.buffer));
+        self.err(Error::UnexpectedLiteralChar(self.buffer.clone()));
       }
       // read_start_string_state
       TokenizerState::StartString => {
@@ -419,7 +427,7 @@ impl<'a> Tokenizer<'a> {
           self.state = TokenizerState::InnerString;
           self.buffer.push('\t');
         }
-        _ => self.err(&format!("invalid escape sequence: {}", c)),
+        _ => self.err(Error::UnexpectedEscapeSequence(c)),
       },
       // read_end_string_state
       TokenizerState::EndString => {
@@ -432,7 +440,11 @@ impl<'a> Tokenizer<'a> {
       // read_start_number_state
       TokenizerState::StartNumber => match c {
         '1'..='9' => {
-          self.err(&format!("invalid number literal (leading zero): {}", c));
+          self.err(Error::UnexpectedLiteralNumber(c));
+        }
+        '.' => {
+          self.state = TokenizerState::NumberFloat;
+          self.buffer.push(c);
         }
         c => {
           self.buffer.clear();
@@ -445,12 +457,29 @@ impl<'a> Tokenizer<'a> {
         '0'..='9' => {
           self.buffer.push(c);
         }
+        '.' => {
+          self.state = TokenizerState::NumberFloat;
+          self.buffer.push(c);
+        }
         c => {
           let num = self.buffer.to_owned();
-          let num = num.parse::<u64>().unwrap();
+          let num = num.parse::<i64>().unwrap();
           self.buffer.clear();
 
           return self.reset_back(c, TokenKind::Int(num));
+        }
+      },
+      // read_number_float_state
+      TokenizerState::NumberFloat => match c {
+        '0'..='9' => {
+          self.buffer.push(c);
+        }
+        c => {
+          let num = self.buffer.to_owned();
+          let num = num.parse::<f64>().unwrap();
+          self.buffer.clear();
+
+          return self.reset_back(c, TokenKind::Float(num));
         }
       },
       // read_identifier_state
@@ -475,6 +504,65 @@ impl<'a> Tokenizer<'a> {
           self.state = TokenizerState::Idle;
           return Some(TokenKind::CommentLine);
         }
+
+        // TODO: error handling
+      }
+      // read_comment_doc_line_state
+      TokenizerState::CommentLineDoc => {
+        if c == '\n' || c == '\0' {
+          self.state = TokenizerState::Idle;
+          return Some(TokenKind::CommentLineDoc);
+        }
+
+        // TODO: error handling
+      }
+      // read_comment_block_state
+      TokenizerState::StartCommentBlock => {
+        self.state = TokenizerState::InnerCommentBlock;
+      }
+      // read_inner_comment_block_state
+      TokenizerState::InnerCommentBlock => match c {
+        '%' => {
+          self.state = TokenizerState::EndCommentBlock;
+        }
+        '!' => {
+          print!("char: {}\n", c); // TODO: start comment block never detected
+          self.state = TokenizerState::StartCommentDocBlock;
+        }
+        _ => {
+          self.state = TokenizerState::InnerCommentBlock;
+        }
+      },
+      // read_end_comment_block_state
+      TokenizerState::EndCommentBlock => {
+        if c == '-' {
+          self.state = TokenizerState::Idle;
+          return Some(TokenKind::CommentBlock);
+        }
+
+        // TODO: error handling
+      }
+      // read_start_comment_doc_block_state
+      TokenizerState::StartCommentDocBlock => {
+        self.state = TokenizerState::InnerCommentDocBlock;
+      }
+      // read_inner_comment_doc_block_state
+      TokenizerState::InnerCommentDocBlock => match c {
+        '%' => {
+          self.state = TokenizerState::EndCommentDocBlock;
+        }
+        _ => {
+          self.state = TokenizerState::InnerCommentDocBlock;
+        }
+      },
+      // read_end_comment_doc_block_state
+      TokenizerState::EndCommentDocBlock => {
+        if c == '-' {
+          self.state = TokenizerState::Idle;
+          return Some(TokenKind::CommentDocBlock);
+        }
+
+        // TODO: error handling
       }
     };
 

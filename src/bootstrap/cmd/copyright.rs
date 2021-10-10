@@ -7,5 +7,5 @@ pub fn run() {
 // print the copyright
 #[inline]
 pub fn copyright() {
-  print!("not implemented yet\n");
+  print!("\nnot implemented yet\n\n");
 }

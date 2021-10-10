@@ -1,4 +1,4 @@
-# Qhantoom
+# qhantoom
 
 > *a fresh wind to design safe and optimised applications*
 
@@ -35,7 +35,7 @@ fun main := () {
 * no gc
 * type system
 * high performance (fast compilation time)
-* backend | `cranelift`, `llvm`
+* backend (`aot` and `jit`) | `cranelift`
 * small binaries size
 
 ## Development
@@ -56,10 +56,10 @@ $ cargo build --release
 
 **start**
 
-| run	    | cmd
-|---------|--------------------------------|
-| compile	| `cargo run compile <filename>` |
-| repl	  | `cargo run repl`               |
+| run	    | desc                    | cmd                            |
+|---------|-------------------------|--------------------------------|
+| compile	| run the `aot` compiler  | `cargo run compile <filename>` |
+| repl	  | run the `jit` compiler  | `cargo run repl`               |
 
 ## License
 

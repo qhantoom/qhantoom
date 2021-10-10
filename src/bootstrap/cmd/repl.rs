@@ -4,8 +4,8 @@ use super::help;
 use super::license;
 use super::version;
 
-use qhantoomc::front::interpreter::{self, runtime::Runtime};
-
+use qhantoomc::back;
+use qhantoomc::back::codegen::Jit;
 use qute::prelude::*;
 
 // run the `repl`command
@@ -13,20 +13,20 @@ use qute::prelude::*;
 pub fn run(args: &[String]) {
   match repl(args) {
     Ok(_) => return,
-    Err(_) => panic!("repl error"),
+    Err(e) => panic!("{}", e),
   }
 }
 
 // read a line of input from stdin
 #[inline]
 fn repl(args: &[String]) -> Result<(), String> {
-  let mut runtime = Runtime::new();
+  let mut jit = Jit::new();
 
   banner();
 
   loop {
     match crate::util::readline("📡") {
-      Ok(ref line) => processing(&mut runtime, args, line),
+      Ok(ref line) => processing(&mut jit, args, line),
       Err(e) => Err(format!("{}", e)),
     }?;
   }
@@ -35,7 +35,7 @@ fn repl(args: &[String]) -> Result<(), String> {
 // process the line of input from stdin
 #[inline]
 fn processing(
-  runtime: &mut Runtime,
+  jit: &mut Jit,
   _args: &[String],
   line: &str,
 ) -> Result<(), String> {
@@ -48,7 +48,7 @@ fn processing(
     l if l.starts_with("help") => Ok(help::run()),
     l if l.starts_with("copyright") => Ok(copyright::run()),
     l if l.starts_with("license") => Ok(license::run()),
-    _ => match interpreter::interpret(runtime, line) {
+    _ => match back::codegen::compile::<f64>(jit, line) {
       Ok(value) => Ok(print!("🛰️  {}\n", value)),
       Err(e) => Err(format!("{}", e)),
     },
@@ -56,7 +56,7 @@ fn processing(
 }
 
 // print the repl banner
-// design:
+// the design banner should looks like this:
 // qhantoomc v0.1.0 (Oct 03 2021, 20:05:01)
 // welcome {user} to qhantoom version 0.1.0 Darwin/x86_64
 // use "help", "copyright" or "license" for more information.

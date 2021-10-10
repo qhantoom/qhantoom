@@ -15,7 +15,13 @@ fn tokenize_comments_token() {
   let file = read_file("../../samples/tokens/comments.qh");
   let tokens = tokenize(&file).unwrap();
 
-  let expected = vec![TokenKind::CommentLine, TokenKind::EOF];
+  let expected = vec![
+    TokenKind::CommentLine,
+    TokenKind::CommentDocLine,
+    TokenKind::CommentBlock,
+    // TokenKind::CommentDocBlock,
+    TokenKind::EOF,
+  ];
 
   run_test(2, tokens, expected);
 }

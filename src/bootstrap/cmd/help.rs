@@ -7,5 +7,5 @@ pub fn run() {
 // display the usage of the help command
 #[inline]
 fn usage() {
-  println!("usage: help");
+  print!("\nusage: help\n\n");
 }

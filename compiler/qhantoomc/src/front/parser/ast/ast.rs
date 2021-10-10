@@ -1,77 +1,13 @@
-use crate::front::tokenizer::token::{Token, TokenKind};
-
-#[derive(Debug)]
-pub struct Pkg {
-  pub items: Vec<Box<Item>>,
-}
+use crate::front::tokenizer::token::TokenKind;
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct Item {
-  pub kind: ItemKind,
-}
-
-impl Item {
-  #[inline]
-  pub const fn new(kind: ItemKind) -> Self {
-    Self { kind }
-  }
-
-  #[inline]
-  pub fn kind(&self) -> &ItemKind {
-    &self.kind
-  }
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub enum ItemKind {
-  Fun(Box<FunDecl>),
-  Imu(Box<Local>),
+pub struct Program {
+  pub stmts: Vec<Box<Stmt>>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Block {
   pub stmts: Vec<Box<Stmt>>,
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct FunDecl {
-  pub ident: Box<Expr>,
-  pub ty: Box<Ty>,
-  pub args: Vec<Box<Expr>>,
-  pub block: Box<Block>,
-}
-
-impl FunDecl {
-  #[inline]
-  pub fn name(&self) -> &str {
-    match self.ident.kind() {
-      ExprKind::Ident(ref name) => name,
-      _ => unreachable!(),
-    }
-  }
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct Local {
-  pub ident: Box<Expr>,
-  pub immutable: bool,
-  pub ty: Box<Ty>,
-  pub value: Box<Expr>,
-}
-
-impl Local {
-  #[inline]
-  pub fn name(&self) -> String {
-    match self.ident.kind() {
-      ExprKind::Ident(ref sym) => sym.to_string(),
-      _ => unreachable!(),
-    }
-  }
-
-  #[inline]
-  pub fn value(&self) -> &Box<Expr> {
-    &self.value
-  }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -93,14 +29,45 @@ impl Stmt {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum StmtKind {
-  Break,
-  Continue,
-  Fun(Box<FunDecl>),
-  Imu(Box<Local>),
-  Val(Box<Local>),
-  Mut(Box<Local>),
-  Return(Option<Box<Expr>>),
+  Fun(Function),
+  Val(Local),
   Expr(Box<Expr>),
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Function {
+  pub prototype: Prototype,
+  pub body: Box<Block>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Prototype {
+  pub name: Box<Expr>,
+  pub args: Vec<Box<Expr>>,
+  pub ty: Box<Ty>,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct Local {
+  pub name: Box<Expr>,
+  pub immutable: bool,
+  pub ty: Box<Ty>,
+  pub value: Box<Expr>,
+}
+
+impl Local {
+  #[inline]
+  pub fn name(&self) -> String {
+    match self.name.kind() {
+      ExprKind::Ident(ref s) => s.into(),
+      _ => unreachable!(),
+    }
+  }
+
+  #[inline]
+  pub fn value(&self) -> &Box<Expr> {
+    &self.value
+  }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -124,8 +91,8 @@ impl Expr {
 pub enum ExprKind {
   Ident(String),
   Bool(bool),
-  Int(i32),
-  Float(f32),
+  Int(i64),
+  Float(f64),
   Char(char),
   Str(String),
   Array(Vec<Box<Expr>>),
@@ -143,7 +110,7 @@ pub enum ExprKind {
     rhs: Box<Expr>,
   },
   Call {
-    callee: Box<Expr>,
+    callee: String,
     args: Vec<Box<Expr>>,
   },
   If {
@@ -171,6 +138,8 @@ pub enum BinopKind {
   Mul,
   Div,
   Mod,
+  And,
+  Or,
   Lt,
   Le,
   Gt,
@@ -187,6 +156,8 @@ impl BinopKind {
       TokenKind::Mul => Self::Mul,
       TokenKind::Div => Self::Div,
       TokenKind::Mod => Self::Mod,
+      TokenKind::And => Self::And,
+      TokenKind::PipePipe => Self::Or,
       TokenKind::Lt => Self::Lt,
       TokenKind::Gt => Self::Gt,
       TokenKind::Le => Self::Le,

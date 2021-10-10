@@ -6,4 +6,4 @@ mod parser;
 mod tests;
 
 pub use interface::Precedence;
-pub use parser::{parse, parse_stmts, Parser};
+pub use parser::{parse, Parser};

@@ -1,6 +1,8 @@
 use std::any::Any;
 
+use qhantoomc::back;
 use qhantoomc::front;
+use qhantoomc::util;
 
 // run the `compile` command
 #[inline]
@@ -35,20 +37,20 @@ fn compiling(args: Vec<String>) {
   // read the file from the path
   let file = match crate::util::readfile(&args[0]) {
     Ok(f) => f,
-    Err(e) => panic!("{}", e),
+    Err(e) => panic!("io error: {}", e),
   };
 
   print!("\nfile: {}\n", file);
 
   // transform source code into tokens
-  // let tokens = match front::tokenizer::tokenize(&file) {
-  //   Ok(t) => t,
-  //   Err(e) => panic!("tokenizer error: {}", e),
-  // };
+  let tokens = match front::tokenizer::tokenize(&file) {
+    Ok(t) => t,
+    Err(e) => panic!("tokenizer error: {}", e),
+  };
 
-  // print!("\ntokens: {:#?}\n", tokens);
+  print!("\ntokens: {:#?}\n", tokens);
 
-  // transform tokens into AST
+  // transform source code into AST
   let ast = {
     match front::parser::parse(&file) {
       Ok(ast) => ast,
@@ -58,14 +60,22 @@ fn compiling(args: Vec<String>) {
 
   print!("\nast: {:#?}\n", ast);
 
-  // check the AST
+  // type checking the AST
   front::analyzer::maincheck::check(&ast);
+  front::analyzer::typecheck::check(&ast);
 
-  // transform AST into bytecode
-  // write bytecode to file
-  unsafe {
-    qhantoomc::back::codegen::codegen_with_llvm(&ast);
-  }
+  // code generation from an AST to machine code
+  let code = {
+    match back::codegen::generate(&ast) {
+      Ok(code) => code,
+      Err(e) => panic!("codegen error: {}", e),
+    }
+  };
+
+  print!("\ncode: {:?}\n", code);
+
+  // write machine code to file
+  let _ = util::writer::write("test.o", code);
 
   // print success message
   print!("\ncompiled successfully..\n");

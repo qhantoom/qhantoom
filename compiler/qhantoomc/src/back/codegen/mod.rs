@@ -1,10 +1,10 @@
 mod codegen;
-pub mod cranelift;
-mod interface;
-pub mod llvm;
+mod jit;
+mod translator;
 
 #[cfg(test)]
 mod tests;
 
-pub use codegen::{codegen_with_cranelift, codegen_with_llvm, Codegen};
-pub use interface::CodeGenerator;
+pub use codegen::{generate, Codegen};
+pub use jit::{compile, Jit};
+pub use translator::Translator;

@@ -23,6 +23,7 @@
   * [ ] `hash`
   * [ ] `tuple`
   * [ ] `struct`
+  * [ ] `action`
 
 **optimizations**
 

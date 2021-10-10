@@ -4,15 +4,18 @@
 
 `--` comment line symbol    
 
-`-#` - comment block scope start symbol   
-`#-` - comment block scope end symbol   
+`-!` doc comment line
 
-`-!` - comment block doc scope start symbol   
-`!-` - comment block doc symbol   
+`-%` - comment block scope start symbol   
+`%-` - comment block scope end symbol   
+
+`-%!` - comment block doc scope start symbol   
+`%-` - comment block doc symbol   
 
 ```
 -- this is a line comments
--* this is a block comments *-
+-! this is a doc line comments
+-% this is a block comments %-
 -! this is a doc comments !-
 ```
 

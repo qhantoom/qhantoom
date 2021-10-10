@@ -1,61 +1,55 @@
+use std::mem;
+
 use super::translator::Translator;
 
 use crate::front::parser::ast::Program;
+use crate::front::parser::parse;
 use crate::util::error::Result;
 
+use cranelift::prelude::*;
 use cranelift_codegen::binemit::{NullStackMapSink, NullTrapSink};
-use cranelift_codegen::settings::Flags;
-use cranelift_codegen::{settings, Context};
+use cranelift_codegen::Context;
+use cranelift_jit::{JITBuilder, JITModule};
 use cranelift_module::{default_libcall_names, Linkage, Module};
-use cranelift_native::builder;
-use cranelift_object::{ObjectBuilder, ObjectModule};
 use cranelift_preopt::optimize;
 
-use cranelift::prelude::{
-  types, AbiParam, FunctionBuilder, FunctionBuilderContext, InstBuilder,
-};
-
 #[inline]
-pub fn generate(ast: &Program) -> Result<Vec<u8>> {
-  let generator = Codegen::new();
-  let code = generator.generate(ast)?;
+pub fn compile<O>(jit: &mut Jit, src: &str) -> Result<O> {
+  let ast = parse(src)?;
+  let code_ptr = jit.compile(&ast)?;
+  let code_fn = unsafe { mem::transmute::<_, fn() -> O>(code_ptr) };
 
-  Ok(code)
+  Ok(code_fn())
 }
 
-pub struct Codegen {
+pub struct Jit {
+  builder_context: FunctionBuilderContext,
   ctx: Context,
-  module: ObjectModule,
+  index: usize,
+  module: JITModule,
 }
 
-impl Codegen {
+impl Jit {
   #[inline]
   pub fn new() -> Self {
-    let flag_builder = settings::builder();
-    let isa_builder = builder().unwrap();
-    let isa = isa_builder.finish(Flags::new(flag_builder));
-
-    let object_builder = ObjectBuilder::new(
-      isa,
-      String::from("qhantoom"),
-      default_libcall_names(),
-    )
-    .unwrap();
-
-    let module = ObjectModule::new(object_builder);
+    let builder = JITBuilder::new(default_libcall_names());
+    let module = JITModule::new(builder);
 
     Self {
+      builder_context: FunctionBuilderContext::new(),
       ctx: module.make_context(),
-      module: module,
+      index: 0,
+      module,
     }
   }
 
   #[inline]
-  pub fn generate(mut self, program: &Program) -> Result<Vec<u8>> {
+  pub fn compile(&mut self, program: &Program) -> Result<*const u8> {
     self.translate(program)?;
+    self.index += 1;
 
     let id = self.module.declare_function(
-      "main",
+      &format!("_main:{}", self.index),
       Linkage::Export,
       &self.ctx.func.signature,
     )?;
@@ -68,11 +62,12 @@ impl Codegen {
     )?;
 
     self.module.clear_context(&mut self.ctx);
+    self.module.finalize_definitions();
 
-    let product = self.module.finish();
-    let bytes = product.emit()?;
+    let code =
+      unsafe { mem::transmute(self.module.get_finalized_function(id)) };
 
-    Ok(bytes)
+    Ok(code)
   }
 
   #[inline]
@@ -84,13 +79,11 @@ impl Codegen {
       .returns
       .push(AbiParam::new(types::F64));
 
-    let mut builder_context = FunctionBuilderContext::new();
-
     let mut builder =
-      FunctionBuilder::new(&mut self.ctx.func, &mut builder_context);
-
+      FunctionBuilder::new(&mut self.ctx.func, &mut self.builder_context);
     let entry_block = builder.create_block();
 
+    builder.append_block_params_for_function_params(entry_block);
     builder.switch_to_block(entry_block);
     builder.seal_block(entry_block);
 

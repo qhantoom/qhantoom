@@ -8,7 +8,7 @@ pub fn run() {
 #[inline]
 pub fn license() {
   match crate::util::readfile("LICENSE") {
-    Ok(s) => print!("{}\n", s),
-    Err(_) => println!("License not found"),
+    Ok(s) => print!("\n{}\n", s),
+    Err(_) => print!("License not found"),
   }
 }
