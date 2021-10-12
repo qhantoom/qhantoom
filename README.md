@@ -2,6 +2,10 @@
 
 > *a fresh wind to design safe and optimised applications*
 
+<p align="center">
+  <img src="./src/doc/qhantoom-banner.png">
+</p>
+
 ## About
 
 under development | under development | under development
