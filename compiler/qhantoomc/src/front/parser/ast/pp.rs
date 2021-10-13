@@ -1,8 +1,8 @@
 use std::fmt;
 
 use super::ast::{
-  BinopKind, Block, Expr, ExprKind, Function, Prototype, Stmt, StmtKind, Ty,
-  TyKind, UnopKind,
+  BinopKind, Block, Expr, ExprKind, Fun, Prototype, Stmt, StmtKind, Ty, TyKind,
+  UnopKind,
 };
 
 pub struct CommaSep<'a, T: 'a>(pub &'a [T]);
@@ -20,14 +20,12 @@ impl<'a, T: fmt::Display> fmt::Display for CommaSep<'a, T> {
   }
 }
 
-// fun ident : ty = (args) block
-impl fmt::Display for Function {
+impl fmt::Display for Fun {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "fun {} {}", self.prototype, self.body)
   }
 }
 
-// ext ident : ty = (args)
 impl fmt::Display for Prototype {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(

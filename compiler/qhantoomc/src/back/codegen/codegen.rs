@@ -17,10 +17,9 @@ use cranelift::prelude::{
 
 #[inline]
 pub fn generate(ast: &Program) -> Result<Vec<u8>> {
-  let generator = Codegen::new();
-  let code = generator.generate(ast)?;
+  let codegen = Codegen::new();
 
-  Ok(code)
+  codegen.generate(ast)
 }
 
 pub struct Codegen {
@@ -35,12 +34,9 @@ impl Codegen {
     let isa_builder = builder().unwrap();
     let isa = isa_builder.finish(Flags::new(flag_builder));
 
-    let object_builder = ObjectBuilder::new(
-      isa,
-      String::from("qhantoom"),
-      default_libcall_names(),
-    )
-    .unwrap();
+    let object_builder =
+      ObjectBuilder::new(isa, "qhantoom".to_string(), default_libcall_names())
+        .unwrap();
 
     let module = ObjectModule::new(object_builder);
 
@@ -94,17 +90,17 @@ impl Codegen {
     builder.switch_to_block(entry_block);
     builder.seal_block(entry_block);
 
-    let mut trans = Translator {
+    let mut translator = Translator {
       builder,
       module: &mut self.module,
       ty: types::F64,
     };
 
-    let return_value = trans.translate(program);
+    let return_value = translator.translate(program);
 
-    trans.builder.ins().return_(&[return_value]);
-    trans.builder.finalize();
-    optimize(&mut self.ctx, &*self.module.isa())?;
+    translator.builder.ins().return_(&[return_value]);
+    translator.builder.finalize();
+    optimize(&mut self.ctx, self.module.isa())?;
 
     Ok(())
   }

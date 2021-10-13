@@ -29,13 +29,12 @@ impl Stmt {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum StmtKind {
-  Fun(Function),
-  Val(Local),
+  Fun(Fun),
   Expr(Box<Expr>),
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct Function {
+pub struct Fun {
   pub prototype: Prototype,
   pub body: Box<Block>,
 }
@@ -45,29 +44,6 @@ pub struct Prototype {
   pub name: Box<Expr>,
   pub args: Vec<Box<Expr>>,
   pub ty: Box<Ty>,
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct Local {
-  pub name: Box<Expr>,
-  pub immutable: bool,
-  pub ty: Box<Ty>,
-  pub value: Box<Expr>,
-}
-
-impl Local {
-  #[inline]
-  pub fn name(&self) -> String {
-    match self.name.kind() {
-      ExprKind::Ident(ref s) => s.into(),
-      _ => unreachable!(),
-    }
-  }
-
-  #[inline]
-  pub fn value(&self) -> &Box<Expr> {
-    &self.value
-  }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -110,7 +86,7 @@ pub enum ExprKind {
     rhs: Box<Expr>,
   },
   Call {
-    callee: String,
+    callee: Box<Expr>,
     args: Vec<Box<Expr>>,
   },
   If {

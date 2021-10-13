@@ -2,8 +2,8 @@ use std::mem;
 
 use super::translator::Translator;
 
+use crate::front::parser;
 use crate::front::parser::ast::Program;
-use crate::front::parser::parse;
 use crate::util::error::Result;
 
 use cranelift::prelude::*;
@@ -15,7 +15,7 @@ use cranelift_preopt::optimize;
 
 #[inline]
 pub fn compile<O>(jit: &mut Jit, src: &str) -> Result<O> {
-  let ast = parse(src)?;
+  let ast = parser::parse(src)?;
   let code_ptr = jit.compile(&ast)?;
   let code_fn = unsafe { mem::transmute::<_, fn() -> O>(code_ptr) };
 
@@ -81,22 +81,23 @@ impl Jit {
 
     let mut builder =
       FunctionBuilder::new(&mut self.ctx.func, &mut self.builder_context);
+
     let entry_block = builder.create_block();
 
     builder.append_block_params_for_function_params(entry_block);
     builder.switch_to_block(entry_block);
     builder.seal_block(entry_block);
 
-    let mut trans = Translator {
+    let mut translator = Translator {
       builder,
       module: &mut self.module,
       ty: types::F64,
     };
 
-    let return_value = trans.translate(program);
+    let return_value = translator.translate(program);
 
-    trans.builder.ins().return_(&[return_value]);
-    trans.builder.finalize();
+    translator.builder.ins().return_(&[return_value]);
+    translator.builder.finalize();
     optimize(&mut self.ctx, &*self.module.isa())?;
 
     Ok(())

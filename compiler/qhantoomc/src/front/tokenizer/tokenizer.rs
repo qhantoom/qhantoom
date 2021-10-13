@@ -17,9 +17,8 @@ pub fn tokenize(src: &str) -> Result<Vec<Token>> {
   source.push_str("\0");
 
   let mut tokenizer = Tokenizer::new(&source);
-  let tokens = tokenizer.tokenize()?;
 
-  Ok(tokens)
+  tokenizer.tokenize()
 }
 
 pub struct Tokenizer<'a> {
@@ -87,45 +86,19 @@ impl<'a> Tokenizer<'a> {
         // c if is_whitespace(c) => {}
 
         // one character tokens
-        '\0' => {
-          return Some(TokenKind::EOF);
-        }
-        '\n' => {
-          return Some(TokenKind::Newline);
-        }
-        '\\' => {
-          return Some(TokenKind::BackSlash);
-        }
-        '(' => {
-          return Some(TokenKind::OpenParen);
-        }
-        ')' => {
-          return Some(TokenKind::CloseParen);
-        }
-        '{' => {
-          return Some(TokenKind::OpenBrace);
-        }
-        '}' => {
-          return Some(TokenKind::CloseBrace);
-        }
-        '[' => {
-          return Some(TokenKind::OpenBracket);
-        }
-        ']' => {
-          return Some(TokenKind::CloseBracket);
-        }
-        ',' => {
-          return Some(TokenKind::Comma);
-        }
-        ';' => {
-          return Some(TokenKind::Semicolon);
-        }
-        '?' => {
-          return Some(TokenKind::Question);
-        }
-        '@' => {
-          return Some(TokenKind::At);
-        }
+        '\0' => return Some(TokenKind::EOF),
+        '\n' => return Some(TokenKind::Newline),
+        '\\' => return Some(TokenKind::BackSlash),
+        '(' => return Some(TokenKind::OpenParen),
+        ')' => return Some(TokenKind::CloseParen),
+        '{' => return Some(TokenKind::OpenBrace),
+        '}' => return Some(TokenKind::CloseBrace),
+        '[' => return Some(TokenKind::OpenBracket),
+        ']' => return Some(TokenKind::CloseBracket),
+        ',' => return Some(TokenKind::Comma),
+        ';' => return Some(TokenKind::Semicolon),
+        '?' => return Some(TokenKind::Question),
+        '@' => return Some(TokenKind::At),
 
         // n characters tokens
         '+' => {
@@ -526,7 +499,7 @@ impl<'a> Tokenizer<'a> {
           self.state = TokenizerState::EndCommentBlock;
         }
         '!' => {
-          print!("char: {}\n", c); // TODO: start comment block never detected
+          // TODO: start comment block never detected
           self.state = TokenizerState::StartCommentDocBlock;
         }
         _ => {

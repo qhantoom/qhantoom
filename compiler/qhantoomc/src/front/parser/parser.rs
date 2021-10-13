@@ -1,8 +1,7 @@
 use std::mem;
 
 use super::ast::{
-  BinopKind, /* Block, */ Expr, ExprKind, /* Function, */ /* Local, */ Program,
-  /* Prototype, */ Stmt, StmtKind, /* Ty, */ /* TyKind, */ UnopKind,
+  BinopKind, Expr, ExprKind, Program, Stmt, StmtKind, UnopKind,
 };
 
 use super::interface::Precedence;
@@ -34,7 +33,7 @@ impl<'a> Parser<'a> {
       current: TOKEN_EOF,
       errors: vec![],
       first: TOKEN_EOF,
-      tokenizer: tokenizer,
+      tokenizer,
     }
   }
 
@@ -130,11 +129,11 @@ impl<'a> Parser<'a> {
   fn parse_binop_expr(&mut self, lhs: ExprKind) -> Result<ExprKind> {
     let precedence = self.precedence();
     let op = self.binop();
-    // move to the next token
+
     self.next();
-    // parse the right hand side of the expression
+
     let rhs = self.parse_expr_by_precedence(&precedence)?;
-    // return the binary expression
+
     Ok(ExprKind::Binop {
       lhs: box Expr::new(lhs),
       op,
@@ -225,15 +224,18 @@ impl<'a> Parser<'a> {
 
   #[inline]
   fn parse_unop_expr(&mut self) -> Result<ExprKind> {
-    // SYNTAX: - <expr> | ! <expr>
-    // store the operand
-    let op = UnopKind::from(self.current.kind());
-    // move to the next token
+    let op = self.unop();
+
     self.next();
-    // parse right hand side expression by precedence
+
     let rhs = self.parse_expr_by_precedence(&Precedence::Unary)?;
-    // return the unary expression
-    Ok(ExprKind::Unop { op: op, rhs: rhs })
+
+    Ok(ExprKind::Unop { op, rhs })
+  }
+
+  #[inline]
+  fn unop(&mut self) -> UnopKind {
+    UnopKind::from(self.current.kind())
   }
 
   #[inline]

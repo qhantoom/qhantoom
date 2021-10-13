@@ -17,10 +17,6 @@ impl<'a, T> Translator<'a, T> {
   pub fn translate(&mut self, program: &Program) -> Value {
     let mut return_value = Value::new(0);
 
-    if program.stmts.is_empty() {
-      return return_value;
-    }
-
     for stmt in &program.stmts {
       return_value = self.translate_stmt(stmt);
     }

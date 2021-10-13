@@ -17,13 +17,14 @@ fn tokenize_comments_token() {
 
   let expected = vec![
     TokenKind::CommentLine,
-    TokenKind::CommentDocLine,
+    TokenKind::CommentLine,
+    TokenKind::CommentLineDoc,
+    TokenKind::CommentLineDoc,
     TokenKind::CommentBlock,
-    // TokenKind::CommentDocBlock,
     TokenKind::EOF,
   ];
 
-  run_test(2, tokens, expected);
+  run_test(6, tokens, expected);
 }
 
 #[test]
@@ -113,7 +114,21 @@ fn tokenize_ints_token() {
   run_test(6, tokens, expected);
 }
 
-fn tokenize_floats_token() {}
+#[test]
+fn tokenize_floats_token() {
+  let file = read_file("../../samples/tokens/floats.qh");
+  let tokens = tokenize(&file).unwrap();
+
+  let expected = vec![
+    TokenKind::Float(0.5),
+    TokenKind::Float(1.0),
+    TokenKind::Float(230.47),
+    TokenKind::Float(30949.374),
+    TokenKind::EOF,
+  ];
+
+  run_test(5, tokens, expected);
+}
 
 fn tokenize_hex_token() {}
 
@@ -227,6 +242,7 @@ fn tokenize_keywords_token() {
   run_test(41, tokens, expected);
 }
 
+#[test]
 fn tokenize_tys_token() {
   let file = read_file("../../samples/tokens/tys.qh");
   let tokens = tokenize(&file).unwrap();
@@ -247,6 +263,7 @@ fn tokenize_tys_token() {
     TokenKind::Bool,
     TokenKind::Char,
     TokenKind::Str,
+    TokenKind::EOF,
   ];
 
   run_test(16, tokens, expected);

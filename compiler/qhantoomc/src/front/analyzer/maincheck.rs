@@ -5,4 +5,3 @@ use crate::front::parser::ast::Program;
 pub fn check(_program: &Program) {
   print!("\nmaincheck: no\n");
 }
-

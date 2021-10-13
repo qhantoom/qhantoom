@@ -5,25 +5,24 @@
 * [ ] front-end
   * [x] `tokenizer`
   * [x] `parser`
-  * [ ] `analyzer` | *wip*
-  * [ ] `interpreter`
-  * [ ] `transpiler`
+  * [ ] `analyzer`
 
 * [ ] middle-end | *needs help*
+
 * [ ] back-end | *needs help*
+  * [ ] `codegen` | *wip*
 
 * [ ] library
-  * [ ] `core`
-  * [ ] `std`
+  * [ ] `std`
   * [ ] `ogl`
   * [ ] `wgl`
 
 * [ ] data-structures
+  * [ ] `action`
   * [ ] `array`
   * [ ] `hash`
-  * [ ] `tuple`
   * [ ] `struct`
-  * [ ] `action`
+  * [ ] `tuple`
 
 **optimizations**
 
@@ -39,7 +38,7 @@
 
 **tools**
 
-* [ ] repl | *wip*
+* [ ] `repl` | *wip*
 * [ ] vscode extension
 * [ ] package manager
-* [ ] qhantoom.dev | *wip*
+* [ ] [qhantoom.dev](https://qhantoom.dev) | *wip*
