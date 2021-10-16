@@ -10,7 +10,7 @@
 * [ ] middle-end | *needs help*
 
 * [ ] back-end | *needs help*
-  * [ ] `codegen` | *wip*
+  * [ ] `codegen` | *wip*
 
 * [ ] library
   * [ ] `std`
@@ -18,11 +18,11 @@
   * [ ] `wgl`
 
 * [ ] data-structures
-  * [ ] `action`
-  * [ ] `array`
-  * [ ] `hash`
-  * [ ] `struct`
-  * [ ] `tuple`
+  * [ ] `action`
+  * [ ] `array`
+  * [ ] `hash`
+  * [ ] `struct`
+  * [ ] `tuple`
 
 **optimizations**
 
