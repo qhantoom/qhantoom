@@ -92,13 +92,14 @@ impl Jit {
       builder,
       module: &mut self.module,
       ty: types::F64,
+      index: 0,
     };
 
     let return_value = translator.translate(program);
 
     translator.builder.ins().return_(&[return_value]);
     translator.builder.finalize();
-    optimize(&mut self.ctx, &*self.module.isa())?;
+    optimize(&mut self.ctx, self.module.isa())?;
 
     Ok(())
   }

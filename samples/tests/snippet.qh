@@ -32,4 +32,6 @@ mut u := 10;
 val v := p + q + r;
 mut w := s + t + u;
 
+mut x := !true;
+
 3 + 39; -- returns 42

@@ -1,15 +1,16 @@
 use crate::front::parser::ast::{
-  BinopKind, Expr, ExprKind, Program, Stmt, StmtKind,
+  BinopKind, Expr, ExprKind, Program, Stmt, StmtKind, UnopKind,
 };
 
 use cranelift::prelude::{
-  types, EntityRef, FloatCC, FunctionBuilder, InstBuilder, Value,
+  types, EntityRef, FloatCC, FunctionBuilder, InstBuilder, IntCC, Value,
 };
 
 pub struct Translator<'a, T> {
   pub builder: FunctionBuilder<'a>,
   pub module: &'a mut T,
   pub ty: types::Type,
+  pub index: usize,
 }
 
 impl<'a, T> Translator<'a, T> {
@@ -28,7 +29,7 @@ impl<'a, T> Translator<'a, T> {
   fn translate_stmt(&mut self, stmt: &Stmt) -> Value {
     match stmt.kind() {
       StmtKind::Expr(expr) => self.translate_expr(expr),
-      _ => unimplemented!(),
+      _ => todo!(),
     }
   }
 
@@ -42,7 +43,8 @@ impl<'a, T> Translator<'a, T> {
         ref lhs,
         ref rhs,
       } => self.translate_binop(op, lhs, rhs),
-      _ => unimplemented!(),
+      ExprKind::Unop { ref op, ref rhs } => self.translate_unop(op, rhs),
+      _ => todo!(),
     }
   }
 
@@ -79,7 +81,7 @@ impl<'a, T> Translator<'a, T> {
       BinopKind::Ge => self.translate_ge_binop(lhs, rhs),
       BinopKind::Eq => self.translate_eq_binop(lhs, rhs),
       BinopKind::Ne => self.translate_ne_binop(lhs, rhs),
-      _ => unimplemented!(),
+      _ => todo!(),
     }
   }
 
@@ -105,12 +107,12 @@ impl<'a, T> Translator<'a, T> {
 
   #[inline]
   fn translate_and_binop(&mut self, _lhs: Value, _rhs: Value) -> Value {
-    unimplemented!()
+    todo!()
   }
 
   #[inline]
   fn translate_or_binop(&mut self, _lhs: Value, _rhs: Value) -> Value {
-    unimplemented!()
+    todo!()
   }
 
   #[inline]
@@ -157,5 +159,15 @@ impl<'a, T> Translator<'a, T> {
     let boolean = self.builder.ins().fcmp(FloatCC::NotEqual, lhs, rhs);
     let int = self.builder.ins().bint(types::I32, boolean);
     self.builder.ins().fcvt_from_sint(types::F64, int)
+  }
+
+  #[inline]
+  fn translate_unop(&mut self, op: &UnopKind, rhs: &Box<Expr>) -> Value {
+    let rhs = self.translate_expr(rhs);
+
+    match op {
+      UnopKind::Neg => self.builder.ins().fneg(rhs),
+      _ => unimplemented!(),
+    }
   }
 }

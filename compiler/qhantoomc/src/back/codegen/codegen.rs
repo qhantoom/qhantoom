@@ -65,8 +65,8 @@ impl Codegen {
 
     self.module.clear_context(&mut self.ctx);
 
-    let product = self.module.finish();
-    let bytes = product.emit()?;
+    let object = self.module.finish();
+    let bytes = object.emit()?;
 
     Ok(bytes)
   }
@@ -94,6 +94,7 @@ impl Codegen {
       builder,
       module: &mut self.module,
       ty: types::F64,
+      index: 0,
     };
 
     let return_value = translator.translate(program);
