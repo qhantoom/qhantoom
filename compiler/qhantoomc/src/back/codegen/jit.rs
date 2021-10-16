@@ -1,12 +1,17 @@
 use std::mem;
 
+use super::context::ScopeMap;
 use super::translator::Translator;
 
 use crate::front::parser;
 use crate::front::parser::ast::Program;
 use crate::util::error::Result;
 
-use cranelift::prelude::*;
+use cranelift::prelude::{
+  types, AbiParam, FunctionBuilder, FunctionBuilderContext, InstBuilder,
+  Variable,
+};
+
 use cranelift_codegen::binemit::{NullStackMapSink, NullTrapSink};
 use cranelift_codegen::Context;
 use cranelift_jit::{JITBuilder, JITModule};
@@ -27,6 +32,7 @@ pub struct Jit {
   ctx: Context,
   index: usize,
   module: JITModule,
+  scope_map: ScopeMap<Variable>,
 }
 
 impl Jit {
@@ -40,6 +46,7 @@ impl Jit {
       ctx: module.make_context(),
       index: 0,
       module,
+      scope_map: ScopeMap::new(),
     }
   }
 
@@ -64,8 +71,7 @@ impl Jit {
     self.module.clear_context(&mut self.ctx);
     self.module.finalize_definitions();
 
-    let code =
-      unsafe { mem::transmute(self.module.get_finalized_function(id)) };
+    let code = self.module.get_finalized_function(id);
 
     Ok(code)
   }
@@ -90,9 +96,10 @@ impl Jit {
 
     let mut translator = Translator {
       builder,
-      module: &mut self.module,
-      ty: types::F64,
       index: 0,
+      module: &mut self.module,
+      scope_map: &mut self.scope_map,
+      ty: types::F64,
     };
 
     let return_value = translator.translate(program);
@@ -100,6 +107,8 @@ impl Jit {
     translator.builder.ins().return_(&[return_value]);
     translator.builder.finalize();
     optimize(&mut self.ctx, self.module.isa())?;
+
+    // println!("{}", self.ctx.func.display(None).to_string());
 
     Ok(())
   }

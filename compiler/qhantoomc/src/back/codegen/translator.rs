@@ -1,9 +1,12 @@
+use super::context::ScopeMap;
+
 use crate::front::parser::ast::{
-  BinopKind, Expr, ExprKind, Program, Stmt, StmtKind, UnopKind,
+  BinopKind, Expr, ExprKind, Local, Program, Stmt, StmtKind, UnopKind,
 };
 
 use cranelift::prelude::{
-  types, EntityRef, FloatCC, FunctionBuilder, InstBuilder, IntCC, Value,
+  types, EntityRef, FloatCC, FunctionBuilder, InstBuilder, Value,
+  Variable,
 };
 
 pub struct Translator<'a, T> {
@@ -11,9 +14,22 @@ pub struct Translator<'a, T> {
   pub module: &'a mut T,
   pub ty: types::Type,
   pub index: usize,
+  pub scope_map: &'a mut ScopeMap<Variable>,
 }
 
 impl<'a, T> Translator<'a, T> {
+  #[inline]
+  fn create_variable(&mut self, name: String) -> Variable {
+    let var = Variable::new(self.index);
+
+    self.scope_map.add_variable(name, var).unwrap();
+    self.builder.declare_var(var, self.ty);
+
+    self.index += 1;
+
+    var
+  }
+
   #[inline]
   pub fn translate(&mut self, program: &Program) -> Value {
     let mut return_value = Value::new(0);
@@ -28,9 +44,18 @@ impl<'a, T> Translator<'a, T> {
   #[inline]
   fn translate_stmt(&mut self, stmt: &Stmt) -> Value {
     match stmt.kind() {
+      StmtKind::Val(local) | StmtKind::Mut(local) => self.translate_var(local),
       StmtKind::Expr(expr) => self.translate_expr(expr),
-      _ => todo!(),
     }
+  }
+
+  #[inline]
+  fn translate_var(&mut self, local: &Local) -> Value {
+    let var = self.create_variable(local.name.to_string());
+    let value = self.translate_expr(&local.value);
+    self.builder.def_var(var, value);
+
+    value
   }
 
   #[inline]
@@ -44,6 +69,7 @@ impl<'a, T> Translator<'a, T> {
         ref rhs,
       } => self.translate_binop(op, lhs, rhs),
       ExprKind::Unop { ref op, ref rhs } => self.translate_unop(op, rhs),
+      ExprKind::Ident(ref name) => self.translate_ident(name),
       _ => todo!(),
     }
   }
@@ -169,5 +195,11 @@ impl<'a, T> Translator<'a, T> {
       UnopKind::Neg => self.builder.ins().fneg(rhs),
       _ => unimplemented!(),
     }
+  }
+
+  #[inline]
+  fn translate_ident(&mut self, name: &str) -> Value {
+    let variable = self.scope_map.get_variable(&name).unwrap();
+    self.builder.use_var(*variable)
   }
 }

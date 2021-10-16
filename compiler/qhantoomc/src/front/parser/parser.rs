@@ -134,6 +134,7 @@ impl<'a> Parser<'a> {
     Ok(Stmt::new(StmtKind::Expr(expr)))
   }
 
+  #[inline]
   fn parse_expr_by_precedence(
     &mut self,
     precedence: &Precedence,
@@ -184,6 +185,7 @@ impl<'a> Parser<'a> {
       TokenKind::StrBuffer(..) => self.parse_str_expr(),
       TokenKind::Identifier(..) => self.parse_ident_expr(),
       TokenKind::Sub | TokenKind::Not => self.parse_unop_expr(),
+      TokenKind::OpenParen => self.parse_group_expr(),
       _ => Err(Error::Custom("expr error")),
     }
   }
@@ -264,6 +266,17 @@ impl<'a> Parser<'a> {
     let rhs = self.parse_expr_by_precedence(&Precedence::Unary)?;
 
     Ok(ExprKind::Unop { op, rhs })
+  }
+
+  #[inline]
+  fn parse_group_expr(&mut self) -> Result<ExprKind> {
+    self.next();
+
+    let exp = self.parse_expr_by_precedence(&Precedence::Lowest)?;
+
+    self.expect_first(&TokenKind::CloseParen)?;
+
+    Ok(exp.kind().to_owned())
   }
 
   #[inline]

@@ -1,4 +1,5 @@
 mod codegen;
+pub mod context;
 mod jit;
 mod translator;
 

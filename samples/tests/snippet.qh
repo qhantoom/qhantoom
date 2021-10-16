@@ -17,9 +17,9 @@ val j : sint = 10;
 val k : f32 = 1234.5678;
 val l : f64 = 1234.5678;
 
-val m : bool = true;
-val n : char = 'a';
-val o : str = "hello, world!";
+val m : uint = 0;
+val n : uint = 0;
+val o : uint = 0;
 
 val p := 10;
 val q := 10;
@@ -32,6 +32,8 @@ mut u := 10;
 val v := p + q + r;
 mut w := s + t + u;
 
-mut x := !true;
+mut x := 1;
+mut y := 3;
+mut z := 39;
 
 3 + 39; -- returns 42

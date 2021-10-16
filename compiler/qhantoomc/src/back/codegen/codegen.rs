@@ -1,3 +1,4 @@
+use super::context::ScopeMap;
 use super::translator::Translator;
 
 use crate::front::parser::ast::Program;
@@ -13,6 +14,7 @@ use cranelift_preopt::optimize;
 
 use cranelift::prelude::{
   types, AbiParam, FunctionBuilder, FunctionBuilderContext, InstBuilder,
+  Variable,
 };
 
 #[inline]
@@ -25,6 +27,7 @@ pub fn generate(ast: &Program) -> Result<Vec<u8>> {
 pub struct Codegen {
   ctx: Context,
   module: ObjectModule,
+  scope_map: ScopeMap<Variable>,
 }
 
 impl Codegen {
@@ -43,6 +46,7 @@ impl Codegen {
     Self {
       ctx: module.make_context(),
       module: module,
+      scope_map: ScopeMap::new(),
     }
   }
 
@@ -92,9 +96,10 @@ impl Codegen {
 
     let mut translator = Translator {
       builder,
-      module: &mut self.module,
-      ty: types::F64,
       index: 0,
+      module: &mut self.module,
+      scope_map: &mut self.scope_map,
+      ty: types::F64,
     };
 
     let return_value = translator.translate(program);
