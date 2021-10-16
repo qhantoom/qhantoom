@@ -2,12 +2,12 @@ use crate::front::tokenizer::token::TokenKind;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Program {
-  pub stmts: Vec<Box<Stmt>>,
+  pub stmts: Vec<Stmt>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Block {
-  pub stmts: Vec<Box<Stmt>>,
+  pub stmts: Vec<Stmt>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -29,7 +29,8 @@ impl Stmt {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum StmtKind {
-  Fun(Fun),
+  Val(Box<Local>),
+  Mut(Box<Local>),
   Expr(Box<Expr>),
 }
 
@@ -44,6 +45,14 @@ pub struct Prototype {
   pub name: Box<Expr>,
   pub args: Vec<Box<Expr>>,
   pub ty: Box<Ty>,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct Local {
+  pub name: Box<Expr>,
+  pub immutable: bool,
+  pub ty: Box<Ty>,
+  pub value: Box<Expr>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -71,7 +80,7 @@ pub enum ExprKind {
   Float(f64),
   Char(char),
   Str(String),
-  Array(Vec<Box<Expr>>),
+  Array(Vec<Expr>),
   Assign {
     lhs: Box<Expr>,
     rhs: Box<Expr>,
@@ -87,7 +96,7 @@ pub enum ExprKind {
   },
   Call {
     callee: Box<Expr>,
-    args: Vec<Box<Expr>>,
+    args: Vec<Expr>,
   },
   If {
     condition: Box<Expr>,

@@ -1,7 +1,8 @@
 use std::mem;
 
 use super::ast::{
-  BinopKind, Expr, ExprKind, Program, Stmt, StmtKind, UnopKind,
+  BinopKind, Expr, ExprKind, Local, Program, Stmt, StmtKind, Ty, TyKind,
+  UnopKind,
 };
 
 use super::interface::Precedence;
@@ -38,7 +39,7 @@ impl<'a> Parser<'a> {
   }
 
   #[inline]
-  fn _expect_first(&mut self, kind: &TokenKind) -> Result<()> {
+  fn expect_first(&mut self, kind: &TokenKind) -> Result<()> {
     if self.first.is(kind.to_owned()) {
       self.next();
       return Ok(());
@@ -77,28 +78,60 @@ impl<'a> Parser<'a> {
         },
       }
 
-      self.tokenizer.next();
+      self.next();
     }
 
     Ok(Program { stmts })
   }
 
   #[inline]
-  fn parse_stmt(&mut self) -> Result<Box<Stmt>> {
+  fn parse_stmt(&mut self) -> Result<Stmt> {
     match self.current.kind() {
+      TokenKind::Val | TokenKind::Mut => self.parse_var_stmt(),
       _ => self.parse_expr_stmt(),
     }
   }
 
   #[inline]
-  fn parse_expr_stmt(&mut self) -> Result<Box<Stmt>> {
+  fn parse_var_stmt(&mut self) -> Result<Stmt> {
+    let kw = self.current.to_owned();
+
+    self.next();
+
+    let name = self.parse_ident_expr()?;
+    let ty = self.parse_ty_expr()?;
+    let value = self.parse_expr_by_precedence(&Precedence::Lowest)?;
+
+    self.expect_first(&TokenKind::Semicolon)?;
+
+    let kind = match kw.kind() {
+      TokenKind::Val => StmtKind::Val(box Local {
+        name: box Expr::new(name),
+        immutable: true,
+        ty,
+        value,
+      }),
+      TokenKind::Mut => StmtKind::Mut(box Local {
+        name: box Expr::new(name),
+        immutable: false,
+        ty,
+        value,
+      }),
+      _ => unreachable!(),
+    };
+
+    Ok(Stmt::new(kind))
+  }
+
+  #[inline]
+  fn parse_expr_stmt(&mut self) -> Result<Stmt> {
     let expr = self.parse_expr_by_precedence(&Precedence::Lowest)?;
 
     if self.first.is(TokenKind::Semicolon) {
       self.next();
     }
 
-    Ok(box Stmt::new(StmtKind::Expr(expr)))
+    Ok(Stmt::new(StmtKind::Expr(expr)))
   }
 
   fn parse_expr_by_precedence(
@@ -231,6 +264,53 @@ impl<'a> Parser<'a> {
     let rhs = self.parse_expr_by_precedence(&Precedence::Unary)?;
 
     Ok(ExprKind::Unop { op, rhs })
+  }
+
+  #[inline]
+  fn parse_ty_expr(&mut self) -> Result<Box<Ty>> {
+    self.next();
+
+    if self.current.is(TokenKind::ColonAssign) {
+      self.next();
+      return Ok(box Ty::new(TyKind::Dynamic));
+    }
+
+    self.next();
+
+    let ty = match self.current.kind() {
+      _ => self.parse_ty()?,
+    };
+
+    self.next();
+
+    Ok(ty)
+  }
+
+  #[inline]
+  fn parse_ty(&mut self) -> Result<Box<Ty>> {
+    let kind = match self.current.kind() {
+      TokenKind::U8 => TyKind::U8,
+      TokenKind::U16 => TyKind::U16,
+      TokenKind::U32 => TyKind::U32,
+      TokenKind::U64 => TyKind::U64,
+      TokenKind::UInt => TyKind::UInt,
+      TokenKind::S8 => TyKind::S8,
+      TokenKind::S16 => TyKind::S16,
+      TokenKind::S32 => TyKind::S32,
+      TokenKind::S64 => TyKind::S64,
+      TokenKind::SInt => TyKind::SInt,
+      TokenKind::F32 => TyKind::F32,
+      TokenKind::F64 => TyKind::F64,
+      TokenKind::Bool => TyKind::Bool,
+      TokenKind::Char => TyKind::Char,
+      TokenKind::Str => TyKind::Str,
+      TokenKind::Void => TyKind::Void,
+      _ => return Err(Error::Custom("type error")),
+    };
+
+    self.next();
+
+    Ok(box Ty::new(kind))
   }
 
   #[inline]
