@@ -106,13 +106,13 @@ impl<'a> Parser<'a> {
 
     let kind = match kw.kind() {
       TokenKind::Val => StmtKind::Val(box Local {
-        name: box Expr::new(name),
+        name,
         immutable: true,
         ty,
         value,
       }),
       TokenKind::Mut => StmtKind::Mut(box Local {
-        name: box Expr::new(name),
+        name,
         immutable: false,
         ty,
         value,
@@ -120,7 +120,7 @@ impl<'a> Parser<'a> {
       _ => unreachable!(),
     };
 
-    Ok(Stmt::new(kind))
+    Ok(mk_stmt(kind))
   }
 
   #[inline]
@@ -131,7 +131,7 @@ impl<'a> Parser<'a> {
       self.next();
     }
 
-    Ok(Stmt::new(StmtKind::Expr(expr)))
+    Ok(mk_stmt(StmtKind::Expr(expr)))
   }
 
   #[inline]
@@ -149,18 +149,18 @@ impl<'a> Parser<'a> {
       lhs = self.parse_binop_rhs(lhs)?;
     }
 
-    Ok(box Expr::new(lhs))
+    Ok(lhs)
   }
 
   #[inline]
-  fn parse_binop_rhs(&mut self, lhs: ExprKind) -> Result<ExprKind> {
+  fn parse_binop_rhs(&mut self, lhs: Box<Expr>) -> Result<Box<Expr>> {
     match self.current.kind() {
       _ => self.parse_binop_expr(lhs),
     }
   }
 
   #[inline]
-  fn parse_binop_expr(&mut self, lhs: ExprKind) -> Result<ExprKind> {
+  fn parse_binop_expr(&mut self, lhs: Box<Expr>) -> Result<Box<Expr>> {
     let precedence = self.precedence();
     let op = self.binop();
 
@@ -168,15 +168,11 @@ impl<'a> Parser<'a> {
 
     let rhs = self.parse_expr_by_precedence(&precedence)?;
 
-    Ok(ExprKind::Binop {
-      lhs: box Expr::new(lhs),
-      op,
-      rhs,
-    })
+    Ok(box mk_expr(ExprKind::Binop { lhs, op, rhs }))
   }
 
   #[inline]
-  fn parse_expr(&mut self) -> Result<ExprKind> {
+  fn parse_expr(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
       TokenKind::True | TokenKind::False => self.parse_bool_expr(),
       TokenKind::Int(..) => self.parse_int_expr(),
@@ -191,10 +187,10 @@ impl<'a> Parser<'a> {
   }
 
   #[inline]
-  fn parse_bool_expr(&mut self) -> Result<ExprKind> {
+  fn parse_bool_expr(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
-      TokenKind::True => Ok(ExprKind::Bool(true)),
-      TokenKind::False => Ok(ExprKind::Bool(false)),
+      TokenKind::True => Ok(box mk_expr(ExprKind::Bool(true))),
+      TokenKind::False => Ok(box mk_expr(ExprKind::Bool(false))),
       _ => Err(Error::ExpectedExpr(
         "bool",
         format!("{:?}", self.current.kind()),
@@ -203,9 +199,9 @@ impl<'a> Parser<'a> {
   }
 
   #[inline]
-  fn parse_int_expr(&mut self) -> Result<ExprKind> {
+  fn parse_int_expr(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
-      TokenKind::Int(ref num) => Ok(ExprKind::Int(*num)),
+      TokenKind::Int(ref num) => Ok(box mk_expr(ExprKind::Int(*num))),
       _ => Err(Error::ExpectedExpr(
         "int",
         format!("{:?}", self.current.kind()),
@@ -214,9 +210,9 @@ impl<'a> Parser<'a> {
   }
 
   #[inline]
-  fn parse_float_expr(&mut self) -> Result<ExprKind> {
+  fn parse_float_expr(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
-      TokenKind::Float(ref num) => Ok(ExprKind::Float(*num)),
+      TokenKind::Float(ref num) => Ok(box mk_expr(ExprKind::Float(*num))),
       _ => Err(Error::ExpectedExpr(
         "float",
         format!("{:?}", self.current.kind()),
@@ -225,9 +221,11 @@ impl<'a> Parser<'a> {
   }
 
   #[inline]
-  fn parse_char_expr(&mut self) -> Result<ExprKind> {
+  fn parse_char_expr(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
-      TokenKind::CharAscii(ref ascii) => Ok(ExprKind::Char(*ascii)),
+      TokenKind::CharAscii(ref ascii) => {
+        Ok(box mk_expr(ExprKind::Char(*ascii)))
+      }
       _ => Err(Error::ExpectedExpr(
         "char",
         format!("{:?}", self.current.kind()),
@@ -236,9 +234,11 @@ impl<'a> Parser<'a> {
   }
 
   #[inline]
-  fn parse_str_expr(&mut self) -> Result<ExprKind> {
+  fn parse_str_expr(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
-      TokenKind::StrBuffer(ref buf) => Ok(ExprKind::Str(buf.into())),
+      TokenKind::StrBuffer(ref buf) => {
+        Ok(box mk_expr(ExprKind::Str(buf.into())))
+      }
       _ => Err(Error::ExpectedExpr(
         "str",
         format!("{:?}", self.current.kind()),
@@ -247,9 +247,11 @@ impl<'a> Parser<'a> {
   }
 
   #[inline]
-  fn parse_ident_expr(&mut self) -> Result<ExprKind> {
+  fn parse_ident_expr(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
-      TokenKind::Identifier(ref ident) => Ok(ExprKind::Ident(ident.into())),
+      TokenKind::Identifier(ref ident) => {
+        Ok(box mk_expr(ExprKind::Ident(ident.into())))
+      }
       _ => Err(Error::ExpectedExpr(
         "ident",
         format!("{:?}", self.current.kind()),
@@ -258,25 +260,25 @@ impl<'a> Parser<'a> {
   }
 
   #[inline]
-  fn parse_unop_expr(&mut self) -> Result<ExprKind> {
+  fn parse_unop_expr(&mut self) -> Result<Box<Expr>> {
     let op = self.unop();
 
     self.next();
 
     let rhs = self.parse_expr_by_precedence(&Precedence::Unary)?;
 
-    Ok(ExprKind::Unop { op, rhs })
+    Ok(box mk_expr(ExprKind::Unop { op, rhs }))
   }
 
   #[inline]
-  fn parse_group_expr(&mut self) -> Result<ExprKind> {
+  fn parse_group_expr(&mut self) -> Result<Box<Expr>> {
     self.next();
 
-    let exp = self.parse_expr_by_precedence(&Precedence::Lowest)?;
+    let expr = self.parse_expr_by_precedence(&Precedence::Lowest)?;
 
     self.expect_first(&TokenKind::CloseParen)?;
 
-    Ok(exp.kind().to_owned())
+    Ok(expr)
   }
 
   #[inline]
@@ -345,4 +347,14 @@ impl<'a> Parser<'a> {
   fn should_precedence_has_priority(&mut self, kind: &Precedence) -> bool {
     *kind < Precedence::from(self.first.kind())
   }
+}
+
+#[inline]
+fn mk_stmt(kind: StmtKind) -> Stmt {
+  Stmt::new(kind)
+}
+
+#[inline]
+fn mk_expr(kind: ExprKind) -> Expr {
+  Expr::new(kind)
 }

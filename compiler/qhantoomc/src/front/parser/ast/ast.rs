@@ -141,7 +141,7 @@ impl BinopKind {
       TokenKind::Mul => Self::Mul,
       TokenKind::Div => Self::Div,
       TokenKind::Mod => Self::Mod,
-      TokenKind::And => Self::And,
+      TokenKind::AndAnd => Self::And,
       TokenKind::PipePipe => Self::Or,
       TokenKind::Lt => Self::Lt,
       TokenKind::Gt => Self::Gt,
