@@ -13,10 +13,7 @@ use crate::util::error::{Error, Result};
 // tokenize a string into a vector of tokens
 #[inline]
 pub fn tokenize(src: &str) -> Result<Vec<Token>> {
-  let mut source = src.to_owned();
-  source.push_str("\0");
-
-  let mut tokenizer = Tokenizer::new(&source);
+  let mut tokenizer = Tokenizer::new(&src);
 
   tokenizer.tokenize()
 }
