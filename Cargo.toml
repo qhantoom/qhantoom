@@ -3,3 +3,13 @@ members = [
   "src/bootstrap",
   "compiler/qhantoomc",
 ]
+
+exclude = [
+  "target/**/*",
+  "Cargo.lock",
+]
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
