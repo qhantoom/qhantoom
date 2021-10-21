@@ -61,8 +61,8 @@ fn compiling(args: Vec<String>) {
   print!("\nast: {:#?}\n", ast);
 
   // type checking the AST
-  front::analyzer::maincheck::check(&ast);
-  front::analyzer::typecheck::check(&ast);
+  front::analyzer::maincheck::analyze(&ast);
+  front::analyzer::typecheck::analyze(&ast);
 
   // code generation from an AST to machine code
   let code = {

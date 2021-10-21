@@ -66,6 +66,7 @@ impl<'a> Parser<'a> {
       match self.current.kind() {
         TokenKind::EOF => break,
         TokenKind::Semicolon
+        | TokenKind::Newline
         | TokenKind::CommentLine
         | TokenKind::CommentLineDoc
         | TokenKind::CommentBlock => {

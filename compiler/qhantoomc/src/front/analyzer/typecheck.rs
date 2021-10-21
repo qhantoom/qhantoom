@@ -2,6 +2,6 @@ use crate::front::parser::ast::Program;
 
 // traverse the AST and check the types function
 #[inline]
-pub fn check(_program: &Program) {
+pub fn analyze(_program: &Program) {
   print!("typecheck: no\n");
 }

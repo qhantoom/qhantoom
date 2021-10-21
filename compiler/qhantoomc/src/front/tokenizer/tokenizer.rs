@@ -79,8 +79,7 @@ impl<'a> Tokenizer<'a> {
       // read_idle_state
       TokenizerState::Idle => match c {
         // skip whitespace
-        c if is_whitespace(c) || c == '\n' => {}
-        // c if is_whitespace(c) => {}
+        c if is_whitespace(c) => {}
 
         // one character tokens
         '\0' => return Some(TokenKind::EOF),
