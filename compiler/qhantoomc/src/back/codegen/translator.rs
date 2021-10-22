@@ -46,6 +46,7 @@ impl<'a, T> Translator<'a, T> {
     match stmt.kind() {
       StmtKind::Val(local) | StmtKind::Mut(local) => self.translate_var(local),
       StmtKind::Expr(expr) => self.translate_expr(expr),
+      _ => todo!(),
     }
   }
 

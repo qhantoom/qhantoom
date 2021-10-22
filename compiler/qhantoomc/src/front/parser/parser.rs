@@ -1,8 +1,8 @@
 use std::mem;
 
 use super::ast::{
-  BinopKind, Expr, ExprKind, Local, Program, Stmt, StmtKind, Ty, TyKind,
-  UnopKind,
+  BinopKind, Block, Expr, ExprKind, Fun, Local, Program, Prototype, Stmt,
+  StmtKind, Ty, TyKind, UnopKind,
 };
 
 use super::interface::Precedence;
@@ -41,8 +41,7 @@ impl<'a> Parser<'a> {
   #[inline]
   fn expect_first(&mut self, kind: &TokenKind) -> Result<()> {
     if self.first.is(kind.to_owned()) {
-      self.next();
-      return Ok(());
+      return Ok(self.next());
     }
 
     Err(Error::Custom(
@@ -88,9 +87,72 @@ impl<'a> Parser<'a> {
   #[inline]
   fn parse_stmt(&mut self) -> Result<Stmt> {
     match self.current.kind() {
-      TokenKind::Val | TokenKind::Mut => self.parse_var_stmt(),
+      TokenKind::Fun => self.parse_fun_stmt(),
+      TokenKind::Imu | TokenKind::Val | TokenKind::Mut => self.parse_var_stmt(),
       _ => self.parse_expr_stmt(),
     }
+  }
+
+  // TODO: this will be change in the future
+  #[inline]
+  fn parse_fun_stmt(&mut self) -> Result<Stmt> {
+    let prototype = self.parse_prototype()?;
+    let body = self.parse_block()?;
+
+    Ok(Stmt::new(StmtKind::Fun(box Fun { prototype, body })))
+  }
+
+  // TODO: this will be change in the future
+  #[inline]
+  fn parse_prototype(&mut self) -> Result<Prototype> {
+    self.next();
+
+    let name = self.parse_ident_expr()?;
+    let ty = self.parse_ty_expr()?;
+    let args = self.parse_args()?;
+
+    Ok(Prototype { name, ty, args })
+  }
+
+  // TODO: this will be change in the future
+  #[inline]
+  fn parse_args(&mut self) -> Result<Vec<Box<Expr>>> {
+    let mut args = vec![];
+
+    if self.first.is(TokenKind::CloseParen) {
+      self.next();
+      return Ok(args);
+    }
+
+    self.next();
+    args.push(self.parse_ident_expr()?);
+
+    while self.first.is(TokenKind::Comma) {
+      self.next();
+      self.next();
+      args.push(self.parse_ident_expr()?);
+    }
+
+    self.expect_first(&TokenKind::CloseParen)?;
+
+    Ok(args)
+  }
+
+  #[inline]
+  fn parse_block(&mut self) -> Result<Box<Block>> {
+    let mut stmts = vec![];
+
+    self.expect_first(&TokenKind::OpenBrace)?;
+    self.next();
+
+    while *self.current.kind() != TokenKind::CloseBrace
+      && *self.current.kind() != TokenKind::EOF
+    {
+      stmts.push(self.parse_stmt()?);
+      self.next();
+    }
+
+    Ok(box Block { stmts })
   }
 
   #[inline]
@@ -156,8 +218,16 @@ impl<'a> Parser<'a> {
   #[inline]
   fn parse_binop_rhs(&mut self, lhs: Box<Expr>) -> Result<Box<Expr>> {
     match self.current.kind() {
+      TokenKind::OpenParen => self.parse_call_expr(lhs),
       _ => self.parse_binop_expr(lhs),
     }
+  }
+
+  #[inline]
+  fn parse_call_expr(&mut self, lhs: Box<Expr>) -> Result<Box<Expr>> {
+    let args = self.parse_until(&TokenKind::CloseParen)?;
+
+    Ok(box mk_expr(ExprKind::Call { callee: lhs, args }))
   }
 
   #[inline]
@@ -282,6 +352,7 @@ impl<'a> Parser<'a> {
     Ok(expr)
   }
 
+  // TODO: implement a dynamic type system
   #[inline]
   fn parse_ty_expr(&mut self) -> Result<Box<Ty>> {
     self.next();
@@ -327,6 +398,29 @@ impl<'a> Parser<'a> {
     self.next();
 
     Ok(box Ty::new(kind))
+  }
+
+  #[inline]
+  fn parse_until(&mut self, kind: &TokenKind) -> Result<Vec<Box<Expr>>> {
+    let mut exprs = vec![];
+
+    if self.first.is(kind.to_owned()) {
+      self.next();
+      return Ok(exprs);
+    }
+
+    self.next();
+    exprs.push(self.parse_expr_by_precedence(&Precedence::Lowest)?);
+
+    while self.first.is(TokenKind::Comma) {
+      self.next();
+      self.next();
+      exprs.push(self.parse_expr_by_precedence(&Precedence::Lowest)?);
+    }
+
+    self.expect_first(&kind)?;
+
+    Ok(exprs)
   }
 
   #[inline]

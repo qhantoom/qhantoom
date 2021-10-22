@@ -29,6 +29,8 @@ impl Stmt {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum StmtKind {
+  Ext(Box<Prototype>),
+  Fun(Box<Fun>),
   Val(Box<Local>),
   Mut(Box<Local>),
   Expr(Box<Expr>),
@@ -96,7 +98,7 @@ pub enum ExprKind {
   },
   Call {
     callee: Box<Expr>,
-    args: Vec<Expr>,
+    args: Vec<Box<Expr>>,
   },
   If {
     condition: Box<Expr>,
