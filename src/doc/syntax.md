@@ -104,6 +104,8 @@ f32   f64   str   char  bool
 
 **derived types**
 
+*still in research*
+
 ```
 type Symbol = s32;
 ```
@@ -139,11 +141,13 @@ val c := a == b;
 **multiple assignments**
 
 ```
-val x, y, z, : s8 = 0;
-val x, y, z, := 0;
+val x, y, z : s8 = 0;
+val x, y, z := 0;
 ```
 
 ## Functions
+
+*still in research*
 
 `fun` function declaration    
 `\->` arrow function    
@@ -175,7 +179,7 @@ if a < b {
 } else if a > b {
   1
 } else {
-  panic()
+  #abort()
 }
 ```
 
@@ -210,7 +214,7 @@ struct Button {
 }
 
 set Button {
-  fun new: (str) -> Button = (name) {
+  fun new : (str) -> Button = (name) {
     Button {
       id = 0,
       name = name,
@@ -225,7 +229,7 @@ actions are simply interfaces that allow a new behaviour to be assigned
 
 ```
 action Vec2 {
-  fun mul: (uint) -> uint;
+  fun mul : (uint) -> uint;
 }
 
 struct Point {
@@ -234,7 +238,7 @@ struct Point {
 }
 
 set Vec2 for Point {
-  fun mul: (uint) -> uint = (x) { x * x }
+  fun mul : (uint) -> uint = (x) { x * x }
 }
 ```
 
@@ -266,7 +270,7 @@ match op {
   '-' => sub(x, y),
   '*' => mul(x, y),
   '/' => div(x, y),
-  _ => #panic("with msg"),
+  _ => #abort("with msg"),
 }
 ```
 
@@ -308,10 +312,10 @@ async {
 
 ## Channels
 
+*still in research*
+
 `chan` - make channel keyword   
 `spawn` - make thread keyword   
-
-*still in research*
 
 ```
 chan (tx, rx) = 0;
@@ -337,7 +341,7 @@ unit {
 **mock**
 
 ```
-mock tokenization_mock = () {
+mock tokenization_mock := () {
   -- mock computation
 }
 ```
@@ -345,7 +349,7 @@ mock tokenization_mock = () {
 **test**
 
 ```
-test tokenization_test = () {
+test tokenization_test := () {
   -- test computation
 }
 ```
@@ -357,12 +361,14 @@ test tokenization_test = () {
 **bench**
 
 ```
-bench tokenization_benchmark = () {
+bench tokenization_benchmark := () {
   -- bench computation
 }
 ```
 
 ## FFI
+
+*still in research*
 
 `ext` - call a c function keyword   
 `exp` - call a javascript function keyword    
