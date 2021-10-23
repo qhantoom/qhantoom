@@ -1,5 +1,7 @@
+cargo-features = ["edition2021"]
+
 [package]
-edition = "2018"
+edition = "2021"
 name = "qhantoomc"
 version = "0.1.0"
 
