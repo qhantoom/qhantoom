@@ -82,7 +82,7 @@ pub enum ExprKind {
   Float(f64),
   Char(char),
   Str(String),
-  Array(Vec<Expr>),
+  Array(Vec<Box<Expr>>),
   Assign {
     lhs: Box<Expr>,
     rhs: Box<Expr>,
@@ -274,6 +274,11 @@ pub fn mk_prototype(
 #[inline]
 pub fn mk_expr(kind: ExprKind) -> Expr {
   Expr::new(kind)
+}
+
+#[inline]
+pub fn mk_array(exprs: Vec<Box<Expr>>) -> ExprKind {
+  ExprKind::Array(exprs)
 }
 
 #[inline]
