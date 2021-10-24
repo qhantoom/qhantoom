@@ -40,13 +40,35 @@ impl fmt::Display for Prototype {
 
 impl fmt::Display for Block {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "{{ {} }}", CommaSep(&self.stmts))
+    let stmts = self
+      .stmts
+      .iter()
+      .map(|a| a.to_string())
+      .collect::<Vec<String>>()
+      .join("");
+
+    write!(f, "{{ {} }}", stmts)
   }
 }
 
 impl fmt::Display for Stmt {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match self.kind() {
+      StmtKind::Val(ref local) => {
+        if *local.ty.kind() == TyKind::Dynamic {
+          return write!(f, "val {} := {};", local.name, local.value);
+        }
+
+        write!(f, "val {} : {} = {};", local.name, local.ty, local.value)
+      }
+      StmtKind::Mut(ref local) => {
+        if *local.ty.kind() == TyKind::Dynamic {
+          return write!(f, "mut {} := {};", local.name, local.value);
+        }
+
+        write!(f, "mut {} : {} = {};", local.name, local.ty, local.value)
+      }
+      StmtKind::Return(ref expr) => write!(f, "return {};", expr),
       StmtKind::Expr(ref expr) => write!(f, "{:?}", expr),
       _ => write!(f, "{:?}", self.kind()),
     }
