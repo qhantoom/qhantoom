@@ -5,7 +5,7 @@ use crate::front::tokenizer::token::TokenKind;
 #[derive(Clone, Copy, Debug, Eq, PartialEq, PartialOrd)]
 pub enum Precedence {
   Lowest,
-  Assignement,
+  Assignment,
   Conditional,
   Sum,
   Exponent,
@@ -27,7 +27,7 @@ impl From<&TokenKind> for Precedence {
       | TokenKind::Equal
       | TokenKind::Bang
       | TokenKind::DotDot // no sure about this precedence for range
-      | TokenKind::NotAssign => Self::Assignement,
+      | TokenKind::NotAssign => Self::Assignment,
       TokenKind::OpenParen => Self::Calling,
       TokenKind::OpenBracket => Self::Index,
       _ => Self::Lowest,

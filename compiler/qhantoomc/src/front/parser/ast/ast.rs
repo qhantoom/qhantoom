@@ -211,3 +211,117 @@ pub enum TyKind {
   Array(Box<Ty>),
   Fun(Vec<Box<Ty>>, Box<Ty>),
 }
+
+#[inline]
+pub fn mk_program(stmts: Vec<Stmt>) -> Program {
+  Program { stmts }
+}
+
+#[inline]
+pub fn mk_block(stmts: Vec<Stmt>) -> Block {
+  Block { stmts }
+}
+
+#[inline]
+pub fn mk_stmt(kind: StmtKind) -> Stmt {
+  Stmt::new(kind)
+}
+
+#[inline]
+pub fn mk_mut(
+  name: Box<Expr>,
+  immutable: bool,
+  ty: Box<Ty>,
+  value: Box<Expr>,
+) -> StmtKind {
+  StmtKind::Mut(box Local {
+    name,
+    immutable,
+    ty,
+    value,
+  })
+}
+
+#[inline]
+pub fn mk_val(
+  name: Box<Expr>,
+  immutable: bool,
+  ty: Box<Ty>,
+  value: Box<Expr>,
+) -> StmtKind {
+  StmtKind::Val(box Local {
+    name,
+    immutable,
+    ty,
+    value,
+  })
+}
+
+#[inline]
+pub fn mk_fun(prototype: Prototype, body: Box<Block>) -> StmtKind {
+  StmtKind::Fun(box Fun { prototype, body })
+}
+
+#[inline]
+pub fn mk_prototype(
+  name: Box<Expr>,
+  ty: Box<Ty>,
+  args: Vec<Box<Expr>>,
+) -> Prototype {
+  Prototype { name, ty, args }
+}
+
+#[inline]
+pub fn mk_expr(kind: ExprKind) -> Expr {
+  Expr::new(kind)
+}
+
+#[inline]
+pub fn mk_binop(op: BinopKind, lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
+  ExprKind::Binop { lhs, op, rhs }
+}
+
+#[inline]
+pub fn mk_bool(value: bool) -> ExprKind {
+  ExprKind::Bool(value)
+}
+
+#[inline]
+pub fn mk_int(value: i64) -> ExprKind {
+  ExprKind::Int(value)
+}
+
+#[inline]
+pub fn mk_float(value: f64) -> ExprKind {
+  ExprKind::Float(value)
+}
+
+#[inline]
+pub fn mk_char(value: char) -> ExprKind {
+  ExprKind::Char(value)
+}
+
+#[inline]
+pub fn mk_str(value: String) -> ExprKind {
+  ExprKind::Str(value)
+}
+
+#[inline]
+pub fn mk_ident(name: String) -> ExprKind {
+  ExprKind::Ident(name)
+}
+
+#[inline]
+pub fn mk_call(callee: Box<Expr>, args: Vec<Box<Expr>>) -> ExprKind {
+  ExprKind::Call { callee, args }
+}
+
+#[inline]
+pub fn mk_unop(op: UnopKind, rhs: Box<Expr>) -> ExprKind {
+  ExprKind::Unop { op, rhs }
+}
+
+#[inline]
+pub fn mk_ty(kind: TyKind) -> Ty {
+  Ty::new(kind)
+}

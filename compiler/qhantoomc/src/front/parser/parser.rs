@@ -1,8 +1,10 @@
 use std::mem;
 
+use super::ast;
+
 use super::ast::{
-  BinopKind, Block, Expr, ExprKind, Fun, Local, Program, Prototype, Stmt,
-  StmtKind, Ty, TyKind, UnopKind,
+  BinopKind, Block, Expr, Program, Prototype, Stmt, StmtKind, Ty, TyKind,
+  UnopKind,
 };
 
 use super::interface::Precedence;
@@ -81,14 +83,14 @@ impl<'a> Parser<'a> {
       self.next();
     }
 
-    Ok(Program { stmts })
+    Ok(ast::mk_program(stmts))
   }
 
   #[inline]
   fn parse_stmt(&mut self) -> Result<Stmt> {
     match self.current.kind() {
       TokenKind::Fun => self.parse_fun_stmt(),
-      TokenKind::Imu | TokenKind::Val | TokenKind::Mut => self.parse_var_stmt(),
+      TokenKind::Val | TokenKind::Mut => self.parse_var_stmt(),
       _ => self.parse_expr_stmt(),
     }
   }
@@ -99,7 +101,7 @@ impl<'a> Parser<'a> {
     let prototype = self.parse_prototype()?;
     let body = self.parse_block()?;
 
-    Ok(Stmt::new(StmtKind::Fun(box Fun { prototype, body })))
+    Ok(ast::mk_stmt(ast::mk_fun(prototype, body)))
   }
 
   // TODO: this will be change in the future
@@ -111,7 +113,7 @@ impl<'a> Parser<'a> {
     let ty = self.parse_ty_expr()?;
     let args = self.parse_args()?;
 
-    Ok(Prototype { name, ty, args })
+    Ok(ast::mk_prototype(name, ty, args))
   }
 
   // TODO: this will be change in the future
@@ -152,7 +154,7 @@ impl<'a> Parser<'a> {
       self.next();
     }
 
-    Ok(box Block { stmts })
+    Ok(box ast::mk_block(stmts))
   }
 
   #[inline]
@@ -168,22 +170,12 @@ impl<'a> Parser<'a> {
     self.expect_first(&TokenKind::Semicolon)?;
 
     let kind = match kw.kind() {
-      TokenKind::Val => StmtKind::Val(box Local {
-        name,
-        immutable: true,
-        ty,
-        value,
-      }),
-      TokenKind::Mut => StmtKind::Mut(box Local {
-        name,
-        immutable: false,
-        ty,
-        value,
-      }),
+      TokenKind::Val => ast::mk_val(name, true, ty, value),
+      TokenKind::Mut => ast::mk_mut(name, false, ty, value),
       _ => unreachable!(),
     };
 
-    Ok(mk_stmt(kind))
+    Ok(ast::mk_stmt(kind))
   }
 
   #[inline]
@@ -194,7 +186,7 @@ impl<'a> Parser<'a> {
       self.next();
     }
 
-    Ok(mk_stmt(StmtKind::Expr(expr)))
+    Ok(ast::mk_stmt(StmtKind::Expr(expr)))
   }
 
   #[inline]
@@ -227,7 +219,7 @@ impl<'a> Parser<'a> {
   fn parse_call_expr(&mut self, lhs: Box<Expr>) -> Result<Box<Expr>> {
     let args = self.parse_until(&TokenKind::CloseParen)?;
 
-    Ok(box mk_expr(ExprKind::Call { callee: lhs, args }))
+    Ok(box ast::mk_expr(ast::mk_call(lhs, args)))
   }
 
   #[inline]
@@ -239,7 +231,7 @@ impl<'a> Parser<'a> {
 
     let rhs = self.parse_expr_by_precedence(&precedence)?;
 
-    Ok(box mk_expr(ExprKind::Binop { lhs, op, rhs }))
+    Ok(box ast::mk_expr(ast::mk_binop(op, lhs, rhs)))
   }
 
   #[inline]
@@ -260,8 +252,8 @@ impl<'a> Parser<'a> {
   #[inline]
   fn parse_bool_expr(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
-      TokenKind::True => Ok(box mk_expr(ExprKind::Bool(true))),
-      TokenKind::False => Ok(box mk_expr(ExprKind::Bool(false))),
+      TokenKind::True => Ok(box ast::mk_expr(ast::mk_bool(true))),
+      TokenKind::False => Ok(box ast::mk_expr(ast::mk_bool(false))),
       _ => Err(Error::ExpectedExpr(
         "bool",
         format!("{:?}", self.current.kind()),
@@ -272,7 +264,7 @@ impl<'a> Parser<'a> {
   #[inline]
   fn parse_int_expr(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
-      TokenKind::Int(ref num) => Ok(box mk_expr(ExprKind::Int(*num))),
+      TokenKind::Int(ref num) => Ok(box ast::mk_expr(ast::mk_int(*num))),
       _ => Err(Error::ExpectedExpr(
         "int",
         format!("{:?}", self.current.kind()),
@@ -283,7 +275,7 @@ impl<'a> Parser<'a> {
   #[inline]
   fn parse_float_expr(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
-      TokenKind::Float(ref num) => Ok(box mk_expr(ExprKind::Float(*num))),
+      TokenKind::Float(ref num) => Ok(box ast::mk_expr(ast::mk_float(*num))),
       _ => Err(Error::ExpectedExpr(
         "float",
         format!("{:?}", self.current.kind()),
@@ -295,7 +287,7 @@ impl<'a> Parser<'a> {
   fn parse_char_expr(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
       TokenKind::CharAscii(ref ascii) => {
-        Ok(box mk_expr(ExprKind::Char(*ascii)))
+        Ok(box ast::mk_expr(ast::mk_char(*ascii)))
       }
       _ => Err(Error::ExpectedExpr(
         "char",
@@ -308,7 +300,7 @@ impl<'a> Parser<'a> {
   fn parse_str_expr(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
       TokenKind::StrBuffer(ref buf) => {
-        Ok(box mk_expr(ExprKind::Str(buf.into())))
+        Ok(box ast::mk_expr(ast::mk_str(buf.into())))
       }
       _ => Err(Error::ExpectedExpr(
         "str",
@@ -321,7 +313,7 @@ impl<'a> Parser<'a> {
   fn parse_ident_expr(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
       TokenKind::Identifier(ref ident) => {
-        Ok(box mk_expr(ExprKind::Ident(ident.into())))
+        Ok(box ast::mk_expr(ast::mk_ident(ident.into())))
       }
       _ => Err(Error::ExpectedExpr(
         "ident",
@@ -338,7 +330,7 @@ impl<'a> Parser<'a> {
 
     let rhs = self.parse_expr_by_precedence(&Precedence::Unary)?;
 
-    Ok(box mk_expr(ExprKind::Unop { op, rhs }))
+    Ok(box ast::mk_expr(ast::mk_unop(op, rhs)))
   }
 
   #[inline]
@@ -359,7 +351,7 @@ impl<'a> Parser<'a> {
 
     if self.current.is(TokenKind::ColonAssign) {
       self.next();
-      return Ok(box Ty::new(TyKind::Dynamic));
+      return Ok(box ast::mk_ty(TyKind::Dynamic));
     }
 
     self.next();
@@ -397,7 +389,7 @@ impl<'a> Parser<'a> {
 
     self.next();
 
-    Ok(box Ty::new(kind))
+    Ok(box ast::mk_ty(kind))
   }
 
   #[inline]
@@ -442,14 +434,4 @@ impl<'a> Parser<'a> {
   fn should_precedence_has_priority(&mut self, kind: &Precedence) -> bool {
     *kind < Precedence::from(self.first.kind())
   }
-}
-
-#[inline]
-fn mk_stmt(kind: StmtKind) -> Stmt {
-  Stmt::new(kind)
-}
-
-#[inline]
-fn mk_expr(kind: ExprKind) -> Expr {
-  Expr::new(kind)
 }
