@@ -332,6 +332,19 @@ pub fn mk_index(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
 }
 
 #[inline]
+pub fn mk_if(
+  condition: Box<Expr>,
+  consequence: Box<Block>,
+  alternative: Option<Box<Block>>,
+) -> ExprKind {
+  ExprKind::If {
+    condition,
+    consequence,
+    alternative,
+  }
+}
+
+#[inline]
 pub fn mk_unop(op: UnopKind, rhs: Box<Expr>) -> ExprKind {
   ExprKind::Unop { op, rhs }
 }

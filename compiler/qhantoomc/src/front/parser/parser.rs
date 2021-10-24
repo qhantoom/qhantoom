@@ -270,6 +270,7 @@ impl<'a> Parser<'a> {
       TokenKind::Sub | TokenKind::Not => self.parse_unop_expr(),
       TokenKind::OpenParen => self.parse_group_expr(),
       TokenKind::OpenBracket => self.parse_array_expr(),
+      TokenKind::If => self.parse_if_expr(),
       _ => Err(Error::Custom("expr error")),
     }
   }
@@ -374,6 +375,27 @@ impl<'a> Parser<'a> {
     let exprs = self.parse_until(&TokenKind::CloseBracket)?;
 
     Ok(box ast::mk_expr(ast::mk_array(exprs)))
+  }
+
+  #[inline]
+  fn parse_if_expr(&mut self) -> Result<Box<Expr>> {
+    self.next();
+
+    let condition = self.parse_expr_by_precedence(&Precedence::Lowest)?;
+    let consequence = self.parse_block()?;
+
+    let alternative = if self.first.is(TokenKind::Else) {
+      self.next();
+      Some(self.parse_block()?)
+    } else {
+      None
+    };
+
+    Ok(box ast::mk_expr(ast::mk_if(
+      condition,
+      consequence,
+      alternative,
+    )))
   }
 
   // TODO: implement a dynamic type system
