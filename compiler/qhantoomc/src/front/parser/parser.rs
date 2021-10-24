@@ -93,6 +93,7 @@ impl<'a> Parser<'a> {
       TokenKind::Val | TokenKind::Mut => self.parse_var_stmt(),
       TokenKind::Return => self.parse_return_stmt(),
       TokenKind::Break => self.parse_break_stmt(),
+      TokenKind::Continue => self.parse_continue_stmt(),
       _ => self.parse_expr_stmt(),
     }
   }
@@ -222,6 +223,23 @@ impl<'a> Parser<'a> {
     }
 
     Ok(ast::mk_stmt(ast::mk_break(Some(expr))))
+  }
+
+  #[inline]
+  fn parse_continue_stmt(&mut self) -> Result<Stmt> {
+    self.next();
+
+    if self.current.is(TokenKind::Semicolon) {
+      return Ok(ast::mk_stmt(ast::mk_continue(None)));
+    }
+
+    let expr = self.parse_expr_by_precedence(&Precedence::Lowest)?;
+
+    if self.first.is(TokenKind::Semicolon) {
+      self.next();
+    }
+
+    Ok(ast::mk_stmt(ast::mk_continue(Some(expr))))
   }
 
   #[inline]

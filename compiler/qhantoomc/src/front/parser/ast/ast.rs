@@ -35,6 +35,7 @@ pub enum StmtKind {
   Mut(Box<Local>),
   Return(Box<Expr>),
   Break(Option<Box<Expr>>),
+  Continue(Option<Box<Expr>>),
   Expr(Box<Expr>),
 }
 
@@ -281,6 +282,11 @@ pub fn mk_return(expr: Box<Expr>) -> StmtKind {
 #[inline]
 pub fn mk_break(expr: Option<Box<Expr>>) -> StmtKind {
   StmtKind::Break(expr)
+}
+
+#[inline]
+pub fn mk_continue(expr: Option<Box<Expr>>) -> StmtKind {
+  StmtKind::Continue(expr)
 }
 
 #[inline]

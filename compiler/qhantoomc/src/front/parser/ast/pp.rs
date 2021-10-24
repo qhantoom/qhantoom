@@ -75,7 +75,14 @@ impl fmt::Display for Stmt {
         } else {
           write!(f, "break;")
         }
-      },
+      }
+      StmtKind::Continue(ref expr) => {
+        if let Some(ref expr) = *expr {
+          write!(f, "continue {};", expr)
+        } else {
+          write!(f, "continue;")
+        }
+      }
       StmtKind::Expr(ref expr) => write!(f, "{:?}", expr),
       _ => write!(f, "{:?}", self.kind()),
     }
