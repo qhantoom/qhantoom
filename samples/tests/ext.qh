@@ -1,4 +1,0 @@
-ext cos : (uint) -> uint;
-
-ext cos : uint = (x : uint);
-ext cos := (x : uint);

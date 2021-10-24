@@ -1,0 +1,14 @@
+-- ext ident : ty;
+ext cos : (uint) -> uint;
+
+-- ext ident : ty;
+ext cos : uint -> uint;
+
+-- ext fun ident : ty;
+ext fun cos : (uint) -> uint;
+
+-- ext ident : ty = ( args* );
+ext cos : uint = (x : uint);
+
+-- ext ident := ( args* );
+ext cos := (x : uint);

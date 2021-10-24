@@ -1,0 +1,16 @@
+load std::math::(min, max);
+
+ext cos : (uint) -> uint;
+ext abs : (uint) -> uint;
+
+fun main := () {
+  val min := min(3, 6);
+  val max := max(9, 12);
+
+  #print("minimum: {min}, maximum: {max}");
+
+  val cos := cos(1);
+  val abs := abs(3);
+
+  #print("cosine: {min}, absolute: {abs}");
+}

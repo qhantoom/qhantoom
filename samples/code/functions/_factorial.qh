@@ -6,4 +6,6 @@ fun main := () {
 
     n * factorial(n - 1)
   }
+
+  #print(factorial(3));
 }

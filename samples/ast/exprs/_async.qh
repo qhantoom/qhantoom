@@ -1,3 +1,5 @@
 fun main := () {
   async {}
 }
+
+async foo := () {}

@@ -10,5 +10,5 @@ fun main := {
     x1
   }
 
-  print(fibonacci(7));
+  #print(fibonacci(7));
 }

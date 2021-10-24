@@ -3,3 +3,7 @@ fun main := () {
     await 0
   }
 }
+
+async foo : (uint) -> uint = () {
+  await 0
+}

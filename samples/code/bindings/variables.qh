@@ -1,0 +1,35 @@
+fun main := () {
+  val a : u8 = 10;
+  val b : u16 = 10;
+  val c : u32 = 10;
+  val d : u64 = 10;
+  val e : uint = 10;
+
+  val f : s8 = 10;
+  val g : s16 = 10;
+  val h : s32 = 10;
+  val i : s64 = 10;
+  val j : sint = 10;
+
+  val k : f32 = 1234.5678;
+  val l : f64 = 1234.5678;
+
+  val m : uint = 0;
+  val n : uint = 0;
+  val o : uint = 0;
+
+  val p := 10;
+  val q := 10;
+  val r := 10;
+
+  mut s := 10;
+  mut t := 10;
+  mut u := 10;
+
+  val v := p + q + r;
+  mut w := s + t + u;
+
+  mut x := 1;
+  mut y := 3;
+  mut z := 39;
+}

@@ -1,5 +1,5 @@
 fun square : (uint) -> uint = (x) { x * x }
 
 fun main := () {
-  square(2)
+  #print!(square(2));
 }
