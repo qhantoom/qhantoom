@@ -210,9 +210,21 @@ impl<'a> Parser<'a> {
   #[inline]
   fn parse_binop_rhs(&mut self, lhs: Box<Expr>) -> Result<Box<Expr>> {
     match self.current.kind() {
+      TokenKind::Assign => self.parse_assign_expr(lhs),
       TokenKind::OpenParen => self.parse_call_expr(lhs),
       _ => self.parse_binop_expr(lhs),
     }
+  }
+
+  #[inline]
+  fn parse_assign_expr(&mut self, lhs: Box<Expr>) -> Result<Box<Expr>> {
+    self.next();
+
+    let rhs = self.parse_expr_by_precedence(&Precedence::Lowest)?;
+
+    self.expect_first(&TokenKind::Semicolon)?;
+
+    Ok(box ast::mk_expr(ast::mk_assign(lhs, rhs)))
   }
 
   #[inline]

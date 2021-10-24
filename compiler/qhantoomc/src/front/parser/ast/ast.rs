@@ -282,6 +282,11 @@ pub fn mk_array(exprs: Vec<Box<Expr>>) -> ExprKind {
 }
 
 #[inline]
+pub fn mk_assign(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
+  ExprKind::Assign { lhs, rhs }
+}
+
+#[inline]
 pub fn mk_binop(op: BinopKind, lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
   ExprKind::Binop { lhs, op, rhs }
 }
