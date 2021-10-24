@@ -91,6 +91,7 @@ impl<'a> Parser<'a> {
     match self.current.kind() {
       TokenKind::Fun => self.parse_fun_stmt(),
       TokenKind::Val | TokenKind::Mut => self.parse_var_stmt(),
+      TokenKind::Return => self.parse_return_stmt(),
       _ => self.parse_expr_stmt(),
     }
   }
@@ -150,13 +151,21 @@ impl<'a> Parser<'a> {
     while *self.current.kind() != TokenKind::CloseBrace
       && *self.current.kind() != TokenKind::EOF
     {
-      // TODO: this must be change in the future
-      if self.current.is(TokenKind::Newline) {
-        self.next();
-        continue;
+      match self.current.kind() {
+        TokenKind::Semicolon
+        | TokenKind::Newline
+        | TokenKind::CommentLine
+        | TokenKind::CommentLineDoc
+        | TokenKind::CommentBlock => {
+          self.next();
+          continue;
+        }
+        _ => match self.parse_stmt() {
+          Ok(stmt) => stmts.push(stmt),
+          Err(e) => self.errors.push(e),
+        },
       }
 
-      stmts.push(self.parse_stmt()?);
       self.next();
     }
 
@@ -182,6 +191,19 @@ impl<'a> Parser<'a> {
     };
 
     Ok(ast::mk_stmt(kind))
+  }
+
+  #[inline]
+  fn parse_return_stmt(&mut self) -> Result<Stmt> {
+    self.next();
+
+    let expr = self.parse_expr_by_precedence(&Precedence::Lowest)?;
+
+    while *self.first.kind() != TokenKind::Semicolon {
+      self.next();
+    }
+
+    Ok(ast::mk_stmt(ast::mk_return(expr)))
   }
 
   #[inline]
@@ -489,7 +511,7 @@ impl<'a> Parser<'a> {
       exprs.push(self.parse_expr_by_precedence(&Precedence::Lowest)?);
     }
 
-    self.expect_first(&kind)?;
+    self.expect_first(kind)?;
 
     Ok(exprs)
   }

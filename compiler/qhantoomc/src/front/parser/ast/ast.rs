@@ -33,6 +33,7 @@ pub enum StmtKind {
   Fun(Box<Fun>),
   Val(Box<Local>),
   Mut(Box<Local>),
+  Return(Box<Expr>),
   Expr(Box<Expr>),
 }
 
@@ -228,6 +229,20 @@ pub fn mk_stmt(kind: StmtKind) -> Stmt {
 }
 
 #[inline]
+pub fn mk_fun(prototype: Prototype, body: Box<Block>) -> StmtKind {
+  StmtKind::Fun(box Fun { prototype, body })
+}
+
+#[inline]
+pub fn mk_prototype(
+  name: Box<Expr>,
+  ty: Box<Ty>,
+  args: Vec<Box<Expr>>,
+) -> Prototype {
+  Prototype { name, ty, args }
+}
+
+#[inline]
 pub fn mk_mut(
   name: Box<Expr>,
   immutable: bool,
@@ -258,17 +273,8 @@ pub fn mk_val(
 }
 
 #[inline]
-pub fn mk_fun(prototype: Prototype, body: Box<Block>) -> StmtKind {
-  StmtKind::Fun(box Fun { prototype, body })
-}
-
-#[inline]
-pub fn mk_prototype(
-  name: Box<Expr>,
-  ty: Box<Ty>,
-  args: Vec<Box<Expr>>,
-) -> Prototype {
-  Prototype { name, ty, args }
+pub fn mk_return(expr: Box<Expr>) -> StmtKind {
+  StmtKind::Return(expr)
 }
 
 #[inline]
