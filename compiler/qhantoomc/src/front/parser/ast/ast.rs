@@ -350,6 +350,11 @@ pub fn mk_loop(block: Box<Block>) -> ExprKind {
 }
 
 #[inline]
+pub fn mk_while(condition: Box<Expr>, block: Box<Block>) -> ExprKind {
+  ExprKind::While { condition, block }
+}
+
+#[inline]
 pub fn mk_unop(op: UnopKind, rhs: Box<Expr>) -> ExprKind {
   ExprKind::Unop { op, rhs }
 }

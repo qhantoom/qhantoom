@@ -155,7 +155,7 @@ impl<'a> Parser<'a> {
         self.next();
         continue;
       }
-    
+
       stmts.push(self.parse_stmt()?);
       self.next();
     }
@@ -278,6 +278,7 @@ impl<'a> Parser<'a> {
       TokenKind::OpenBracket => self.parse_array_expr(),
       TokenKind::If => self.parse_if_expr(),
       TokenKind::Loop => self.parse_loop_expr(),
+      TokenKind::While => self.parse_while_expr(),
       _ => Err(Error::Custom("expr error")),
     }
   }
@@ -410,6 +411,16 @@ impl<'a> Parser<'a> {
     let block = self.parse_block()?;
 
     Ok(box ast::mk_expr(ast::mk_loop(block)))
+  }
+
+  #[inline]
+  fn parse_while_expr(&mut self) -> Result<Box<Expr>> {
+    self.next();
+
+    let condition = self.parse_expr_by_precedence(&Precedence::Lowest)?;
+    let block = self.parse_block()?;
+
+    Ok(box ast::mk_expr(ast::mk_while(condition, block)))
   }
 
   // TODO: implement a dynamic type system
