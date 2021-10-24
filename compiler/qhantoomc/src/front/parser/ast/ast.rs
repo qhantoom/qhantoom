@@ -327,6 +327,11 @@ pub fn mk_call(callee: Box<Expr>, args: Vec<Box<Expr>>) -> ExprKind {
 }
 
 #[inline]
+pub fn mk_index(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
+  ExprKind::Index { lhs, rhs }
+}
+
+#[inline]
 pub fn mk_unop(op: UnopKind, rhs: Box<Expr>) -> ExprKind {
   ExprKind::Unop { op, rhs }
 }
