@@ -69,6 +69,13 @@ impl fmt::Display for Stmt {
         write!(f, "mut {} : {} = {};", local.name, local.ty, local.value)
       }
       StmtKind::Return(ref expr) => write!(f, "return {};", expr),
+      StmtKind::Break(ref expr) => {
+        if let Some(ref expr) = *expr {
+          write!(f, "break {};", expr)
+        } else {
+          write!(f, "break;")
+        }
+      },
       StmtKind::Expr(ref expr) => write!(f, "{:?}", expr),
       _ => write!(f, "{:?}", self.kind()),
     }
