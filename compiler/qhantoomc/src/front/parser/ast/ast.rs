@@ -345,6 +345,11 @@ pub fn mk_if(
 }
 
 #[inline]
+pub fn mk_loop(block: Box<Block>) -> ExprKind {
+  ExprKind::Loop { block }
+}
+
+#[inline]
 pub fn mk_unop(op: UnopKind, rhs: Box<Expr>) -> ExprKind {
   ExprKind::Unop { op, rhs }
 }

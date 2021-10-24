@@ -150,6 +150,12 @@ impl<'a> Parser<'a> {
     while *self.current.kind() != TokenKind::CloseBrace
       && *self.current.kind() != TokenKind::EOF
     {
+      // TODO: this must be change in the future
+      if self.current.is(TokenKind::Newline) {
+        self.next();
+        continue;
+      }
+    
       stmts.push(self.parse_stmt()?);
       self.next();
     }
@@ -271,6 +277,7 @@ impl<'a> Parser<'a> {
       TokenKind::OpenParen => self.parse_group_expr(),
       TokenKind::OpenBracket => self.parse_array_expr(),
       TokenKind::If => self.parse_if_expr(),
+      TokenKind::Loop => self.parse_loop_expr(),
       _ => Err(Error::Custom("expr error")),
     }
   }
@@ -396,6 +403,13 @@ impl<'a> Parser<'a> {
       consequence,
       alternative,
     )))
+  }
+
+  #[inline]
+  fn parse_loop_expr(&mut self) -> Result<Box<Expr>> {
+    let block = self.parse_block()?;
+
+    Ok(box ast::mk_expr(ast::mk_loop(block)))
   }
 
   // TODO: implement a dynamic type system
