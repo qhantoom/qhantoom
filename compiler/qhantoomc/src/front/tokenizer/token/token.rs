@@ -16,7 +16,7 @@ impl Token {
   }
 
   #[inline]
-  pub fn new(kind: TokenKind) -> Self {
+  pub const fn new(kind: TokenKind) -> Self {
     Self { kind: kind }
   }
 

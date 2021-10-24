@@ -79,26 +79,31 @@ impl Expr {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum ExprKind {
-  Ident(String),
   Bool(bool),
   Int(i64),
   Float(f64),
   Char(char),
   Str(String),
+  Ident(String),
   Array(Vec<Box<Expr>>),
-  Assign {
-    lhs: Box<Expr>,
-    rhs: Box<Expr>,
-  },
   Binop {
     lhs: Box<Expr>,
     op: BinopKind,
+    rhs: Box<Expr>,
+  },
+  Unop {
+    op: UnopKind,
+    rhs: Box<Expr>,
+  },
+  Assign {
+    lhs: Box<Expr>,
     rhs: Box<Expr>,
   },
   Index {
     lhs: Box<Expr>,
     rhs: Box<Expr>,
   },
+  Closure(Box<Fun>),
   Call {
     callee: Box<Expr>,
     args: Vec<Box<Expr>>,
@@ -108,16 +113,22 @@ pub enum ExprKind {
     consequence: Box<Block>,
     alternative: Option<Box<Block>>,
   },
-  Unop {
-    op: UnopKind,
-    rhs: Box<Expr>,
-  },
   Loop {
-    block: Box<Block>,
+    body: Box<Block>,
   },
   While {
     condition: Box<Expr>,
-    block: Box<Block>,
+    body: Box<Block>,
+  },
+  For {
+    iterable: Box<Expr>,
+    iterator: Box<Expr>,
+    body: Box<Block>,
+  },
+  Range {
+    start: Box<Expr>,
+    end: Box<Expr>,
+    body: Box<Block>,
   },
 }
 
@@ -138,8 +149,9 @@ pub enum BinopKind {
   Ne,
 }
 
-impl BinopKind {
-  pub fn from(kind: &TokenKind) -> Self {
+impl From<&TokenKind> for BinopKind {
+  #[inline]
+  fn from(kind: &TokenKind) -> Self {
     match kind {
       TokenKind::Add => Self::Add,
       TokenKind::Sub => Self::Sub,
@@ -166,8 +178,9 @@ pub enum UnopKind {
 }
 
 impl From<&TokenKind> for UnopKind {
-  fn from(operand: &TokenKind) -> Self {
-    match operand {
+  #[inline]
+  fn from(kind: &TokenKind) -> Self {
+    match kind {
       TokenKind::Sub => Self::Neg,
       TokenKind::Not => Self::Not,
       _ => unreachable!(),
@@ -215,28 +228,53 @@ pub enum TyKind {
   Fun(Vec<Box<Ty>>, Box<Ty>),
 }
 
+impl From<&TokenKind> for TyKind {
+  #[inline]
+  fn from(kind: &TokenKind) -> Self {
+    match kind {
+      TokenKind::U8 => Self::U8,
+      TokenKind::U16 => Self::U16,
+      TokenKind::U32 => Self::U32,
+      TokenKind::U64 => Self::U64,
+      TokenKind::UInt => Self::UInt,
+      TokenKind::S8 => Self::S8,
+      TokenKind::S16 => Self::S16,
+      TokenKind::S32 => Self::S32,
+      TokenKind::S64 => Self::S64,
+      TokenKind::SInt => Self::SInt,
+      TokenKind::F32 => Self::F32,
+      TokenKind::F64 => Self::F64,
+      TokenKind::Bool => Self::Bool,
+      TokenKind::Char => Self::Char,
+      TokenKind::Str => Self::Str,
+      TokenKind::Void => Self::Void,
+      _ => unreachable!(),
+    }
+  }
+}
+
 #[inline]
-pub fn mk_program(stmts: Vec<Stmt>) -> Program {
+pub const fn mk_program(stmts: Vec<Stmt>) -> Program {
   Program { stmts }
 }
 
 #[inline]
-pub fn mk_block(stmts: Vec<Stmt>) -> Block {
+pub const fn mk_block(stmts: Vec<Stmt>) -> Block {
   Block { stmts }
 }
 
 #[inline]
-pub fn mk_stmt(kind: StmtKind) -> Stmt {
+pub const fn mk_stmt(kind: StmtKind) -> Stmt {
   Stmt::new(kind)
 }
 
 #[inline]
-pub fn mk_fun(prototype: Prototype, body: Box<Block>) -> StmtKind {
-  StmtKind::Fun(box Fun { prototype, body })
+pub const fn mk_fun(fun: Box<Fun>) -> StmtKind {
+  StmtKind::Fun(fun)
 }
 
 #[inline]
-pub fn mk_prototype(
+pub const fn mk_prototype(
   name: Box<Expr>,
   ty: Box<Ty>,
   args: Vec<Box<Expr>>,
@@ -245,112 +283,116 @@ pub fn mk_prototype(
 }
 
 #[inline]
-pub fn mk_mut(
+pub const fn mk_mut(local: Box<Local>) -> StmtKind {
+  StmtKind::Mut(local)
+}
+
+#[inline]
+pub const fn mk_val(local: Box<Local>) -> StmtKind {
+  StmtKind::Val(local)
+}
+
+#[inline]
+pub const fn mk_local(
   name: Box<Expr>,
   immutable: bool,
   ty: Box<Ty>,
   value: Box<Expr>,
-) -> StmtKind {
-  StmtKind::Mut(box Local {
+) -> Local {
+  Local {
     name,
     immutable,
     ty,
     value,
-  })
+  }
 }
 
 #[inline]
-pub fn mk_val(
-  name: Box<Expr>,
-  immutable: bool,
-  ty: Box<Ty>,
-  value: Box<Expr>,
-) -> StmtKind {
-  StmtKind::Val(box Local {
-    name,
-    immutable,
-    ty,
-    value,
-  })
-}
-
-#[inline]
-pub fn mk_return(expr: Box<Expr>) -> StmtKind {
+pub const fn mk_return(expr: Box<Expr>) -> StmtKind {
   StmtKind::Return(expr)
 }
 
 #[inline]
-pub fn mk_break(expr: Option<Box<Expr>>) -> StmtKind {
+pub const fn mk_break(expr: Option<Box<Expr>>) -> StmtKind {
   StmtKind::Break(expr)
 }
 
 #[inline]
-pub fn mk_continue(expr: Option<Box<Expr>>) -> StmtKind {
+pub const fn mk_continue(expr: Option<Box<Expr>>) -> StmtKind {
   StmtKind::Continue(expr)
 }
 
 #[inline]
-pub fn mk_expr(kind: ExprKind) -> Expr {
+pub const fn mk_expr(kind: ExprKind) -> Expr {
   Expr::new(kind)
 }
 
 #[inline]
-pub fn mk_array(exprs: Vec<Box<Expr>>) -> ExprKind {
+pub const fn mk_array(exprs: Vec<Box<Expr>>) -> ExprKind {
   ExprKind::Array(exprs)
 }
 
 #[inline]
-pub fn mk_assign(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
+pub const fn mk_assign(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
   ExprKind::Assign { lhs, rhs }
 }
 
 #[inline]
-pub fn mk_binop(op: BinopKind, lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
+pub const fn mk_binop(
+  op: BinopKind,
+  lhs: Box<Expr>,
+  rhs: Box<Expr>,
+) -> ExprKind {
   ExprKind::Binop { lhs, op, rhs }
 }
 
 #[inline]
-pub fn mk_bool(value: bool) -> ExprKind {
+pub const fn mk_bool(value: bool) -> ExprKind {
   ExprKind::Bool(value)
 }
 
 #[inline]
-pub fn mk_int(value: i64) -> ExprKind {
+pub const fn mk_int(value: i64) -> ExprKind {
   ExprKind::Int(value)
 }
 
 #[inline]
-pub fn mk_float(value: f64) -> ExprKind {
+pub const fn mk_float(value: f64) -> ExprKind {
   ExprKind::Float(value)
 }
 
 #[inline]
-pub fn mk_char(value: char) -> ExprKind {
+pub const fn mk_char(value: char) -> ExprKind {
   ExprKind::Char(value)
 }
 
 #[inline]
-pub fn mk_str(value: String) -> ExprKind {
+pub const fn mk_str(value: String) -> ExprKind {
   ExprKind::Str(value)
 }
 
 #[inline]
-pub fn mk_ident(name: String) -> ExprKind {
+pub const fn mk_ident(name: String) -> ExprKind {
   ExprKind::Ident(name)
 }
 
 #[inline]
-pub fn mk_call(callee: Box<Expr>, args: Vec<Box<Expr>>) -> ExprKind {
+pub const fn mk_closure(fun: Box<Fun>) -> ExprKind {
+  ExprKind::Closure(fun)
+}
+
+#[inline]
+pub const fn mk_call(callee: Box<Expr>, args: Vec<Box<Expr>>) -> ExprKind {
   ExprKind::Call { callee, args }
 }
 
 #[inline]
-pub fn mk_index(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
+pub const fn mk_index(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
   ExprKind::Index { lhs, rhs }
 }
 
 #[inline]
-pub fn mk_if(
+pub const fn mk_if(
   condition: Box<Expr>,
   consequence: Box<Block>,
   alternative: Option<Box<Block>>,
@@ -363,21 +405,43 @@ pub fn mk_if(
 }
 
 #[inline]
-pub fn mk_loop(block: Box<Block>) -> ExprKind {
-  ExprKind::Loop { block }
+pub const fn mk_loop(body: Box<Block>) -> ExprKind {
+  ExprKind::Loop { body }
 }
 
 #[inline]
-pub fn mk_while(condition: Box<Expr>, block: Box<Block>) -> ExprKind {
-  ExprKind::While { condition, block }
+pub const fn mk_while(condition: Box<Expr>, body: Box<Block>) -> ExprKind {
+  ExprKind::While { condition, body }
 }
 
 #[inline]
-pub fn mk_unop(op: UnopKind, rhs: Box<Expr>) -> ExprKind {
+pub const fn mk_for(
+  iterable: Box<Expr>,
+  iterator: Box<Expr>,
+  body: Box<Block>,
+) -> ExprKind {
+  ExprKind::For {
+    iterable,
+    iterator,
+    body,
+  }
+}
+
+#[inline]
+pub const fn mk_range(
+  start: Box<Expr>,
+  end: Box<Expr>,
+  body: Box<Block>,
+) -> ExprKind {
+  ExprKind::Range { start, end, body }
+}
+
+#[inline]
+pub const fn mk_unop(op: UnopKind, rhs: Box<Expr>) -> ExprKind {
   ExprKind::Unop { op, rhs }
 }
 
 #[inline]
-pub fn mk_ty(kind: TyKind) -> Ty {
+pub const fn mk_ty(kind: TyKind) -> Ty {
   Ty::new(kind)
 }

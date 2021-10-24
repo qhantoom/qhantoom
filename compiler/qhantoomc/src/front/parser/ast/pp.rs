@@ -8,6 +8,7 @@ use super::ast::{
 pub struct CommaSep<'a, T: 'a>(pub &'a [T]);
 
 impl<'a, T: fmt::Display> fmt::Display for CommaSep<'a, T> {
+  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let exprs = self
       .0
@@ -21,12 +22,14 @@ impl<'a, T: fmt::Display> fmt::Display for CommaSep<'a, T> {
 }
 
 impl fmt::Display for Fun {
+  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "fun {} {}", self.prototype, self.body)
   }
 }
 
 impl fmt::Display for Prototype {
+  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(
       f,
@@ -39,6 +42,7 @@ impl fmt::Display for Prototype {
 }
 
 impl fmt::Display for Block {
+  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let stmts = self
       .stmts
@@ -52,8 +56,13 @@ impl fmt::Display for Block {
 }
 
 impl fmt::Display for Stmt {
+  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match self.kind() {
+      StmtKind::Ext(ref prototype) => {
+        write!(f, "ext {};", prototype)
+      }
+      StmtKind::Fun(ref fun) => write!(f, "{}", fun),
       StmtKind::Val(ref local) => {
         if *local.ty.kind() == TyKind::Dynamic {
           return write!(f, "val {} := {};", local.name, local.value);
@@ -84,12 +93,12 @@ impl fmt::Display for Stmt {
         }
       }
       StmtKind::Expr(ref expr) => write!(f, "{:?}", expr),
-      _ => write!(f, "{:?}", self.kind()),
     }
   }
 }
 
 impl fmt::Display for Expr {
+  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match self.kind() {
       ExprKind::Bool(ref boolean) => write!(f, "{}", boolean),
@@ -107,6 +116,9 @@ impl fmt::Display for Expr {
         ref op,
         ref rhs,
       } => write!(f, "({} {} {})", lhs, op, rhs),
+      ExprKind::Closure(ref fun) => {
+        write!(f, "({}) -> {}", CommaSep(&fun.prototype.args), fun.body)
+      }
       ExprKind::Call {
         ref callee,
         ref args,
@@ -121,16 +133,27 @@ impl fmt::Display for Expr {
         ref consequence,
         alternative: Some(ref alternative),
       } => write!(f, "if {} {} else {}", condition, consequence, alternative),
+      ExprKind::Loop { ref body } => write!(f, "loop {}", body),
       ExprKind::While {
         ref condition,
-        ref block,
-      } => write!(f, "while {} {}", condition, block),
-      ExprKind::Loop { ref block } => write!(f, "loop {}", block),
+        ref body,
+      } => write!(f, "while {} {}", condition, body),
+      ExprKind::For {
+        ref iterable,
+        ref iterator,
+        ref body,
+      } => write!(f, "for {} = ({}) {}", iterable, iterator, body),
+      ExprKind::Range {
+        ref start,
+        ref end,
+        ref body,
+      } => write!(f, "for {}..{} = (..) {}", start, end, body),
     }
   }
 }
 
 impl fmt::Display for Ty {
+  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match self.kind() {
       TyKind::S8 => write!(f, "s8"),
@@ -152,13 +175,14 @@ impl fmt::Display for Ty {
       TyKind::Dynamic => write!(f, "dynamic"),
       TyKind::Array(ref ty) => write!(f, "[{}]", ty),
       TyKind::Fun(ref tys, ref ret_ty) => {
-        write!(f, "({}) -> {}", CommaSep(tys), ret_ty,)
+        write!(f, "({}) -> {}", CommaSep(tys), ret_ty)
       }
     }
   }
 }
 
 impl fmt::Display for BinopKind {
+  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match *self {
       Self::Add => write!(f, "+"),
@@ -179,6 +203,7 @@ impl fmt::Display for BinopKind {
 }
 
 impl fmt::Display for UnopKind {
+  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match *self {
       Self::Neg => write!(f, "-"),

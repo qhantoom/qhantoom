@@ -1,9 +1,9 @@
 fun main := () {
   if true {
-    print("true");
+    #print("true");
   } else if false {
-    print("false");
+    #print("false");
   } else {
-    abort("!")
+    #abort("!")
   }
 }

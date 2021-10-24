@@ -42,6 +42,7 @@ fn compiling(args: Vec<String>) {
 
   print!("\nfile: {}\n", file);
 
+  // TMP: this is used just for printing the tokenize output
   // transform source code into tokens
   let tokens = match front::tokenizer::tokenize(&file) {
     Ok(t) => t,
@@ -66,13 +67,13 @@ fn compiling(args: Vec<String>) {
 
   // code generation from an AST to machine code
   let code = {
-    match back::codegen::generate(&ast) {
+    match back::codegen::aot::generate(&ast) {
       Ok(code) => code,
       Err(e) => panic!("codegen error: {}", e),
     }
   };
 
-  print!("\ncode: {:?}\n", code);
+  print!("code: {:?}\n", code);
 
   // write machine code to file
   let _ = util::writer::write("test.o", code);

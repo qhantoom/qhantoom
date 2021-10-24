@@ -5,7 +5,7 @@ use super::license;
 use super::version;
 
 use qhantoomc::back;
-use qhantoomc::back::codegen::Jit;
+use qhantoomc::back::codegen::jit::Jit;
 use qute::prelude::*;
 
 // run the `repl`command
@@ -48,7 +48,7 @@ fn processing(
     l if l.starts_with("help") => Ok(help::run()),
     l if l.starts_with("copyright") => Ok(copyright::run()),
     l if l.starts_with("license") => Ok(license::run()),
-    _ => match back::codegen::compile::<f64>(jit, line) {
+    _ => match back::codegen::jit::compile::<f64>(jit, line) {
       Ok(value) => Ok(print!("🛰️  {}\n", value)),
       Err(e) => Err(format!("{}", e)),
     },

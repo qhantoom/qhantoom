@@ -1,8 +1,8 @@
 use std::mem;
 
-use super::context::ScopeMap;
 use super::translator::Translator;
 
+use crate::back::codegen::context::ScopeMap;
 use crate::front::parser;
 use crate::front::parser::ast::Program;
 use crate::util::error::Result;
@@ -15,7 +15,7 @@ use cranelift::prelude::{
 use cranelift_codegen::binemit::{NullStackMapSink, NullTrapSink};
 use cranelift_codegen::Context;
 use cranelift_jit::{JITBuilder, JITModule};
-use cranelift_module::{default_libcall_names, Linkage, Module};
+use cranelift_module::{default_libcall_names, DataContext, Linkage, Module};
 use cranelift_preopt::optimize;
 
 #[inline]
@@ -30,6 +30,7 @@ pub fn compile<O>(jit: &mut Jit, src: &str) -> Result<O> {
 pub struct Jit {
   builder_context: FunctionBuilderContext,
   ctx: Context,
+  data_ctx: DataContext,
   index: usize,
   module: JITModule,
   scope_map: ScopeMap<Variable>,
@@ -44,6 +45,7 @@ impl Jit {
     Self {
       builder_context: FunctionBuilderContext::new(),
       ctx: module.make_context(),
+      data_ctx: DataContext::new(),
       index: 0,
       module,
       scope_map: ScopeMap::new(),
@@ -61,11 +63,14 @@ impl Jit {
       &self.ctx.func.signature,
     )?;
 
+    let mut trap_sink = NullTrapSink {};
+    let mut stack_map_sink = NullStackMapSink {};
+
     self.module.define_function(
       id,
       &mut self.ctx,
-      &mut NullTrapSink {},
-      &mut NullStackMapSink {},
+      &mut trap_sink,
+      &mut stack_map_sink,
     )?;
 
     self.module.clear_context(&mut self.ctx);
@@ -96,6 +101,7 @@ impl Jit {
 
     let mut translator = Translator {
       builder,
+      data_ctx: &mut self.data_ctx,
       index: 0,
       module: &mut self.module,
       scope_map: &mut self.scope_map,

@@ -1,5 +1,5 @@
 fun main := () {
   val x : uint = 10;
   val y : uint = 10;
-  val c : uint = x + y;
+  val z : uint = x + y;
 }

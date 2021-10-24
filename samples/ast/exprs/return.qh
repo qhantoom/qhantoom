@@ -1,7 +1,7 @@
 fun a := () {
-  return;
+  return 0;
 }
 
 fun main := () {
-  return 0;
+  return a();
 }

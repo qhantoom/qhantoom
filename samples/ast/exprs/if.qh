@@ -1,5 +1,5 @@
 fun main := () {
   if true {
-    print("true");
+    #print("true");
   }
 }

@@ -4,12 +4,11 @@ use std::path::Path;
 
 use chrono::{DateTime, FixedOffset, Utc};
 
-// TODO: detect current timezone
 // get the current date time
 #[inline]
 pub fn datetime() -> String {
   let now = Utc::now();
-  let tz = FixedOffset::east(2 * 3600);
+  let tz = FixedOffset::east(2 * 3600); // TODO: detect current timezone
   let utc_time = DateTime::<Utc>::from_utc(now.naive_utc(), Utc);
 
   utc_time

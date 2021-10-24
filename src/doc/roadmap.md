@@ -12,17 +12,17 @@
 * [ ] back-end | *needs help*
   * [ ] `codegen` | *wip*
 
-* [ ] library
-  * [ ] `std`
-  * [ ] `ogl`
-  * [ ] `wgl`
-
 * [ ] data-structures
   * [ ] `action`
   * [ ] `array`
   * [ ] `hash`
   * [ ] `struct`
   * [ ] `tuple`
+
+* [ ] library
+  * [ ] `std`
+  * [ ] `ogl`
+  * [ ] `wgl`
 
 **optimizations**
 

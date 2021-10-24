@@ -3,7 +3,7 @@ use std::mem;
 use super::ast;
 
 use super::ast::{
-  BinopKind, Block, Expr, Program, Prototype, Stmt, StmtKind, Ty, TyKind,
+  BinopKind, Block, Expr, Fun, Program, Prototype, Stmt, StmtKind, Ty, TyKind,
   UnopKind,
 };
 
@@ -87,6 +87,37 @@ impl<'a> Parser<'a> {
   }
 
   #[inline]
+  fn parse_block(&mut self) -> Result<Box<Block>> {
+    let mut stmts = vec![];
+
+    self.expect_first(&TokenKind::OpenBrace)?;
+    self.next();
+
+    while *self.current.kind() != TokenKind::CloseBrace
+      && *self.current.kind() != TokenKind::EOF
+    {
+      match self.current.kind() {
+        TokenKind::Semicolon
+        | TokenKind::Newline
+        | TokenKind::CommentLine
+        | TokenKind::CommentLineDoc
+        | TokenKind::CommentBlock => {
+          self.next();
+          continue;
+        }
+        _ => match self.parse_stmt() {
+          Ok(stmt) => stmts.push(stmt),
+          Err(e) => self.errors.push(e),
+        },
+      }
+
+      self.next();
+    }
+
+    Ok(box ast::mk_block(stmts))
+  }
+
+  #[inline]
   fn parse_stmt(&mut self) -> Result<Stmt> {
     match self.current.kind() {
       TokenKind::Fun => self.parse_fun_stmt(),
@@ -104,7 +135,7 @@ impl<'a> Parser<'a> {
     let prototype = self.parse_prototype()?;
     let body = self.parse_block()?;
 
-    Ok(ast::mk_stmt(ast::mk_fun(prototype, body)))
+    Ok(ast::mk_stmt(ast::mk_fun(box Fun { prototype, body })))
   }
 
   // TODO: this will be change in the future
@@ -144,37 +175,6 @@ impl<'a> Parser<'a> {
   }
 
   #[inline]
-  fn parse_block(&mut self) -> Result<Box<Block>> {
-    let mut stmts = vec![];
-
-    self.expect_first(&TokenKind::OpenBrace)?;
-    self.next();
-
-    while *self.current.kind() != TokenKind::CloseBrace
-      && *self.current.kind() != TokenKind::EOF
-    {
-      match self.current.kind() {
-        TokenKind::Semicolon
-        | TokenKind::Newline
-        | TokenKind::CommentLine
-        | TokenKind::CommentLineDoc
-        | TokenKind::CommentBlock => {
-          self.next();
-          continue;
-        }
-        _ => match self.parse_stmt() {
-          Ok(stmt) => stmts.push(stmt),
-          Err(e) => self.errors.push(e),
-        },
-      }
-
-      self.next();
-    }
-
-    Ok(box ast::mk_block(stmts))
-  }
-
-  #[inline]
   fn parse_var_stmt(&mut self) -> Result<Stmt> {
     let kw = self.current.to_owned();
 
@@ -187,8 +187,8 @@ impl<'a> Parser<'a> {
     self.expect_first(&TokenKind::Semicolon)?;
 
     let kind = match kw.kind() {
-      TokenKind::Val => ast::mk_val(name, true, ty, value),
-      TokenKind::Mut => ast::mk_mut(name, false, ty, value),
+      TokenKind::Val => ast::mk_val(box ast::mk_local(name, true, ty, value)),
+      TokenKind::Mut => ast::mk_mut(box ast::mk_local(name, false, ty, value)),
       _ => unreachable!(),
     };
 
@@ -486,47 +486,32 @@ impl<'a> Parser<'a> {
   fn parse_ty_expr(&mut self) -> Result<Box<Ty>> {
     self.next();
 
-    if self.current.is(TokenKind::ColonAssign) {
-      self.next();
-      return Ok(box ast::mk_ty(TyKind::Dynamic));
-    }
-
-    self.next();
-
-    let ty = match self.current.kind() {
+    let kind = match self.current.kind() {
+      TokenKind::ColonAssign => return self.parse_dynamic_ty(),
       _ => self.parse_ty()?,
     };
 
     self.next();
 
-    Ok(ty)
+    Ok(box ast::mk_ty(kind))
   }
 
   #[inline]
-  fn parse_ty(&mut self) -> Result<Box<Ty>> {
-    let kind = match self.current.kind() {
-      TokenKind::U8 => TyKind::U8,
-      TokenKind::U16 => TyKind::U16,
-      TokenKind::U32 => TyKind::U32,
-      TokenKind::U64 => TyKind::U64,
-      TokenKind::UInt => TyKind::UInt,
-      TokenKind::S8 => TyKind::S8,
-      TokenKind::S16 => TyKind::S16,
-      TokenKind::S32 => TyKind::S32,
-      TokenKind::S64 => TyKind::S64,
-      TokenKind::SInt => TyKind::SInt,
-      TokenKind::F32 => TyKind::F32,
-      TokenKind::F64 => TyKind::F64,
-      TokenKind::Bool => TyKind::Bool,
-      TokenKind::Char => TyKind::Char,
-      TokenKind::Str => TyKind::Str,
-      TokenKind::Void => TyKind::Void,
-      _ => return Err(Error::Custom("type error")),
-    };
+  fn parse_dynamic_ty(&mut self) -> Result<Box<Ty>> {
+    self.next();
+
+    Ok(box ast::mk_ty(TyKind::Dynamic))
+  }
+
+  #[inline]
+  fn parse_ty(&mut self) -> Result<TyKind> {
+    self.next();
+
+    let kind = self.ty();
 
     self.next();
 
-    Ok(box ast::mk_ty(kind))
+    Ok(kind)
   }
 
   #[inline]
@@ -553,18 +538,23 @@ impl<'a> Parser<'a> {
   }
 
   #[inline]
-  fn unop(&mut self) -> UnopKind {
-    UnopKind::from(self.current.kind())
-  }
-
-  #[inline]
   fn binop(&mut self) -> BinopKind {
-    BinopKind::from(&self.current.kind())
+    BinopKind::from(self.current.kind())
   }
 
   #[inline]
   fn precedence(&mut self) -> Precedence {
     Precedence::from(self.current.kind())
+  }
+
+  #[inline]
+  fn ty(&mut self) -> TyKind {
+    TyKind::from(self.current.kind())
+  }
+
+  #[inline]
+  fn unop(&mut self) -> UnopKind {
+    UnopKind::from(self.current.kind())
   }
 
   #[inline]

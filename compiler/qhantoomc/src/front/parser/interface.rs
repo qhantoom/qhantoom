@@ -16,11 +16,18 @@ pub enum Precedence {
 }
 
 impl From<&TokenKind> for Precedence {
+  #[inline]
   fn from(kind: &TokenKind) -> Precedence {
     match *kind {
-      TokenKind::Mul | TokenKind::Div | TokenKind::Mod => Self::Exponent,
-      TokenKind::Add | TokenKind::Sub => Self::Sum,
-      TokenKind::Lt | TokenKind::Le | TokenKind::Gt | TokenKind::Ge => {
+      TokenKind::Mul
+      | TokenKind::Div
+      | TokenKind::Mod => Self::Exponent,
+      TokenKind::Add
+      | TokenKind::Sub => Self::Sum,
+      TokenKind::Lt
+      | TokenKind::Le
+      | TokenKind::Gt
+      | TokenKind::Ge => {
         Self::Conditional
       }
       TokenKind::Assign
