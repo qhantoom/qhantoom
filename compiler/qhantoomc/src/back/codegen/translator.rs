@@ -8,7 +8,12 @@ use cranelift::prelude::{
   types, EntityRef, FloatCC, FunctionBuilder, InstBuilder, Value, Variable,
 };
 
-pub struct Translator<'a, T> {
+use cranelift_module::Module;
+
+pub struct Translator<'a, T>
+where
+  T: Module,
+{
   pub builder: FunctionBuilder<'a>,
   pub module: &'a mut T,
   pub ty: types::Type,
@@ -16,7 +21,10 @@ pub struct Translator<'a, T> {
   pub scope_map: &'a mut ScopeMap<Variable>,
 }
 
-impl<'a, T> Translator<'a, T> {
+impl<'a, T> Translator<'a, T>
+where
+  T: Module,
+{
   #[inline]
   fn create_variable(&mut self, name: String) -> Variable {
     let var = Variable::new(self.index);
@@ -31,13 +39,13 @@ impl<'a, T> Translator<'a, T> {
 
   #[inline]
   pub fn translate(&mut self, program: &Program) -> Value {
-    let mut return_value = Value::new(0);
+    let mut ret_value = Value::new(0);
 
     for stmt in &program.stmts {
-      return_value = self.translate_stmt(stmt);
+      ret_value = self.translate_stmt(stmt);
     }
 
-    return_value
+    ret_value
   }
 
   #[inline]
@@ -53,6 +61,7 @@ impl<'a, T> Translator<'a, T> {
   fn translate_var(&mut self, local: &Local) -> Value {
     let var = self.create_variable(local.name.to_string());
     let value = self.translate_expr(&local.value);
+
     self.builder.def_var(var, value);
 
     value
@@ -70,6 +79,7 @@ impl<'a, T> Translator<'a, T> {
       } => self.translate_binop(op, lhs, rhs),
       ExprKind::Unop { ref op, ref rhs } => self.translate_unop(op, rhs),
       ExprKind::Ident(ref name) => self.translate_ident(name),
+      ExprKind::Assign { ref lhs, ref rhs } => self.translate_assign(lhs, rhs),
       _ => todo!(),
     }
   }
@@ -145,6 +155,7 @@ impl<'a, T> Translator<'a, T> {
   fn translate_lt_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     let boolean = self.builder.ins().fcmp(FloatCC::LessThan, lhs, rhs);
     let int = self.builder.ins().bint(types::I32, boolean);
+
     self.builder.ins().fcvt_from_sint(types::F64, int)
   }
 
@@ -152,6 +163,7 @@ impl<'a, T> Translator<'a, T> {
   fn translate_gt_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     let boolean = self.builder.ins().fcmp(FloatCC::GreaterThan, lhs, rhs);
     let int = self.builder.ins().bint(types::I32, boolean);
+
     self.builder.ins().fcvt_from_sint(types::F64, int)
   }
 
@@ -159,6 +171,7 @@ impl<'a, T> Translator<'a, T> {
   fn translate_le_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     let boolean = self.builder.ins().fcmp(FloatCC::LessThanOrEqual, lhs, rhs);
     let int = self.builder.ins().bint(types::I32, boolean);
+
     self.builder.ins().fcvt_from_sint(types::F64, int)
   }
 
@@ -169,7 +182,9 @@ impl<'a, T> Translator<'a, T> {
         .builder
         .ins()
         .fcmp(FloatCC::GreaterThanOrEqual, lhs, rhs);
+
     let int = self.builder.ins().bint(types::I32, boolean);
+
     self.builder.ins().fcvt_from_sint(types::F64, int)
   }
 
@@ -177,6 +192,7 @@ impl<'a, T> Translator<'a, T> {
   fn translate_eq_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     let boolean = self.builder.ins().fcmp(FloatCC::Equal, lhs, rhs);
     let int = self.builder.ins().bint(types::I32, boolean);
+
     self.builder.ins().fcvt_from_sint(types::F64, int)
   }
 
@@ -184,6 +200,7 @@ impl<'a, T> Translator<'a, T> {
   fn translate_ne_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     let boolean = self.builder.ins().fcmp(FloatCC::NotEqual, lhs, rhs);
     let int = self.builder.ins().bint(types::I32, boolean);
+
     self.builder.ins().fcvt_from_sint(types::F64, int)
   }
 
@@ -198,8 +215,25 @@ impl<'a, T> Translator<'a, T> {
   }
 
   #[inline]
+  fn translate_assign(&mut self, lhs: &Box<Expr>, rhs: &Box<Expr>) -> Value {
+    let rhs = self.translate_expr(rhs);
+
+    match lhs.kind() {
+      ExprKind::Ident(ref name) => {
+        let var = self.scope_map.get_variable(name).unwrap();
+
+        self.builder.def_var(*var, rhs);
+      }
+      _ => unreachable!(),
+    }
+
+    rhs
+  }
+
+  #[inline]
   fn translate_ident(&mut self, name: &str) -> Value {
-    let variable = self.scope_map.get_variable(&name).unwrap();
-    self.builder.use_var(*variable)
+    let var = self.scope_map.get_variable(&name).unwrap();
+
+    self.builder.use_var(*var)
   }
 }

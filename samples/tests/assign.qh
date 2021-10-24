@@ -1,0 +1,5 @@
+val x : uint = 3;
+val y : uint = 7;
+mut z : uint = 32;
+z = x + y + z;
+z; -- returns 42
