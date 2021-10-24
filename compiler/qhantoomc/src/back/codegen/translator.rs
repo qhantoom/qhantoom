@@ -5,8 +5,7 @@ use crate::front::parser::ast::{
 };
 
 use cranelift::prelude::{
-  types, EntityRef, FloatCC, FunctionBuilder, InstBuilder, Value,
-  Variable,
+  types, EntityRef, FloatCC, FunctionBuilder, InstBuilder, Value, Variable,
 };
 
 pub struct Translator<'a, T> {

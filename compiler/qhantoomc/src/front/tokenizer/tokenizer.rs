@@ -97,51 +97,21 @@ impl<'a> Tokenizer<'a> {
         '@' => return Some(TokenKind::At),
 
         // n characters tokens
-        '+' => {
-          self.state = TokenizerState::StartAdd;
-        }
-        '-' => {
-          self.state = TokenizerState::StartSub;
-        }
-        '*' => {
-          self.state = TokenizerState::StartMul;
-        }
-        '/' => {
-          self.state = TokenizerState::StartDiv;
-        }
-        '%' => {
-          self.state = TokenizerState::StartMod;
-        }
-        '=' => {
-          self.state = TokenizerState::StartAssign;
-        }
-        '&' => {
-          self.state = TokenizerState::StartAnd;
-        }
-        '!' => {
-          self.state = TokenizerState::StartBang;
-        }
-        '|' => {
-          self.state = TokenizerState::StartPipe;
-        }
-        '.' => {
-          self.state = TokenizerState::StartDot;
-        }
-        ':' => {
-          self.state = TokenizerState::StartColon;
-        }
-        '<' => {
-          self.state = TokenizerState::StartLt;
-        }
-        '>' => {
-          self.state = TokenizerState::StartGt;
-        }
-        '"' => {
-          self.state = TokenizerState::StartString;
-        }
-        '\'' => {
-          self.state = TokenizerState::StartChar;
-        }
+        '+' => self.state = TokenizerState::StartAdd,
+        '-' => self.state = TokenizerState::StartSub,
+        '*' => self.state = TokenizerState::StartMul,
+        '/' => self.state = TokenizerState::StartDiv,
+        '%' => self.state = TokenizerState::StartMod,
+        '=' => self.state = TokenizerState::StartAssign,
+        '&' => self.state = TokenizerState::StartAnd,
+        '!' => self.state = TokenizerState::StartBang,
+        '|' => self.state = TokenizerState::StartPipe,
+        '.' => self.state = TokenizerState::StartDot,
+        ':' => self.state = TokenizerState::StartColon,
+        '<' => self.state = TokenizerState::StartLt,
+        '>' => self.state = TokenizerState::StartGt,
+        '"' => self.state = TokenizerState::StartString,
+        '\'' => self.state = TokenizerState::StartChar,
 
         // numbers
         c if is_number_start(c) => {

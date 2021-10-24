@@ -107,7 +107,6 @@ impl Jit {
     translator.builder.ins().return_(&[return_value]);
     translator.builder.finalize();
     optimize(&mut self.ctx, self.module.isa())?;
-
     // println!("{}", self.ctx.func.display(None).to_string());
 
     Ok(())
