@@ -3,6 +3,7 @@ cargo-features = ["edition2021"]
 [package]
 edition = "2021"
 name = "qhantoomc"
+readme = "README.md"
 version = "0.1.0"
 
 [lib]

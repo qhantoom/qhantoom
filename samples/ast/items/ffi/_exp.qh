@@ -1,5 +1,5 @@
-exp fun cos: (uint) -> uint;
+exp cos(x : uint) : uint;
 
-fun main := () {
+fun main() {
   cos(3)
 }

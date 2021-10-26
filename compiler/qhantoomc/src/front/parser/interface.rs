@@ -1,5 +1,3 @@
-pub use self::Precedence::*;
-
 use crate::front::tokenizer::token::TokenKind;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, PartialOrd)]
@@ -12,7 +10,7 @@ pub enum Precedence {
   Unary,
   Calling,
   Index,
-  Highest,
+  // Highest,
 }
 
 impl From<&TokenKind> for Precedence {

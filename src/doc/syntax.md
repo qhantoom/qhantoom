@@ -150,11 +150,11 @@ val x, y, z := 0;
 *still in research*
 
 `fun` function declaration    
-`\->` arrow function    
+`fn` arrow function declaration    
 
 ```
-fun square : (uint) -> uint = (x) { x * x }
-val square : \ uint -> uint = \ x -> x * x;
+fun square(x : uint) : uint { x * x }
+val square : uint = (x : uint) -> x * x;
 ```
 
 ## Branches
@@ -214,7 +214,7 @@ struct Button {
 }
 
 set Button {
-  fun new : (str) -> Button = (name) {
+  fun new(name : str) : Button {
     Button {
       id = 0,
       name = name,
@@ -229,7 +229,7 @@ actions are simply interfaces that allow a new behaviour to be assigned
 
 ```
 action Vec2 {
-  fun mul : (uint) -> uint;
+  fun mul(uint) : uint;
 }
 
 struct Point {
@@ -238,7 +238,7 @@ struct Point {
 }
 
 set Vec2 for Point {
-  fun mul : (uint) -> uint = (x) { x * x }
+  fun mul(x : uint) : uint { x * x }
 }
 ```
 
@@ -294,7 +294,7 @@ enum MyEnum {
 ## Macros
 
 ```
-macro foo := () {}
+macro foo() {}
 
 #foo();
 ```
@@ -321,7 +321,7 @@ async {
 chan (tx, rx) = 0;
 spawn tx.send(1);
 
-print("received: {}", rx.on());
+#print("received: {}", rx.on());
 ```
 
 ## Assertions
@@ -341,7 +341,7 @@ unit {
 **mock**
 
 ```
-mock tokenization_mock := () {
+mock tokenization_mock() {
   -- mock computation
 }
 ```
@@ -349,7 +349,7 @@ mock tokenization_mock := () {
 **test**
 
 ```
-test tokenization_test := () {
+test tokenization_test() {
   -- test computation
 }
 ```
@@ -361,7 +361,7 @@ test tokenization_test := () {
 **bench**
 
 ```
-bench tokenization_benchmark := () {
+bench tokenization_benchmark() {
   -- bench computation
 }
 ```
@@ -377,19 +377,19 @@ bench tokenization_benchmark := () {
 **c**
 
 ```
-ext fun cos: (uint) -> uint;
+ext fun cos(x : uint) : uint;
 ```
 
 **javascript**
 
 ```
-exp fun cos: (uint) -> uint;
+exp fun cos(x : uint) : uint;
 ```
 
 **rust**
 
 ```
-mod fun cos: (uint) -> uint;
+mod fun cos(x : uint) : uint;
 ```
 
 ## WebAssembly
@@ -399,7 +399,7 @@ mod fun cos: (uint) -> uint;
 **wasm**
 
 ```
-wasm fun bar := () {
+wasm fun bar() {
   -- something to do
 }
 ```

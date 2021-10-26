@@ -1,4 +1,4 @@
-fun main := () {
+fun main() {
   match op {
     '+' => add(x, y),
     '-' => sub(x, y),

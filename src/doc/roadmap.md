@@ -39,6 +39,6 @@
 **tools**
 
 * [ ] `repl` | *wip*
-* [ ] vscode extension
+* [ ] extensions | `vscode`
 * [ ] package manager
 * [ ] [qhantoom.dev](https://qhantoom.dev) | *wip*

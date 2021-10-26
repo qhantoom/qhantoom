@@ -1,7 +1,7 @@
-fun a := () {
+fun a() : uint {
   return 0;
 }
 
-fun main := () {
+fun main() {
   return a();
 }

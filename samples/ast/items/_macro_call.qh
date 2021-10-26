@@ -1,7 +1,7 @@
-macro foo := () {
+macro foo() {
   #print("inside macro foo");
 }
 
-fun main := () {
+fun main() {
   #foo();
 }

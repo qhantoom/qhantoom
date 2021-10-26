@@ -1,4 +1,0 @@
-fun main := () {
-  val f1 : () -> uint = fn () -> 0;
-  val f2 : (uint) -> uint = fn (n) -> n * n; 
-}

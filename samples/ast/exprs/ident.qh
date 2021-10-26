@@ -1,4 +1,4 @@
-fun main := () {
+fun main() {
   val x : uint = 10;
   val y : uint = 10;
   val z : uint = x + y;

@@ -1,5 +1,5 @@
-ext fun cos: (uint) -> uint;
+ext cos(x : uint) : uint;
 
-fun main := () {
+fun main() {
   cos(3)
 }

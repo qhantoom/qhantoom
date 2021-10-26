@@ -1,16 +1,21 @@
+use std::fmt::Write;
+
 use super::copyright;
 use super::exit;
 use super::help;
 use super::license;
 use super::version;
 
+use crate::util;
+
 use qhantoomc::back;
 use qhantoomc::back::codegen::jit::Jit;
-use qute::prelude::*;
 
 use clap::ArgMatches;
+use platform_info::Uname;
+use qute::prelude::*;
 
-// run the `repl`command
+// run the `repl` command
 #[inline]
 pub fn run(args: ArgMatches<'static>) {
   match repl(args) {
@@ -27,7 +32,7 @@ fn repl(args: ArgMatches<'static>) -> Result<(), String> {
   banner();
 
   loop {
-    match crate::util::readline("📡") {
+    match util::read_line("📡") {
       Ok(ref line) => processing(&mut jit, &args, line),
       Err(e) => Err(format!("{}", e)),
     }?;
@@ -46,12 +51,12 @@ fn processing(
   }
 
   match line {
-    l if l.starts_with(".exit") => Ok(exit::run()),
+    l if l.starts_with("exit") => Ok(exit::run()),
     l if l.starts_with("help") => Ok(help::run()),
     l if l.starts_with("copyright") => Ok(copyright::run()),
     l if l.starts_with("license") => Ok(license::run()),
-    _ => match back::codegen::jit::compile::<f64>(jit, line) {
-      Ok(value) => Ok(print!("🛰️  {}\n", value)),
+    _ => match back::codegen::jit::compile::<i64>(jit, line) {
+      Ok(v) => Ok(print!("🛰️  {}\n", v)),
       Err(e) => Err(format!("{}", e)),
     },
   }
@@ -67,33 +72,48 @@ fn processing(
 pub fn banner() {
   let help_fmt = format!("{}", "\"help\"");
   let help_styled = qute!(&help_fmt).cyan().italic();
-
   let copyright_fmt = format!("{}", "\"copyright\"");
   let copyright_styled = qute!(&copyright_fmt).cyan().italic();
-
   let license_fmt = format!("{}", "\"license\"");
   let license_styled = qute!(&license_fmt).cyan().italic();
-
-  let username_styled = qute!(&crate::util::username()).underline();
-  let datetime_styled = qute!(&crate::util::datetime()).italic();
-
-  use platform_info::Uname;
+  let username_styled = qute!(&util::username()).underline();
+  let date_time_styled = qute!(&util::date_time()).italic();
   let os = platform_info::PlatformInfo::new().unwrap();
+  let mut buf = String::new();
 
-  print!("\n");
+  write!(
+    buf,
+    "{}",
+    &format!(
+      "\nqhantoomc v{} ({})\n",
+      version::version(),
+      date_time_styled,
+    )
+  )
+  .unwrap();
 
-  print!("qhantoomc v{} ({})\n", version::version(), datetime_styled,);
+  write!(
+    buf,
+    "{}",
+    &format!(
+      "welcome {} to qhantoom version {} {}/{}\n",
+      username_styled,
+      version::version(),
+      os.sysname(),
+      os.machine(),
+    )
+  )
+  .unwrap();
 
-  print!(
-    "welcome {} to qhantoom version {} {}/{}\n",
-    username_styled,
-    version::version(),
-    os.sysname(),
-    os.machine(),
-  );
+  write!(
+    buf,
+    "{}",
+    &format!(
+      "use {}, {} or {} for more information.\n",
+      help_styled, copyright_styled, license_styled,
+    )
+  )
+  .unwrap();
 
-  print!(
-    "use {}, {} or {} for more information.\n",
-    help_styled, copyright_styled, license_styled,
-  );
+  print!("{}", buf);
 }

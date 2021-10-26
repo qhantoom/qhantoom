@@ -1,4 +1,4 @@
-fun main := () {
+fun main() {
   for 0..4 = (i) {
     #print("{}", i);
   }

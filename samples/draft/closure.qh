@@ -1,28 +1,4 @@
-fun main := () {
-  -- val ident : ty = \ args* -> { stmt* }
-  val sqrt : (uint) -> uint = \ x -> x * x;
-
-  -- val ident : ty = \ args* -> { stmt* }
-  val sqrt : uint -> uint = \ x -> x * x;
-
-  -- val ident := \ args* -> { stmt* }
-  val sqrt := \ x -> x * x;
-
-  -- val ident : ty = \ args* -> { stmt* }
-  val sqrt : uint = \ x : uint -> x * x;
-
-  -- val ident : ty = ( args* ) { stmt* }
-  val sqrt : (uint) -> uint = (x) { x * x }
-
-  -- val ident : ty = ( args* ) { stmt* }
-  val sqrt : uint -> uint = (x) { x * x }
-
-  -- val ident : ty = fn ( args* ) { stmt* }
-  val sqrt : uint -> uint = fn (x) { x * x }
-
-  -- val ident : ty = fn ( args* ) -> { stmt* }
-  val sqrt : uint -> uint = fn (x) -> x * x;
-
-  -- val ident := fn args* -> x * x;
-  val sqrt := fn x -> x * x;
+fun main() {
+  val a = (x : uint) : uint -> x * x;
+  val b := (x) -> x * x;
 }

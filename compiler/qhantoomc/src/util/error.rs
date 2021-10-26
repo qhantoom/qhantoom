@@ -32,20 +32,21 @@ pub enum Error {
 }
 
 impl fmt::Display for Error {
+  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match *self {
       Self::Custom(ref msg) => write!(f, "{}", msg),
-      Self::CraneliftCodegen(ref error) => error.fmt(f),
-      Self::CraneLiftIsa(ref error) => error.fmt(f),
-      Self::CraneliftModule(ref error) => error.fmt(f),
-      Self::CraneliftObject(ref error) => error.fmt(f),
+      Self::CraneliftCodegen(ref error) => write!(f, "{}", error),
+      Self::CraneLiftIsa(ref error) => write!(f, "{}", error),
+      Self::CraneliftModule(ref error) => write!(f, "{}", error),
+      Self::CraneliftObject(ref error) => write!(f, "{}", error),
       Self::FunctionRedef => write!(f, "redefinition of function"),
       Self::FunctionRedefWithDifferentParams => write!(
         f,
         "redefinition of function with different number of parameters"
       ),
-      Self::Io(ref error) => error.fmt(f),
-      Self::ParseFloat(ref error) => error.fmt(f),
+      Self::Io(ref error) => write!(f, "{}", error),
+      Self::ParseFloat(ref error) => write!(f, "{}", error),
       Self::Undefined(ref msg) => write!(f, "undefined {}", msg),
       Self::ExpectedExpr(ref expected, ref found) => write!(
         f,

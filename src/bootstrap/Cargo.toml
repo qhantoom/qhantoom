@@ -5,6 +5,7 @@ authors = ["monsieurbadia, iam@monsieurbadia.com"]
 description = "a programming language under development"
 edition = "2021"
 name = "bootstrap"
+readme = "README.md"
 version = "0.0.0"
 
 [[bin]]

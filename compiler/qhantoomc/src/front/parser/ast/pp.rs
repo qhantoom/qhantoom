@@ -1,8 +1,8 @@
 use std::fmt;
 
 use super::ast::{
-  BinopKind, Block, Expr, ExprKind, Fun, Prototype, Stmt, StmtKind, Ty, TyKind,
-  UnopKind,
+  Arg, BinopKind, Block, Expr, ExprKind, Fun, Prototype, Stmt, StmtKind, Ty,
+  TyKind, UnopKind,
 };
 
 pub struct CommaSep<'a, T: 'a>(pub &'a [T]);
@@ -31,13 +31,14 @@ impl fmt::Display for Fun {
 impl fmt::Display for Prototype {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(
-      f,
-      "{} : {} = ({})",
-      self.name,
-      self.ty,
-      CommaSep(&self.args),
-    )
+    write!(f, "{} ({}) : {}", self.name, CommaSep(&self.args), self.ty,)
+  }
+}
+
+impl fmt::Display for Arg {
+  #[inline]
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "{} : {}", self.name, self.ty)
   }
 }
 
@@ -77,7 +78,13 @@ impl fmt::Display for Stmt {
 
         write!(f, "mut {} : {} = {};", local.name, local.ty, local.value)
       }
-      StmtKind::Return(ref expr) => write!(f, "return {};", expr),
+      StmtKind::Return(ref expr) => {
+        if let Some(ref expr) = expr {
+          write!(f, "return {};", expr)
+        } else {
+          write!(f, "return;")
+        }
+      },
       StmtKind::Break(ref expr) => {
         if let Some(ref expr) = *expr {
           write!(f, "break {};", expr)

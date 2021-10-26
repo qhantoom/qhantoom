@@ -1,4 +1,4 @@
-fun main := () {
-  fun foo := () {}
-  fun bar : () -> void = () {}
+fun main() {
+  fun bar() : void {}
+  fun foo() {}
 }

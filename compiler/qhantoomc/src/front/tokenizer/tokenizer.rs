@@ -1,7 +1,7 @@
 use std::str::Chars;
 
 use super::interface::TokenizerState;
-use super::token::{Token, TokenKind};
+use super::token::{Token, TokenKind, TOKEN_EOF};
 
 use crate::util::ascii::{
   is_id_continue, is_id_start, is_number_continue, is_number_start,
@@ -41,7 +41,7 @@ impl<'a> Tokenizer<'a> {
     loop {
       let c = match self.next.take().or_else(|| self.input.next()) {
         Some(c) => c,
-        None => return Token::new(TokenKind::EOF),
+        None => return TOKEN_EOF,
       };
 
       if let Some(k) = self.step(c) {
@@ -505,20 +505,20 @@ impl<'a> Tokenizer<'a> {
       }
     };
 
-    return None;
+    None
   }
 
   #[inline]
   fn reset(&mut self, kind: TokenKind) -> Option<TokenKind> {
     self.state = TokenizerState::Idle;
 
-    return Some(kind);
+    Some(kind)
   }
 
   #[inline]
   fn reset_back(&mut self, c: char, kind: TokenKind) -> Option<TokenKind> {
     self.next = Some(c);
 
-    return self.reset(kind);
+    self.reset(kind)
   }
 }

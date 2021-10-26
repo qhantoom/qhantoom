@@ -1,5 +1,5 @@
-fun main := {
-  fun fibonacci: (uint) -> Vec<uint> = (n) {
+fun main() {
+  fun fibonacci(n : uint) : Vec<uint> {
     mut x1 := [1, 1];
 
     for 2..n = i {

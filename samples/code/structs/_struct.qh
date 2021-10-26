@@ -4,7 +4,7 @@ struct Button {
 }
 
 set Button {
-  fun new: (str) -> Button = (name) {
+  fun new(name : str) : Button {
     Button {
       id = 0,
       name = name,
@@ -12,6 +12,6 @@ set Button {
   }
 }
 
-fun main := () {
-  val btn: Button = Button::new("btn-name");
+fun main() {
+  val btn : Button = Button::new("btn-name");
 }

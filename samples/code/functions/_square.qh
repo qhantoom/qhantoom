@@ -1,5 +1,5 @@
-fun square : (uint) -> uint = (x) { x * x }
+fun square(x : uint) : uint { x * x }
 
-fun main := () {
+fun main() {
   #print(square(2));
 }

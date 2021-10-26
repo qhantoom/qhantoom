@@ -1,0 +1,4 @@
+fun main() {
+  val f1 = (x : uint) : uint -> { x * x };
+  val f2 := (x) { x * x }; 
+}

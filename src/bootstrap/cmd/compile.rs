@@ -1,17 +1,22 @@
 use std::any::Any;
 
+use super::cmd::SUBCOMMAND_COMPILE_NAME;
+
 use qhantoomc::back;
 use qhantoomc::front;
 use qhantoomc::util;
 
 use clap::ArgMatches;
 
+pub const EXIT_SUCCESS: i32 = 0;
+pub const EXIT_FAILURE: i32 = 1;
+
 // run the `compile` command
 #[inline]
 pub fn run(args: ArgMatches<'static>) {
   match compile(args) {
-    Ok(_) => std::process::exit(0),
-    Err(_) => std::process::exit(2),
+    Ok(_) => std::process::exit(EXIT_SUCCESS),
+    Err(_) => std::process::exit(EXIT_FAILURE),
   }
 }
 
@@ -36,11 +41,11 @@ fn compile(
 fn compiling(args: ArgMatches) {
   print!("compiling..\n");
 
-  if let Some(matches) = args.subcommand_matches("compile") {
+  if let Some(matches) = args.subcommand_matches(SUBCOMMAND_COMPILE_NAME) {
     let pathname = matches.value_of("file").unwrap();
 
     // read the file from the path
-    let file = match crate::util::readfile(&pathname) {
+    let file = match crate::util::read_file(&pathname) {
       Ok(f) => f,
       Err(e) => panic!("io error: {}", e),
     };
@@ -49,9 +54,11 @@ fn compiling(args: ArgMatches) {
 
     // TMP: this is used just for printing the tokenize output
     // transform source code into tokens
-    let tokens = match front::tokenizer::tokenize(&file) {
-      Ok(t) => t,
-      Err(e) => panic!("tokenizer error: {}", e),
+    let tokens = {
+      match front::tokenizer::tokenize(&file) {
+        Ok(t) => t,
+        Err(e) => panic!("tokenizer error: {}", e),
+      }
     };
 
     print!("\ntokens: {:#?}\n", tokens);
@@ -59,7 +66,7 @@ fn compiling(args: ArgMatches) {
     // transform source code into AST
     let ast = {
       match front::parser::parse(&file) {
-        Ok(ast) => ast,
+        Ok(a) => a,
         Err(e) => panic!("io error: {}", e),
       }
     };
@@ -73,7 +80,7 @@ fn compiling(args: ArgMatches) {
     // code generation from an AST to machine code
     let code = {
       match back::codegen::aot::generate(&ast) {
-        Ok(code) => code,
+        Ok(c) => c,
         Err(e) => panic!("codegen error: {}", e),
       }
     };

@@ -1,8 +1,7 @@
-fun a: () -> void = () {}
+fun a() {}
+fun b() {}
 
-fun b := () {}
-
-fun main := () {
+fun main() {
   a();
   b();
 }

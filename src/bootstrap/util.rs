@@ -2,11 +2,11 @@ use std::fs;
 use std::io;
 use std::path::Path;
 
-use chrono::{DateTime, FixedOffset, Utc};
-
 // get the current date time
 #[inline]
-pub fn datetime() -> String {
+pub fn date_time() -> String {
+  use chrono::{DateTime, FixedOffset, Utc};
+
   let now = Utc::now();
   let tz = FixedOffset::east(2 * 3600); // TODO: detect current timezone
   let utc_time = DateTime::<Utc>::from_utc(now.naive_utc(), Utc);
@@ -19,18 +19,18 @@ pub fn datetime() -> String {
 
 // read the file at the given path and return the contents as a string
 #[inline]
-pub fn readfile(pathname: &str) -> Result<String, String> {
+pub fn read_file(pathname: &str) -> Result<String, String> {
   let path = Path::new(pathname);
 
   match fs::read_to_string(path) {
-    Ok(file) => Ok(file),
+    Ok(f) => Ok(f),
     Err(e) => Err(format!("{}", e)),
   }
 }
 
 // read the lines from stdin at the given path and return the contents as a string
 #[inline]
-pub fn readline<'a>(icon: &str) -> Result<String, String> {
+pub fn read_line<'a>(icon: &str) -> Result<String, String> {
   let stdin = io::stdin();
   let mut stdout = io::stdout();
   let mut buf = String::new();

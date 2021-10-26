@@ -4,8 +4,8 @@ use std::io::Write;
 
 // write buffer to file
 #[inline]
-pub fn write(filename: &str, buffer: Vec<u8>) -> Result<(), Error> {
+pub fn write(filename: &str, buf: Vec<u8>) -> Result<(), Error> {
   let mut file = File::create(filename)?;
 
-  file.write_all(&buffer)
+  file.write_all(&buf)
 }

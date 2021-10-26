@@ -87,7 +87,7 @@ impl Aot {
       .func
       .signature
       .returns
-      .push(AbiParam::new(types::F64));
+      .push(AbiParam::new(types::I64));
 
     let mut builder_context = FunctionBuilderContext::new();
 
@@ -105,7 +105,7 @@ impl Aot {
       index: 0,
       module: &mut self.module,
       scope_map: &mut self.scope_map,
-      ty: types::F64,
+      ty: types::I64,
     };
 
     let return_value = translator.translate(program);

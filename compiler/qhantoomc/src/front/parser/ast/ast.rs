@@ -33,7 +33,7 @@ pub enum StmtKind {
   Fun(Box<Fun>),
   Val(Box<Local>),
   Mut(Box<Local>),
-  Return(Box<Expr>),
+  Return(Option<Box<Expr>>),
   Break(Option<Box<Expr>>),
   Continue(Option<Box<Expr>>),
   Expr(Box<Expr>),
@@ -48,7 +48,13 @@ pub struct Fun {
 #[derive(Debug, Clone, PartialEq)]
 pub struct Prototype {
   pub name: Box<Expr>,
-  pub args: Vec<Box<Expr>>,
+  pub args: Vec<Box<Arg>>,
+  pub ty: Box<Ty>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Arg {
+  pub name: Box<Expr>,
   pub ty: Box<Ty>,
 }
 
@@ -277,9 +283,14 @@ pub const fn mk_fun(fun: Box<Fun>) -> StmtKind {
 pub const fn mk_prototype(
   name: Box<Expr>,
   ty: Box<Ty>,
-  args: Vec<Box<Expr>>,
+  args: Vec<Box<Arg>>,
 ) -> Prototype {
   Prototype { name, ty, args }
+}
+
+#[inline]
+pub const fn mk_arg(name: Box<Expr>, ty: Box<Ty>) -> Arg {
+  Arg { name, ty }
 }
 
 #[inline]
@@ -308,7 +319,7 @@ pub const fn mk_local(
 }
 
 #[inline]
-pub const fn mk_return(expr: Box<Expr>) -> StmtKind {
+pub const fn mk_return(expr: Option<Box<Expr>>) -> StmtKind {
   StmtKind::Return(expr)
 }
 

@@ -1,9 +1,9 @@
-fun main := () {
+fun main() {
   async {
     await 0
   }
 }
 
-async foo : (uint) -> uint = () {
+async fun foo(x : uint) : uint () {
   await 0
 }

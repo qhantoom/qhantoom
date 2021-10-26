@@ -1,0 +1,14 @@
+-- this is a line comments
+
+fun main() { -- this is a line comments
+  -- this is a line comments
+  val x : uint = 3; -- this is a line comments
+  
+  -- this is a line comments
+  val y : uint = 39;
+
+  -- this is a line comments
+  return x + y; -- this is a line comments
+} -- this is a line comments
+
+-- this is a line comments

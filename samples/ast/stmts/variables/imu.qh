@@ -1,5 +1,5 @@
 imu LIMIT : uint = 4;
 
-fun main := () {
+fun main() {
   #print("{}", LIMIT);
 }

@@ -2,7 +2,7 @@ use std::mem;
 
 use super::translator::Translator;
 
-use crate::back::codegen::context::ScopeMap;
+use crate::back::codegen::context::{print_builtin, ScopeMap};
 use crate::front::parser;
 use crate::front::parser::ast::Program;
 use crate::util::error::Result;
@@ -39,7 +39,11 @@ pub struct Jit {
 impl Jit {
   #[inline]
   pub fn new() -> Self {
-    let builder = JITBuilder::new(default_libcall_names());
+    let mut builder = JITBuilder::new(default_libcall_names());
+
+    let print_addr = print_builtin as *const u8;
+    builder.symbol("print", print_addr);
+
     let module = JITModule::new(builder);
 
     Self {
@@ -88,7 +92,7 @@ impl Jit {
       .func
       .signature
       .returns
-      .push(AbiParam::new(types::F64));
+      .push(AbiParam::new(types::I64));
 
     let mut builder =
       FunctionBuilder::new(&mut self.ctx.func, &mut self.builder_context);
@@ -105,7 +109,7 @@ impl Jit {
       index: 0,
       module: &mut self.module,
       scope_map: &mut self.scope_map,
-      ty: types::F64,
+      ty: types::I64,
     };
 
     let return_value = translator.translate(program);

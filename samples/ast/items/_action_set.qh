@@ -4,7 +4,7 @@ struct Point {
 }
 
 set Vec2 for Point {
-  fun mul: (uint) -> uint = (x) { x * x }
+  fun mul(x : f32) : f32 { x * x }
 }
 
-fun main := () {}
+fun main() {}

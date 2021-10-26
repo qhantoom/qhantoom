@@ -1,10 +1,10 @@
 use super::token::{Token, TokenKind};
-use super::tokenizer::tokenize;
+use super::tokenizer;
 
 #[test]
 fn tokenize_empty_token() {
   let file = read_file("../../samples/tokens/empty.qh");
-  let tokens = tokenize(&file).unwrap();
+  let tokens = tokenize(&file);
   let expected = vec![TokenKind::EOF];
 
   run_test(1, tokens, expected);
@@ -13,7 +13,7 @@ fn tokenize_empty_token() {
 #[test]
 fn tokenize_comments_token() {
   let file = read_file("../../samples/tokens/comments.qh");
-  let tokens = tokenize(&file).unwrap();
+  let tokens = tokenize(&file);
 
   let expected = vec![
     TokenKind::CommentLine,
@@ -30,7 +30,7 @@ fn tokenize_comments_token() {
 #[test]
 fn tokenize_delimiters_token() {
   let file = read_file("../../samples/tokens/delimiters.qh");
-  let tokens = tokenize(&file).unwrap();
+  let tokens = tokenize(&file);
 
   let expected = vec![
     TokenKind::OpenParen,
@@ -48,7 +48,7 @@ fn tokenize_delimiters_token() {
 #[test]
 fn tokenize_operators_token() {
   let file = read_file("../../samples/tokens/operators.qh");
-  let tokens = tokenize(&file).unwrap();
+  let tokens = tokenize(&file);
 
   let expected = vec![
     TokenKind::Add,
@@ -100,7 +100,7 @@ fn tokenize_operators_token() {
 #[test]
 fn tokenize_ints_token() {
   let file = read_file("../../samples/tokens/ints.qh");
-  let tokens = tokenize(&file).unwrap();
+  let tokens = tokenize(&file);
 
   let expected = vec![
     TokenKind::Int(0),
@@ -117,7 +117,7 @@ fn tokenize_ints_token() {
 #[test]
 fn tokenize_floats_token() {
   let file = read_file("../../samples/tokens/floats.qh");
-  let tokens = tokenize(&file).unwrap();
+  let tokens = tokenize(&file);
 
   let expected = vec![
     TokenKind::Float(0.5),
@@ -130,12 +130,12 @@ fn tokenize_floats_token() {
   run_test(5, tokens, expected);
 }
 
-fn tokenize_hex_token() {}
+// fn tokenize_hex_token() {}
 
 #[test]
 fn tokenize_chars_token() {
   let file = read_file("../../samples/tokens/chars.qh");
-  let tokens = tokenize(&file).unwrap();
+  let tokens = tokenize(&file);
 
   let expected = vec![
     TokenKind::CharAscii('a'),
@@ -156,7 +156,7 @@ fn tokenize_chars_token() {
 #[test]
 fn tokenize_strings_token() {
   let file = read_file("../../samples/tokens/strings.qh");
-  let tokens = tokenize(&file).unwrap();
+  let tokens = tokenize(&file);
 
   let expected = vec![
     TokenKind::StrBuffer("hello, world! 👽".into()),
@@ -172,7 +172,7 @@ fn tokenize_strings_token() {
 #[test]
 fn tokenize_identifiers_token() {
   let file = read_file("../../samples/tokens/identifiers.qh");
-  let tokens = tokenize(&file).unwrap();
+  let tokens = tokenize(&file);
 
   let expected = vec![
     TokenKind::Identifier("square".into()),
@@ -193,7 +193,7 @@ fn tokenize_identifiers_token() {
 #[test]
 fn tokenize_keywords_token() {
   let file = read_file("../../samples/tokens/keywords.qh");
-  let tokens = tokenize(&file).unwrap();
+  let tokens = tokenize(&file);
 
   let expected = vec![
     TokenKind::Action,
@@ -245,7 +245,7 @@ fn tokenize_keywords_token() {
 #[test]
 fn tokenize_tys_token() {
   let file = read_file("../../samples/tokens/tys.qh");
-  let tokens = tokenize(&file).unwrap();
+  let tokens = tokenize(&file);
 
   let expected = vec![
     TokenKind::U8,
@@ -270,7 +270,7 @@ fn tokenize_tys_token() {
 }
 
 fn read_file(path: &str) -> String {
-  match crate::util::reader::readfile(&path) {
+  match crate::util::reader::read_file(&path) {
     Ok(f) => f,
     Err(e) => panic!("{}", e),
   }
@@ -282,4 +282,12 @@ fn run_test(len: usize, tokens: Vec<Token>, expected: Vec<TokenKind>) {
   for (i, token) in tokens.iter().enumerate() {
     assert_eq!(*token.kind(), expected[i]);
   }
+}
+
+fn tokenize(file: &str) -> Vec<Token> {
+  tokenizer::tokenize(file)
+    .unwrap()
+    .into_iter()
+    .filter(|t| *t.kind() != TokenKind::Newline)
+    .collect::<Vec<Token>>()
 }

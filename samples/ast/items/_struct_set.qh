@@ -1,10 +1,10 @@
 struct Button {
-  id: uint,
-  name: str,
+  id : uint,
+  name : str,
 }
 
 set Button {
-  fun new: (str) -> Button = (name) {
+  fun new(name : str) : Button {
     Button {
       id = 0,
       name = name,
@@ -12,4 +12,4 @@ set Button {
   }
 }
 
-fun main := () {}
+fun main() {}

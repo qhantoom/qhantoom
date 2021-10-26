@@ -1,17 +1,4 @@
--- fun ident : ty = (args*) { stmt* }
-fun sqrt : (uint) -> uint = (x) { x * x }
+fun a(x : uint) : uint { x * x }
+fun b(x) { x * x }
 
--- fun ident : ty = (args*) { stmt* }
-fun sqrt : uint -> uint = (x) { x * x }
-
--- fun ident := (args*) { stmt* }
-fun sqrt := (x) { x * x }
-
--- fun ident : ty = (args*) { stmt* }
-fun sqrt : uint = (x : uint) { x * x }
-
--- fun ident := (args*) { stmt* }
-fun sqrt := (x : uint) { x * x }
-
--- fun ident : ty = (args*) { stmt* }
-fun sqrt : fn(uint) -> uint = (x) { x * x }
+fun main() {}

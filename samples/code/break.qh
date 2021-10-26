@@ -1,0 +1,9 @@
+mut x : uint = 0;
+
+while x < 3 {
+  if x == 2 { break; }
+
+  x = x + 1;
+}
+
+x;

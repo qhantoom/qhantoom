@@ -14,23 +14,22 @@ under development | under development | under development
 
 ## Usage
 
-```ocaml
-fun main := () {
-  fun fibonacci : (uint) -> uint = (n) {
-    if n == 0 || n == 1 {
-      return n;
-    }
+```q
+load std::math::(min, max);
 
-    let f := [0, 1];
+ext cos(x : uint) : uint;
+ext abs(x : uint) : uint;
 
-    for 2..n = (i) {
-      f[i] = f[i - 1] + f[i - 2];
-    }
+fun main() : void {
+  val min : uint = min(1, 3);
+  val max := max(1, 3);
 
-    return f[n];
-  }
+  #print("minimum: {min}, maximum: {max}");
 
-  #print("{}", fibonacci(7));
+  mut cos : uint = cos(1);
+  mut abs := abs(1);
+
+  #print("cosine: {min}, absolute: {abs}");
 }
 ```
 
@@ -49,21 +48,43 @@ fun main := () {
 **clone**
 
 ```
-$ git clone https://github.com/qhantoom/qhantoom.git
+git clone https://github.com/qhantoom/qhantoom.git
 ```
 
 **build**
 
 ```
-$ cargo build --release
+cargo build --release
 ```
 
 **start**
 
-| run	    | desc                    | cmd                            |
-|---------|-------------------------|--------------------------------|
-| compile	| run the `aot` compiler  | `cargo run compile <filename>` |
-| repl	  | run the `jit` compiler  | `cargo run repl`               |
+| run	    | desc                    | cmd                         |
+|:--------|:------------------------|:----------------------------|
+| compile	| run the `aot` compiler  | `cargo run compile <file>`  |
+| repl	  | run the `jit` compiler  | `cargo run repl`            |
+
+**repl**
+
+the jit compiler execute the source code and then output the result.
+
+**compile**
+
+the aot compiler produce an object file named `test.o`. when the compilation is done you have to follow those commands to ensure that your program produces the right result:
+
+```
+gcc -o test test.o
+```
+
+```
+./test
+```
+
+```
+echo $?
+```
+
+the last command will print the result to the stdout.
 
 ## License
 

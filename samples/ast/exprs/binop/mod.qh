@@ -1,3 +1,3 @@
-fun main := () {
+fun main() {
   3 % 39
 }

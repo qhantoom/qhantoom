@@ -6,12 +6,12 @@ use crate::front::parser::ast::{
 };
 
 use cranelift::prelude::{
-  types, /* AbiParam, */ EntityRef, FloatCC, FunctionBuilder, InstBuilder,
-  Value, Variable,
+  types, AbiParam, EntityRef, FunctionBuilder, InstBuilder, IntCC, Value,
+  Variable,
 };
 
 use cranelift_jit::JITModule;
-use cranelift_module::DataContext;
+use cranelift_module::{DataContext, Linkage, Module};
 
 pub struct Translator<'a> {
   pub builder: FunctionBuilder<'a>,
@@ -82,13 +82,33 @@ impl<'a> Translator<'a> {
   }
 
   #[inline]
-  fn translate_return(&mut self, _expr: &Box<Expr>) -> Value {
-    todo!()
+  fn translate_return(&mut self, expr: &Option<Box<Expr>>) -> Value {
+    if let Some(ref e) = expr {
+      return self.translate_expr(e);
+    }
+
+    // tmp
+    self.builder.ins().iconst(types::I64, 0)
   }
 
   #[inline]
-  fn translate_break(&mut self, _expr: &Option<Box<Expr>>) -> Value {
-    todo!()
+  fn translate_break(&mut self, expr: &Option<Box<Expr>>) -> Value {
+    let mut value = self.builder.ins().iconst(self.ty, 0);
+    let end_block = *self.scope_map.blocks().last().unwrap();
+
+    if let Some(ref e) = expr {
+      value = self.translate_expr(e);
+      self.builder.ins().jump(end_block, &[value]);
+    } else {
+      self.builder.ins().jump(end_block, &[]);
+    }
+
+    let new_block = self.builder.create_block();
+
+    self.builder.seal_block(new_block);
+    self.builder.switch_to_block(new_block);
+
+    value
   }
 
   #[inline]
@@ -143,15 +163,16 @@ impl<'a> Translator<'a> {
   }
 
   #[inline]
-  fn translate_bool(&mut self, _boolean: &bool) -> Value {
-    todo!()
+  fn translate_bool(&mut self, boolean: &bool) -> Value {
+    self.builder.ins().bconst(types::B1, *boolean)
   }
 
   #[inline]
   fn translate_int(&mut self, num: &i64) -> Value {
-    self.builder.ins().f64const(*num as f64)
+    self.builder.ins().iconst(self.ty, *num)
   }
 
+  // TODO: how to support floats?
   #[inline]
   fn translate_float(&mut self, num: &f64) -> Value {
     self.builder.ins().f64const(*num)
@@ -189,6 +210,7 @@ impl<'a> Translator<'a> {
       BinopKind::Sub => self.translate_sub_binop(lhs, rhs),
       BinopKind::Mul => self.translate_mul_binop(lhs, rhs),
       BinopKind::Div => self.translate_div_binop(lhs, rhs),
+      BinopKind::Mod => self.translate_mod_binop(lhs, rhs),
       BinopKind::And => self.translate_and_binop(lhs, rhs),
       BinopKind::Or => self.translate_or_binop(lhs, rhs),
       BinopKind::Lt => self.translate_lt_binop(lhs, rhs),
@@ -197,28 +219,32 @@ impl<'a> Translator<'a> {
       BinopKind::Ge => self.translate_ge_binop(lhs, rhs),
       BinopKind::Eq => self.translate_eq_binop(lhs, rhs),
       BinopKind::Ne => self.translate_ne_binop(lhs, rhs),
-      _ => todo!(),
     }
   }
 
   #[inline]
   fn translate_add_binop(&mut self, lhs: Value, rhs: Value) -> Value {
-    self.builder.ins().fadd(lhs, rhs)
+    self.builder.ins().iadd(lhs, rhs)
   }
 
   #[inline]
   fn translate_sub_binop(&mut self, lhs: Value, rhs: Value) -> Value {
-    self.builder.ins().fsub(lhs, rhs)
+    self.builder.ins().isub(lhs, rhs)
   }
 
   #[inline]
   fn translate_mul_binop(&mut self, lhs: Value, rhs: Value) -> Value {
-    self.builder.ins().fmul(lhs, rhs)
+    self.builder.ins().imul(lhs, rhs)
   }
 
   #[inline]
   fn translate_div_binop(&mut self, lhs: Value, rhs: Value) -> Value {
-    self.builder.ins().fdiv(lhs, rhs)
+    self.builder.ins().sdiv(lhs, rhs)
+  }
+
+  #[inline]
+  fn translate_mod_binop(&mut self, _lhs: Value, _rhs: Value) -> Value {
+    todo!()
   }
 
   #[inline]
@@ -233,26 +259,27 @@ impl<'a> Translator<'a> {
 
   #[inline]
   fn translate_lt_binop(&mut self, lhs: Value, rhs: Value) -> Value {
-    let boolean = self.builder.ins().fcmp(FloatCC::LessThan, lhs, rhs);
-    let int = self.builder.ins().bint(types::I32, boolean);
+    let boolean = self.builder.ins().icmp(IntCC::SignedLessThan, lhs, rhs);
 
-    self.builder.ins().fcvt_from_sint(types::F64, int)
+    self.builder.ins().bint(self.ty, boolean)
   }
 
   #[inline]
   fn translate_gt_binop(&mut self, lhs: Value, rhs: Value) -> Value {
-    let boolean = self.builder.ins().fcmp(FloatCC::GreaterThan, lhs, rhs);
-    let int = self.builder.ins().bint(types::I32, boolean);
+    let boolean = self.builder.ins().icmp(IntCC::SignedGreaterThan, lhs, rhs);
 
-    self.builder.ins().fcvt_from_sint(types::F64, int)
+    self.builder.ins().bint(self.ty, boolean)
   }
 
   #[inline]
   fn translate_le_binop(&mut self, lhs: Value, rhs: Value) -> Value {
-    let boolean = self.builder.ins().fcmp(FloatCC::LessThanOrEqual, lhs, rhs);
-    let int = self.builder.ins().bint(types::I32, boolean);
+    let boolean =
+      self
+        .builder
+        .ins()
+        .icmp(IntCC::SignedLessThanOrEqual, lhs, rhs);
 
-    self.builder.ins().fcvt_from_sint(types::F64, int)
+    self.builder.ins().bint(self.ty, boolean)
   }
 
   #[inline]
@@ -261,27 +288,23 @@ impl<'a> Translator<'a> {
       self
         .builder
         .ins()
-        .fcmp(FloatCC::GreaterThanOrEqual, lhs, rhs);
+        .icmp(IntCC::SignedGreaterThanOrEqual, lhs, rhs);
 
-    let int = self.builder.ins().bint(types::I32, boolean);
-
-    self.builder.ins().fcvt_from_sint(types::F64, int)
+    self.builder.ins().bint(self.ty, boolean)
   }
 
   #[inline]
   fn translate_eq_binop(&mut self, lhs: Value, rhs: Value) -> Value {
-    let boolean = self.builder.ins().fcmp(FloatCC::Equal, lhs, rhs);
-    let int = self.builder.ins().bint(types::I32, boolean);
+    let boolean = self.builder.ins().icmp(IntCC::Equal, lhs, rhs);
 
-    self.builder.ins().fcvt_from_sint(types::F64, int)
+    self.builder.ins().bint(self.ty, boolean)
   }
 
   #[inline]
   fn translate_ne_binop(&mut self, lhs: Value, rhs: Value) -> Value {
-    let boolean = self.builder.ins().fcmp(FloatCC::NotEqual, lhs, rhs);
-    let int = self.builder.ins().bint(types::I32, boolean);
+    let boolean = self.builder.ins().icmp(IntCC::NotEqual, lhs, rhs);
 
-    self.builder.ins().fcvt_from_sint(types::F64, int)
+    self.builder.ins().bint(self.ty, boolean)
   }
 
   #[inline]
@@ -289,7 +312,7 @@ impl<'a> Translator<'a> {
     let rhs = self.translate_expr(rhs);
 
     match op {
-      UnopKind::Neg => self.builder.ins().fneg(rhs),
+      UnopKind::Neg => self.builder.ins().ineg(rhs),
       _ => unimplemented!(),
     }
   }
@@ -328,20 +351,80 @@ impl<'a> Translator<'a> {
   #[inline]
   fn translate_call(
     &mut self,
-    _callee: &Box<Expr>,
-    _args: &Vec<Box<Expr>>,
+    callee: &Box<Expr>,
+    args: &Vec<Box<Expr>>,
   ) -> Value {
-    todo!()
+    let mut sig = self.module.make_signature();
+
+    // Add a parameter for each argument.
+    for _arg in args {
+      sig.params.push(AbiParam::new(self.ty));
+    }
+
+    // For simplicity for now, just make all calls return a single I64.
+    sig.returns.push(AbiParam::new(self.ty));
+
+    // TODO: Streamline the API here?
+    let callee = self
+      .module
+      .declare_function(&callee.to_string(), Linkage::Import, &sig)
+      .expect("problem declaring function");
+
+    let local_callee = self
+      .module
+      .declare_func_in_func(callee, &mut self.builder.func);
+
+    let mut arg_values = Vec::new();
+    for arg in args {
+      arg_values.push(self.translate_expr(arg))
+    }
+
+    let call = self.builder.ins().call(local_callee, &arg_values);
+    self.builder.inst_results(call)[0]
   }
 
   #[inline]
   fn translate_if(
     &mut self,
-    _condition: &Box<Expr>,
-    _consequence: &Box<Block>,
-    _alternative: &Option<Box<Block>>,
+    condition: &Box<Expr>,
+    consequence: &Box<Block>,
+    alternative: &Option<Box<Block>>,
   ) -> Value {
-    todo!()
+    let then_block = self.builder.create_block();
+    let else_block = self.builder.create_block();
+    let merge_block = self.builder.create_block();
+
+    self.builder.append_block_param(merge_block, self.ty);
+
+    let condition_value = self.translate_expr(condition);
+
+    self.builder.ins().brz(condition_value, else_block, &[]);
+    self.builder.ins().jump(then_block, &[]);
+    self.builder.seal_block(else_block);
+    self.builder.seal_block(then_block);
+    self.builder.switch_to_block(then_block);
+
+    let mut value = self.builder.ins().iconst(self.ty, 0);
+
+    for stmt in &consequence.stmts {
+      value = self.translate_stmt(stmt);
+    }
+
+    self.builder.ins().jump(merge_block, &[value]);
+    self.builder.switch_to_block(else_block);
+
+    let mut value = self.builder.ins().iconst(self.ty, 0);
+
+    if let Some(alternative) = alternative {
+      for stmt in &alternative.stmts {
+        value = self.translate_stmt(stmt);
+      }
+    }
+
+    self.builder.ins().jump(merge_block, &[value]);
+    self.builder.seal_block(merge_block);
+    self.builder.switch_to_block(merge_block);
+    self.builder.block_params(merge_block)[0]
   }
 
   #[inline]
@@ -352,10 +435,35 @@ impl<'a> Translator<'a> {
   #[inline]
   fn translate_while(
     &mut self,
-    _condition: &Box<Expr>,
-    _body: &Box<Block>,
+    condition: &Box<Expr>,
+    body: &Box<Block>,
   ) -> Value {
-    todo!()
+    let header_bb = self.builder.create_block();
+    let body_bb = self.builder.create_block();
+    let end_bb = self.builder.create_block();
+
+    self.builder.ins().jump(header_bb, &[]);
+    self.builder.switch_to_block(header_bb);
+
+    let cond = self.translate_expr(condition);
+    self.builder.ins().brz(cond, end_bb, &[]);
+    self.builder.ins().jump(body_bb, &[]);
+
+    self.scope_map.blocks().push(end_bb);
+    self.builder.seal_block(body_bb);
+    self.builder.switch_to_block(body_bb);
+
+    for stmt in &body.stmts {
+      self.translate_stmt(stmt);
+    }
+
+    self.builder.ins().jump(header_bb, &[]);
+    self.scope_map.blocks().pop();
+
+    self.builder.seal_block(header_bb);
+    self.builder.seal_block(end_bb);
+    self.builder.switch_to_block(end_bb);
+    self.builder.ins().iconst(self.ty, 0)
   }
 
   #[inline]

@@ -1,5 +1,5 @@
-fun main := () {
-  fun factorial: (uint) -> uint = (n) {
+fun main() {
+  fun factorial(n : uint) : uint {
     if n <= 1 {
       return 1;
     }

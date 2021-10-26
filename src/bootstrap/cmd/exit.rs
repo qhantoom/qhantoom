@@ -1,3 +1,5 @@
+use super::compile::EXIT_SUCCESS;
+
 // run the `exit` command
 #[inline]
 pub fn run() {
@@ -8,5 +10,5 @@ pub fn run() {
 #[inline]
 pub fn exit() -> ! {
   print!("\nTriForce.. 👋\n");
-  std::process::exit(0);
+  std::process::exit(EXIT_SUCCESS);
 }

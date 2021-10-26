@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use cranelift::prelude::Block;
+
 #[derive(Debug, Clone)]
 pub struct Scope<V> {
   variables: HashMap<String, V>,
@@ -21,7 +23,7 @@ impl<V> Scope<V> {
   #[inline]
   fn add_variable(&mut self, name: String, var: V) -> Result<(), String> {
     match self.variables.get(&name) {
-      Some(_) => Err(format!("variable {} already exists", name)),
+      Some(_) => Err(format!("variable {} already exists", name)), // TODO: should be an error type
       None => {
         self.variables.insert(name, var);
         Ok(())
@@ -31,6 +33,7 @@ impl<V> Scope<V> {
 }
 
 pub struct ScopeMap<V> {
+  blocks: Vec<Block>,
   maps: Vec<Scope<V>>,
 }
 
@@ -38,8 +41,14 @@ impl<V> ScopeMap<V> {
   #[inline]
   pub fn new() -> Self {
     Self {
+      blocks: vec![],
       maps: vec![Scope::new()],
     }
+  }
+
+  #[inline]
+  pub fn blocks(&mut self) -> &mut Vec<Block> {
+    &mut self.blocks
   }
 
   #[inline]
@@ -57,7 +66,7 @@ impl<V> ScopeMap<V> {
   pub fn add_variable(&mut self, name: String, var: V) -> Result<(), String> {
     match self.maps.last_mut() {
       Some(map) => map.add_variable(name, var),
-      None => Err(format!("empty scope map")),
+      None => Err(format!("empty scope map")), // TODO: should be an error type
     }
   }
 

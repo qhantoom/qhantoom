@@ -1,5 +1,5 @@
 action Vec2 {
-  fun mul: (uint) -> uint;
+  fun mul(x : uint) : uint;
 }
 
-fun main := () {}
+fun main() {}

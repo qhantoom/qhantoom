@@ -3,8 +3,8 @@ use std::mem;
 use super::ast;
 
 use super::ast::{
-  BinopKind, Block, Expr, Fun, Program, Prototype, Stmt, StmtKind, Ty, TyKind,
-  UnopKind,
+  Arg, BinopKind, Block, Expr, Fun, Program, Prototype, Stmt, StmtKind, Ty,
+  TyKind, UnopKind,
 };
 
 use super::interface::Precedence;
@@ -75,7 +75,7 @@ impl<'a> Parser<'a> {
           continue;
         }
         _ => match self.parse_stmt() {
-          Ok(stmt) => stmts.push(stmt),
+          Ok(s) => stmts.push(s),
           Err(e) => self.errors.push(e),
         },
       }
@@ -90,7 +90,6 @@ impl<'a> Parser<'a> {
   fn parse_block(&mut self) -> Result<Box<Block>> {
     let mut stmts = vec![];
 
-    self.expect_first(&TokenKind::OpenBrace)?;
     self.next();
 
     while *self.current.kind() != TokenKind::CloseBrace
@@ -106,7 +105,7 @@ impl<'a> Parser<'a> {
           continue;
         }
         _ => match self.parse_stmt() {
-          Ok(stmt) => stmts.push(stmt),
+          Ok(s) => stmts.push(s),
           Err(e) => self.errors.push(e),
         },
       }
@@ -129,7 +128,6 @@ impl<'a> Parser<'a> {
     }
   }
 
-  // TODO: this will be change in the future
   #[inline]
   fn parse_fun_stmt(&mut self) -> Result<Stmt> {
     let prototype = self.parse_prototype()?;
@@ -138,40 +136,48 @@ impl<'a> Parser<'a> {
     Ok(ast::mk_stmt(ast::mk_fun(box Fun { prototype, body })))
   }
 
-  // TODO: this will be change in the future
   #[inline]
   fn parse_prototype(&mut self) -> Result<Prototype> {
     self.next();
 
     let name = self.parse_ident_expr()?;
-    let ty = self.parse_ty_expr()?;
     let args = self.parse_args()?;
+    let ty = self.parse_ty_expr()?;
 
     Ok(ast::mk_prototype(name, ty, args))
   }
 
-  // TODO: this will be change in the future
   #[inline]
-  fn parse_args(&mut self) -> Result<Vec<Box<Expr>>> {
+  fn parse_args(&mut self) -> Result<Vec<Box<Arg>>> {
     let mut args = vec![];
+
+    self.next();
 
     if self.first.is(TokenKind::CloseParen) {
       self.next();
       return Ok(args);
     }
 
-    self.next();
-    args.push(self.parse_ident_expr()?);
+    args.push(self.parse_arg()?);
 
     while self.first.is(TokenKind::Comma) {
       self.next();
-      self.next();
-      args.push(self.parse_ident_expr()?);
+      args.push(self.parse_arg()?);
     }
 
     self.expect_first(&TokenKind::CloseParen)?;
 
     Ok(args)
+  }
+
+  #[inline]
+  fn parse_arg(&mut self) -> Result<Box<Arg>> {
+    self.next();
+    let name = self.parse_ident_expr()?;
+    self.expect_first(&TokenKind::Colon)?;
+    let ty = self.parse_ty_expr()?;
+
+    Ok(box ast::mk_arg(name, ty))
   }
 
   #[inline]
@@ -182,6 +188,12 @@ impl<'a> Parser<'a> {
 
     let name = self.parse_ident_expr()?;
     let ty = self.parse_ty_expr()?;
+
+    if self.first.is(TokenKind::Assign) {
+      self.expect_first(&TokenKind::Assign)?;
+      self.next();
+    }
+
     let value = self.parse_expr_by_precedence(&Precedence::Lowest)?;
 
     self.expect_first(&TokenKind::Semicolon)?;
@@ -199,13 +211,19 @@ impl<'a> Parser<'a> {
   fn parse_return_stmt(&mut self) -> Result<Stmt> {
     self.next();
 
+    if self.current.is(TokenKind::Semicolon) {
+      return Ok(ast::mk_stmt(ast::mk_return(None)));
+    }
+
     let expr = self.parse_expr_by_precedence(&Precedence::Lowest)?;
 
-    while *self.first.kind() != TokenKind::Semicolon {
+    while !self.current.is(TokenKind::Semicolon)
+      && !self.current.is(TokenKind::EOF)
+    {
       self.next();
     }
 
-    Ok(ast::mk_stmt(ast::mk_return(expr)))
+    Ok(ast::mk_stmt(ast::mk_return(Some(expr))))
   }
 
   #[inline]
@@ -404,8 +422,8 @@ impl<'a> Parser<'a> {
   #[inline]
   fn parse_ident_expr(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
-      TokenKind::Identifier(ref ident) => {
-        Ok(box ast::mk_expr(ast::mk_ident(ident.into())))
+      TokenKind::Identifier(ref name) => {
+        Ok(box ast::mk_expr(ast::mk_ident(name.into())))
       }
       _ => Err(Error::ExpectedExpr(
         "ident",
@@ -484,14 +502,26 @@ impl<'a> Parser<'a> {
   // TODO: implement a dynamic type system
   #[inline]
   fn parse_ty_expr(&mut self) -> Result<Box<Ty>> {
+    if self.first.is(TokenKind::ColonAssign) {
+      self.next();
+      return self.parse_dynamic_ty();
+    }
+
+    if self.current.is(TokenKind::CloseParen)
+      && self.first.is(TokenKind::OpenBrace)
+    {
+      return self.parse_dynamic_ty();
+    }
+
     self.next();
 
     let kind = match self.current.kind() {
-      TokenKind::ColonAssign => return self.parse_dynamic_ty(),
-      _ => self.parse_ty()?,
+      TokenKind::Colon => {
+        self.next();
+        self.ty()
+      }
+      _ => self.ty(),
     };
-
-    self.next();
 
     Ok(box ast::mk_ty(kind))
   }
@@ -501,17 +531,6 @@ impl<'a> Parser<'a> {
     self.next();
 
     Ok(box ast::mk_ty(TyKind::Dynamic))
-  }
-
-  #[inline]
-  fn parse_ty(&mut self) -> Result<TyKind> {
-    self.next();
-
-    let kind = self.ty();
-
-    self.next();
-
-    Ok(kind)
   }
 
   #[inline]
@@ -558,7 +577,7 @@ impl<'a> Parser<'a> {
   }
 
   #[inline]
-  fn should_precedence_has_priority(&mut self, kind: &Precedence) -> bool {
-    *kind < Precedence::from(self.first.kind())
+  fn should_precedence_has_priority(&mut self, p: &Precedence) -> bool {
+    *p < Precedence::from(self.first.kind())
   }
 }

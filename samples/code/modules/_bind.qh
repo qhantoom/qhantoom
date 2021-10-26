@@ -1,4 +1,4 @@
 pub bind wgl;
 pub bind ogl;
 
-fun main := () {}
+fun main() {}
