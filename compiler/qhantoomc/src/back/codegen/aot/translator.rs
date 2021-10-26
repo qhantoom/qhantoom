@@ -6,8 +6,8 @@ use crate::front::parser::ast::{
 };
 
 use cranelift::prelude::{
-  types, /* AbiParam, */ EntityRef, FloatCC, FunctionBuilder, InstBuilder, Value,
-  Variable,
+  types, /* AbiParam, */ EntityRef, FloatCC, FunctionBuilder, InstBuilder,
+  Value, Variable,
 };
 
 use cranelift_module::{DataContext, /* Linkage, */ Module};

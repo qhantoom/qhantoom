@@ -6,12 +6,12 @@ use crate::front::parser::ast::{
 };
 
 use cranelift::prelude::{
-  types, /* AbiParam, */ EntityRef, FloatCC, FunctionBuilder, InstBuilder, Value,
-  Variable,
+  types, /* AbiParam, */ EntityRef, FloatCC, FunctionBuilder, InstBuilder,
+  Value, Variable,
 };
 
 use cranelift_jit::JITModule;
-use cranelift_module::{DataContext, /* Linkage, Module */};
+use cranelift_module::DataContext;
 
 pub struct Translator<'a> {
   pub builder: FunctionBuilder<'a>,

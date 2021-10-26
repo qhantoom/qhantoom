@@ -4,9 +4,11 @@ use qhantoomc::back;
 use qhantoomc::front;
 use qhantoomc::util;
 
+use clap::ArgMatches;
+
 // run the `compile` command
 #[inline]
-pub fn run(args: Vec<String>) {
+pub fn run(args: ArgMatches<'static>) {
   match compile(args) {
     Ok(_) => std::process::exit(0),
     Err(_) => std::process::exit(2),
@@ -15,7 +17,9 @@ pub fn run(args: Vec<String>) {
 
 // compile the program in a separate thread
 #[inline]
-fn compile(args: Vec<String>) -> Result<(), Box<(dyn Any + Send + 'static)>> {
+fn compile(
+  args: ArgMatches<'static>,
+) -> Result<(), Box<(dyn Any + Send + 'static)>> {
   use std::thread::Builder;
 
   const STACK_SIZE: usize = 128 * 1024 * 1024;
@@ -29,55 +33,57 @@ fn compile(args: Vec<String>) -> Result<(), Box<(dyn Any + Send + 'static)>> {
 
 // compile the program
 #[inline]
-fn compiling(args: Vec<String>) {
+fn compiling(args: ArgMatches) {
   print!("compiling..\n");
 
-  let args = &args[1..];
+  if let Some(matches) = args.subcommand_matches("compile") {
+    let pathname = matches.value_of("file").unwrap();
 
-  // read the file from the path
-  let file = match crate::util::readfile(&args[0]) {
-    Ok(f) => f,
-    Err(e) => panic!("io error: {}", e),
-  };
-
-  print!("\nfile: {}\n", file);
-
-  // TMP: this is used just for printing the tokenize output
-  // transform source code into tokens
-  let tokens = match front::tokenizer::tokenize(&file) {
-    Ok(t) => t,
-    Err(e) => panic!("tokenizer error: {}", e),
-  };
-
-  print!("\ntokens: {:#?}\n", tokens);
-
-  // transform source code into AST
-  let ast = {
-    match front::parser::parse(&file) {
-      Ok(ast) => ast,
+    // read the file from the path
+    let file = match crate::util::readfile(&pathname) {
+      Ok(f) => f,
       Err(e) => panic!("io error: {}", e),
-    }
-  };
+    };
 
-  print!("\nast: {:#?}\n", ast);
+    print!("\nfile: {}\n", file);
 
-  // type checking the AST
-  front::analyzer::maincheck::analyze(&ast);
-  front::analyzer::typecheck::analyze(&ast);
+    // TMP: this is used just for printing the tokenize output
+    // transform source code into tokens
+    let tokens = match front::tokenizer::tokenize(&file) {
+      Ok(t) => t,
+      Err(e) => panic!("tokenizer error: {}", e),
+    };
 
-  // code generation from an AST to machine code
-  let code = {
-    match back::codegen::aot::generate(&ast) {
-      Ok(code) => code,
-      Err(e) => panic!("codegen error: {}", e),
-    }
-  };
+    print!("\ntokens: {:#?}\n", tokens);
 
-  print!("code: {:?}\n", code);
+    // transform source code into AST
+    let ast = {
+      match front::parser::parse(&file) {
+        Ok(ast) => ast,
+        Err(e) => panic!("io error: {}", e),
+      }
+    };
 
-  // write machine code to file
-  let _ = util::writer::write("test.o", code);
+    print!("\nast: {:#?}\n", ast);
 
-  // print success message
-  print!("\ncompiled successfully..\n");
+    // type checking the AST
+    front::analyzer::maincheck::analyze(&ast);
+    front::analyzer::typecheck::analyze(&ast);
+
+    // code generation from an AST to machine code
+    let code = {
+      match back::codegen::aot::generate(&ast) {
+        Ok(code) => code,
+        Err(e) => panic!("codegen error: {}", e),
+      }
+    };
+
+    print!("code: {:?}\n", code);
+
+    // write machine code to file
+    let _ = util::writer::write("test.o", code);
+
+    // print success message
+    print!("\ncompiled successfully..\n");
+  }
 }

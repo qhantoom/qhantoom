@@ -1,9 +1,11 @@
 cargo-features = ["edition2021"]
 
 [package]
+authors = ["monsieurbadia, iam@monsieurbadia.com"]
+description = "a programming language under development"
 edition = "2021"
 name = "bootstrap"
-version = "0.1.0"
+version = "0.0.0"
 
 [[bin]]
 doctest = false
@@ -17,6 +19,7 @@ path = "lib.rs"
 
 [dependencies]
 chrono = "0.4.19"
+clap = "2.33.3"
 platform-info = "0.1.0"
 qhantoomc = {path = "../../compiler/qhantoomc"}
 qute = "0.0.13"

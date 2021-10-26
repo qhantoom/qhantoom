@@ -8,9 +8,11 @@ use qhantoomc::back;
 use qhantoomc::back::codegen::jit::Jit;
 use qute::prelude::*;
 
+use clap::ArgMatches;
+
 // run the `repl`command
 #[inline]
-pub fn run(args: &[String]) {
+pub fn run(args: ArgMatches<'static>) {
   match repl(args) {
     Ok(_) => return,
     Err(e) => panic!("{}", e),
@@ -19,14 +21,14 @@ pub fn run(args: &[String]) {
 
 // read a line of input from stdin
 #[inline]
-fn repl(args: &[String]) -> Result<(), String> {
+fn repl(args: ArgMatches<'static>) -> Result<(), String> {
   let mut jit = Jit::new();
 
   banner();
 
   loop {
     match crate::util::readline("📡") {
-      Ok(ref line) => processing(&mut jit, args, line),
+      Ok(ref line) => processing(&mut jit, &args, line),
       Err(e) => Err(format!("{}", e)),
     }?;
   }
@@ -36,7 +38,7 @@ fn repl(args: &[String]) -> Result<(), String> {
 #[inline]
 fn processing(
   jit: &mut Jit,
-  _args: &[String],
+  _args: &ArgMatches,
   line: &str,
 ) -> Result<(), String> {
   if line.is_empty() {
