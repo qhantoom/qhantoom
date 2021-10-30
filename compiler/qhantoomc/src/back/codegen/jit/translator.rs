@@ -243,8 +243,8 @@ impl<'a> Translator<'a> {
   }
 
   #[inline]
-  fn translate_mod_binop(&mut self, _lhs: Value, _rhs: Value) -> Value {
-    todo!()
+  fn translate_mod_binop(&mut self, lhs: Value, rhs: Value) -> Value {
+    self.builder.ins().srem(lhs, rhs)
   }
 
   #[inline]
