@@ -207,15 +207,15 @@ impl<'a> Translator<'a> {
       BinopKind::Sub => self.translate_sub_binop(lhs, rhs),
       BinopKind::Mul => self.translate_mul_binop(lhs, rhs),
       BinopKind::Div => self.translate_div_binop(lhs, rhs),
-      BinopKind::And => self.translate_and_binop(lhs, rhs),
-      BinopKind::Or => self.translate_or_binop(lhs, rhs),
+      BinopKind::Rem => self.translate_rem_binop(lhs, rhs),
       BinopKind::Lt => self.translate_lt_binop(lhs, rhs),
       BinopKind::Gt => self.translate_gt_binop(lhs, rhs),
       BinopKind::Le => self.translate_le_binop(lhs, rhs),
       BinopKind::Ge => self.translate_ge_binop(lhs, rhs),
       BinopKind::Eq => self.translate_eq_binop(lhs, rhs),
       BinopKind::Ne => self.translate_ne_binop(lhs, rhs),
-      _ => todo!(),
+      BinopKind::Or => self.translate_or_binop(lhs, rhs),
+      BinopKind::And => self.translate_and_binop(lhs, rhs),
     }
   }
 
@@ -240,13 +240,46 @@ impl<'a> Translator<'a> {
   }
 
   #[inline]
-  fn translate_and_binop(&mut self, _lhs: Value, _rhs: Value) -> Value {
-    todo!()
+  fn translate_rem_binop(&mut self, lhs: Value, rhs: Value) -> Value {
+    self.builder.ins().srem(lhs, rhs)
   }
 
   #[inline]
-  fn translate_or_binop(&mut self, _lhs: Value, _rhs: Value) -> Value {
-    todo!()
+  fn translate_logical_binop(
+    &mut self,
+    op: &BinopKind,
+    lhs: Value,
+    rhs: Value,
+  ) -> Value {
+    let b1 = self.builder.create_block();
+    let merge_bb = self.builder.create_block();
+    self.builder.append_block_param(merge_bb, self.ty);
+
+    match op {
+      BinopKind::And => self.builder.ins().brnz(lhs, b1, &[]),
+      BinopKind::Or => self.builder.ins().brz(lhs, b1, &[]),
+      _ => unreachable!(),
+    };
+
+    self.builder.ins().jump(merge_bb, &[lhs]);
+
+    self.builder.seal_block(b1);
+    self.builder.switch_to_block(b1);
+    self.builder.ins().jump(merge_bb, &[rhs]);
+
+    self.builder.seal_block(merge_bb);
+    self.builder.switch_to_block(merge_bb);
+    self.builder.block_params(merge_bb)[0]
+  }
+
+  #[inline]
+  fn translate_and_binop(&mut self, lhs: Value, rhs: Value) -> Value {
+    self.translate_logical_binop(&BinopKind::And, lhs, rhs)
+  }
+
+  #[inline]
+  fn translate_or_binop(&mut self, lhs: Value, rhs: Value) -> Value {
+    self.translate_logical_binop(&BinopKind::Or, lhs, rhs)
   }
 
   #[inline]

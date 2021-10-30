@@ -84,7 +84,7 @@ impl fmt::Display for Stmt {
         } else {
           write!(f, "return;")
         }
-      },
+      }
       StmtKind::Break(ref expr) => {
         if let Some(ref expr) = *expr {
           write!(f, "break {};", expr)
@@ -196,7 +196,7 @@ impl fmt::Display for BinopKind {
       Self::Sub => write!(f, "-"),
       Self::Mul => write!(f, "*"),
       Self::Div => write!(f, "/"),
-      Self::Mod => write!(f, "%"),
+      Self::Rem => write!(f, "%"),
       Self::And => write!(f, "&&"),
       Self::Or => write!(f, "||"),
       Self::Lt => write!(f, "<"),
