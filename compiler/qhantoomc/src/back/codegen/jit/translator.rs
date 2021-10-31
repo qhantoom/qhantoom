@@ -491,8 +491,26 @@ impl<'a> Translator<'a> {
   }
 
   #[inline]
-  fn translate_loop(&mut self, _body: &Box<Block>) -> Value {
-    todo!()
+  fn translate_loop(&mut self, body: &Box<Block>) -> Value {
+    let body_block = self.builder.create_block();
+    let end_block = self.builder.create_block();
+
+    self.builder.ins().jump(body_block, &[]);
+    self.builder.switch_to_block(body_block);
+
+    self.scope_map.blocks().push(end_block);
+    self.builder.switch_to_block(body_block);
+
+    for stmt in &body.stmts {
+      self.translate_stmt(stmt);
+    }
+
+    self.builder.ins().jump(body_block, &[]);
+    self.scope_map.blocks().pop();
+    self.builder.seal_block(body_block);
+    self.builder.seal_block(end_block);
+    self.builder.switch_to_block(end_block);
+    self.builder.ins().iconst(self.ty, 0)
   }
 
   #[inline]
@@ -501,31 +519,31 @@ impl<'a> Translator<'a> {
     condition: &Box<Expr>,
     body: &Box<Block>,
   ) -> Value {
-    let header_bb = self.builder.create_block();
-    let body_bb = self.builder.create_block();
-    let end_bb = self.builder.create_block();
+    let header_block = self.builder.create_block();
+    let body_block = self.builder.create_block();
+    let end_block = self.builder.create_block();
 
-    self.builder.ins().jump(header_bb, &[]);
-    self.builder.switch_to_block(header_bb);
+    self.builder.ins().jump(header_block, &[]);
+    self.builder.switch_to_block(header_block);
 
     let cond = self.translate_expr(condition);
-    self.builder.ins().brz(cond, end_bb, &[]);
-    self.builder.ins().jump(body_bb, &[]);
+    self.builder.ins().brz(cond, end_block, &[]);
+    self.builder.ins().jump(body_block, &[]);
 
-    self.scope_map.blocks().push(end_bb);
-    self.builder.seal_block(body_bb);
-    self.builder.switch_to_block(body_bb);
+    self.scope_map.blocks().push(end_block);
+    self.builder.seal_block(body_block);
+    self.builder.switch_to_block(body_block);
 
     for stmt in &body.stmts {
       self.translate_stmt(stmt);
     }
 
-    self.builder.ins().jump(header_bb, &[]);
+    self.builder.ins().jump(header_block, &[]);
     self.scope_map.blocks().pop();
 
-    self.builder.seal_block(header_bb);
-    self.builder.seal_block(end_bb);
-    self.builder.switch_to_block(end_bb);
+    self.builder.seal_block(header_block);
+    self.builder.seal_block(end_block);
+    self.builder.switch_to_block(end_block);
     self.builder.ins().iconst(self.ty, 0)
   }
 

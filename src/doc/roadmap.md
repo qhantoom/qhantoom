@@ -49,7 +49,7 @@
   * [x] `else
 
 * [ ] loops
-  * [ ] `loop`
+  * [x] `loop`
   * [ ] `for`
   * [x] `while`
   * [x] `break`

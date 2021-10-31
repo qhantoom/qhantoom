@@ -462,8 +462,26 @@ impl<'a> Translator<'a> {
   }
 
   #[inline]
-  fn translate_loop(&mut self, _body: &Box<Block>) -> Value {
-    todo!()
+  fn translate_loop(&mut self, body: &Box<Block>) -> Value {
+    let body_block = self.builder.create_block();
+    let end_block = self.builder.create_block();
+
+    self.builder.ins().jump(body_block, &[]);
+    self.builder.switch_to_block(body_block);
+
+    self.scope_map.blocks().push(end_block);
+    self.builder.switch_to_block(body_block);
+
+    for stmt in &body.stmts {
+      self.translate_stmt(stmt);
+    }
+
+    self.builder.ins().jump(body_block, &[]);
+    self.scope_map.blocks().pop();
+    self.builder.seal_block(body_block);
+    self.builder.seal_block(end_block);
+    self.builder.switch_to_block(end_block);
+    self.builder.ins().iconst(self.ty, 0)
   }
 
   #[inline]
