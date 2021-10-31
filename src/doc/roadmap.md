@@ -12,7 +12,50 @@
 * [ ] back-end | *needs help*
   * [ ] `codegen` | *wip*
 
-* [ ] data-structures
+* types
+  * [ ] `bool`
+  * [ ] `s8`, `s16`, `s32`, `s64`, `sint`
+  * [ ] `u8`, `u16`, `u32`, `u64`, `uint`
+  * [ ] `char`
+  * [ ] `str`
+
+* [ ] operators
+  * [x] `+`, `-`, `*`, `/`, `%`
+  * [x] `==`, `!=`, `<`, `<=`, `>`, `>=`
+  * [x] `=`
+  * [x] `+=`, `-=`, `*=`, `/=`
+  * [ ] `|=`, `&=`,
+  * [ ] `|`, `&`
+  * [x] `||`, `&&`
+  * [ ] `<<`, `>>`
+
+* [ ] booleans
+  * [ ] `true`
+  * [ ] `false`
+
+* [ ] numbers
+  * [x] `integers`
+  * [ ] `floats`
+  * [ ] `hexadecimals`
+
+* variables
+  * [ ] `imu`
+  * [x] `val` 
+  * [x] `mut`
+
+* [ ] branches
+  * [x] `if`
+  * [ ] `else if`
+  * [x] `else
+
+* [ ] loops
+  * [ ] `loop`
+  * [ ] `for`
+  * [x] `while`
+  * [x] `break`
+  * [ ] `continue`
+
+* [ ] data structures
   * [ ] `action`
   * [ ] `array`
   * [ ] `hash`
