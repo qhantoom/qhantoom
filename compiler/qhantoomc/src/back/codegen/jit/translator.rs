@@ -260,25 +260,24 @@ impl<'a> Translator<'a> {
     lhs: Value,
     rhs: Value,
   ) -> Value {
-    let b1 = self.builder.create_block();
-    let merge_bb = self.builder.create_block();
-    self.builder.append_block_param(merge_bb, self.ty);
+    let body_block = self.builder.create_block();
+    let merge_block = self.builder.create_block();
+
+    self.builder.append_block_param(merge_block, self.ty);
 
     match op {
-      BinopKind::And => self.builder.ins().brnz(lhs, b1, &[]),
-      BinopKind::Or => self.builder.ins().brz(lhs, b1, &[]),
+      BinopKind::And => self.builder.ins().brnz(lhs, body_block, &[]),
+      BinopKind::Or => self.builder.ins().brz(lhs, body_block, &[]),
       _ => unreachable!(),
     };
 
-    self.builder.ins().jump(merge_bb, &[lhs]);
-
-    self.builder.seal_block(b1);
-    self.builder.switch_to_block(b1);
-    self.builder.ins().jump(merge_bb, &[rhs]);
-
-    self.builder.seal_block(merge_bb);
-    self.builder.switch_to_block(merge_bb);
-    self.builder.block_params(merge_bb)[0]
+    self.builder.ins().jump(merge_block, &[lhs]);
+    self.builder.seal_block(body_block);
+    self.builder.switch_to_block(body_block);
+    self.builder.ins().jump(merge_block, &[rhs]);
+    self.builder.seal_block(merge_block);
+    self.builder.switch_to_block(merge_block);
+    self.builder.block_params(merge_block)[0]
   }
 
   #[inline]
@@ -497,7 +496,6 @@ impl<'a> Translator<'a> {
 
     self.builder.ins().jump(body_block, &[]);
     self.builder.switch_to_block(body_block);
-
     self.scope_map.blocks().push(end_block);
     self.builder.switch_to_block(body_block);
 
@@ -527,9 +525,9 @@ impl<'a> Translator<'a> {
     self.builder.switch_to_block(header_block);
 
     let cond = self.translate_expr(condition);
+
     self.builder.ins().brz(cond, end_block, &[]);
     self.builder.ins().jump(body_block, &[]);
-
     self.scope_map.blocks().push(end_block);
     self.builder.seal_block(body_block);
     self.builder.switch_to_block(body_block);
@@ -540,7 +538,6 @@ impl<'a> Translator<'a> {
 
     self.builder.ins().jump(header_block, &[]);
     self.scope_map.blocks().pop();
-
     self.builder.seal_block(header_block);
     self.builder.seal_block(end_block);
     self.builder.switch_to_block(end_block);

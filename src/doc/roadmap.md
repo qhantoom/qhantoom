@@ -11,8 +11,16 @@
 
 * [ ] back-end | *needs help*
   * [ ] `codegen` | *wip*
+  * [x] emit native object `.o` file
+  * [x] create an executable
 
-* types
+* [ ] comments
+  * [x] line comments
+  * [ ] block comments
+  * [x] doc line comments
+  * [ ] doc block comments
+
+* [ ] types
   * [ ] `bool`
   * [ ] `s8`, `s16`, `s32`, `s64`, `sint`
   * [ ] `u8`, `u16`, `u32`, `u64`, `uint`
@@ -38,15 +46,40 @@
   * [ ] `floats`
   * [ ] `hexadecimals`
 
-* variables
+* [ ] variables
   * [ ] `imu`
-  * [x] `val` 
+  * [x] `val`
   * [x] `mut`
+  * [ ] multiples
+
+* [ ] functions
+  * [ ] functions
+  * [ ] closures
+  * [ ] higher order functions
+  * [ ] `return`
+  * [ ] calls
+
+* [ ] ffi
+  * [ ] `exp`
+  * [ ] `ext`
+  * [ ] `mod`
+
+* [ ] macros
+  * [ ] macros
+  * [ ] calls
+
+* [ ] assertions
+  * [ ] `unit`
+  * [ ] `mock`
+  * [ ] `test`
 
 * [ ] branches
   * [x] `if`
   * [ ] `else if`
   * [x] `else
+
+* [ ] pattern matching
+  * [ ] `match`
 
 * [ ] loops
   * [x] `loop`
@@ -58,9 +91,14 @@
 * [ ] data structures
   * [ ] `action`
   * [ ] `array`
+  * [ ] `enum`
   * [ ] `hash`
   * [ ] `struct`
   * [ ] `tuple`
+
+* [ ] modules
+  * [ ] `load`
+  * [ ] `bind`
 
 * [ ] library
   * [ ] `std`
