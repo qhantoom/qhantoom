@@ -12,13 +12,15 @@ pub enum Precedence {
   Unary,
   Calling,
   Index,
-  // Highest,
+  Highest,
 }
 
 impl From<&TokenKind> for Precedence {
   #[inline]
   fn from(kind: &TokenKind) -> Precedence {
     match *kind {
+      TokenKind::Dot | TokenKind::OpenBrace => Precedence::Highest,
+
       TokenKind::OpenBracket => Self::Index,
 
       TokenKind::OpenParen => Self::Calling,

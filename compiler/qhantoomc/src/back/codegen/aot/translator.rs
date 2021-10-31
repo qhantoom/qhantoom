@@ -2,7 +2,7 @@ use crate::back::codegen::context::ScopeMap;
 
 use crate::front::parser::ast::{
   BinopKind, Block, Expr, ExprKind, Fun, Local, Program, Prototype, Stmt,
-  StmtKind, UnopKind,
+  StmtKind, Struct, StructExpr, UnopKind,
 };
 
 use cranelift::prelude::{
@@ -55,6 +55,7 @@ impl<'a> Translator<'a> {
       StmtKind::Return(ref expr) => self.translate_return(expr),
       StmtKind::Break(ref expr) => self.translate_break(expr),
       StmtKind::Continue(ref expr) => self.translate_continue(expr),
+      StmtKind::Struct(ref struct_def) => self.translate_struct_def(struct_def),
       StmtKind::Expr(ref expr) => self.translate_expr(expr),
     }
   }
@@ -115,6 +116,11 @@ impl<'a> Translator<'a> {
   }
 
   #[inline]
+  fn translate_struct_def(&mut self, _struct_def: &Box<Struct>) -> Value {
+    todo!()
+  }
+
+  #[inline]
   fn translate_expr(&mut self, expr: &Expr) -> Value {
     match expr.kind() {
       ExprKind::Bool(ref boolean) => self.translate_bool(boolean),
@@ -162,6 +168,12 @@ impl<'a> Translator<'a> {
         ref end,
         ref body,
       } => self.translate_range(start, end, body),
+      ExprKind::StructExpr(ref struct_expr) => {
+        self.translate_struct_expr(struct_expr)
+      }
+      ExprKind::FieldAccess { ref lhs, ref name } => {
+        self.translate_field_access(lhs, name)
+      }
     }
   }
 
@@ -531,6 +543,20 @@ impl<'a> Translator<'a> {
     _start: &Box<Expr>,
     _end: &Box<Expr>,
     _body: &Box<Block>,
+  ) -> Value {
+    todo!()
+  }
+
+  #[inline]
+  fn translate_struct_expr(&mut self, _struct_expr: &Box<StructExpr>) -> Value {
+    todo!()
+  }
+
+  #[inline]
+  fn translate_field_access(
+    &mut self,
+    _lhs: &Box<Expr>,
+    _name: &Box<Expr>,
   ) -> Value {
     todo!()
   }

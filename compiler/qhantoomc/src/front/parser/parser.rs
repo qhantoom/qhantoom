@@ -1,10 +1,10 @@
 use std::mem;
 
-use super::ast;
+use super::ast::{self, StructExpr};
 
 use super::ast::{
-  Arg, BinopKind, Block, Expr, Fun, Program, Prototype, Stmt, StmtKind, Ty,
-  TyKind, UnopKind,
+  Arg, BinopKind, Block, Expr, ExprKind, Field, FieldExpr, Fun, Program,
+  Prototype, Stmt, StmtKind, Struct, Ty, TyKind, UnopKind,
 };
 
 use super::interface::Precedence;
@@ -53,7 +53,19 @@ impl<'a> Parser<'a> {
 
   #[inline]
   fn next(&mut self) {
-    self.current = mem::replace(&mut self.first, self.tokenizer.next());
+    match self.tokenizer.next() {
+      token => match token.kind() {
+        TokenKind::Newline
+        | TokenKind::CommentLine
+        | TokenKind::CommentLineDoc
+        | TokenKind::CommentBlock => {
+          self.next();
+        }
+        _ => {
+          self.current = mem::replace(&mut self.first, token);
+        }
+      },
+    }
   }
 
   #[inline]
@@ -66,11 +78,7 @@ impl<'a> Parser<'a> {
     loop {
       match self.current.kind() {
         TokenKind::EOF => break,
-        TokenKind::Semicolon
-        | TokenKind::Newline
-        | TokenKind::CommentLine
-        | TokenKind::CommentLineDoc
-        | TokenKind::CommentBlock => {
+        TokenKind::Semicolon => {
           self.next();
           continue;
         }
@@ -96,11 +104,7 @@ impl<'a> Parser<'a> {
       && *self.current.kind() != TokenKind::EOF
     {
       match self.current.kind() {
-        TokenKind::Semicolon
-        | TokenKind::Newline
-        | TokenKind::CommentLine
-        | TokenKind::CommentLineDoc
-        | TokenKind::CommentBlock => {
+        TokenKind::Semicolon => {
           self.next();
           continue;
         }
@@ -124,6 +128,7 @@ impl<'a> Parser<'a> {
       TokenKind::Return => self.parse_return_stmt(),
       TokenKind::Break => self.parse_break_stmt(),
       TokenKind::Continue => self.parse_continue_stmt(),
+      TokenKind::Struct => self.parse_struct_stmt(),
       _ => self.parse_expr_stmt(),
     }
   }
@@ -261,6 +266,57 @@ impl<'a> Parser<'a> {
   }
 
   #[inline]
+  fn parse_struct_stmt(&mut self) -> Result<Stmt> {
+    self.next();
+
+    let name = self.parse_ident_expr()?;
+    let fields = self.parse_fields()?;
+
+    Ok(ast::mk_stmt(ast::mk_struct_def(box Struct {
+      name,
+      fields,
+    })))
+  }
+
+  #[inline]
+  fn parse_fields(&mut self) -> Result<Vec<Box<Field>>> {
+    let mut fields = vec![];
+
+    self.next();
+
+    if self.first.is(TokenKind::CloseBrace) {
+      self.next();
+      return Ok(fields);
+    }
+
+    fields.push(self.parse_field()?);
+
+    while self.first.is(TokenKind::Comma) {
+      self.next();
+
+      if self.first.is(TokenKind::CloseBrace) {
+        break;
+      }
+
+      fields.push(self.parse_field()?);
+    }
+
+    self.expect_first(&TokenKind::CloseBrace)?;
+
+    Ok(fields)
+  }
+
+  #[inline]
+  fn parse_field(&mut self) -> Result<Box<Field>> {
+    self.next();
+
+    let name = self.parse_ident_expr()?;
+    let ty = self.parse_ty_expr()?;
+
+    Ok(box ast::mk_field(name, ty))
+  }
+
+  #[inline]
   fn parse_expr_stmt(&mut self) -> Result<Stmt> {
     let expr = self.parse_expr_by_precedence(&Precedence::Lowest)?;
 
@@ -300,6 +356,8 @@ impl<'a> Parser<'a> {
       TokenKind::ModAssign => self.parse_assign_op_expr(lhs),
       TokenKind::OpenBracket => self.parse_index_expr(lhs),
       TokenKind::OpenParen => self.parse_call_expr(lhs),
+      TokenKind::OpenBrace => self.parse_struct_expr(lhs),
+      TokenKind::Dot => self.parse_field_access(lhs),
       _ => self.parse_binop_expr(lhs),
     }
   }
@@ -353,6 +411,72 @@ impl<'a> Parser<'a> {
     let args = self.parse_until(&TokenKind::CloseParen)?;
 
     Ok(box ast::mk_expr(ast::mk_call(lhs, args)))
+  }
+
+  #[inline]
+  fn parse_struct_expr(&mut self, lhs: Box<Expr>) -> Result<Box<Expr>> {
+    let fields = self.parse_field_exprs()?;
+
+    Ok(box ast::mk_expr(ast::mk_struct_expr(box StructExpr {
+      name: lhs,
+      fields,
+    })))
+  }
+
+  #[inline]
+  fn parse_field_exprs(&mut self) -> Result<Vec<Box<FieldExpr>>> {
+    let mut fields = vec![];
+
+    self.next();
+
+    if self.first.is(TokenKind::CloseBrace) {
+      self.next();
+      return Ok(fields);
+    }
+
+    fields.push(self.parse_field_expr()?);
+
+    while self.first.is(TokenKind::Comma) {
+      self.next();
+
+      if self.first.is(TokenKind::CloseBrace) {
+        break;
+      }
+
+      self.next();
+
+      fields.push(self.parse_field_expr()?);
+    }
+
+    self.expect_first(&TokenKind::CloseBrace)?;
+
+    Ok(fields)
+  }
+
+  #[inline]
+  fn parse_field_expr(&mut self) -> Result<Box<FieldExpr>> {
+    let name = self.parse_ident_expr()?;
+
+    self.expect_first(&TokenKind::Assign)?;
+    self.next();
+
+    let value = self.parse_expr_by_precedence(&Precedence::Lowest)?;
+
+    Ok(box FieldExpr { name, value })
+  }
+
+  #[inline]
+  fn parse_field_access(&mut self, lhs: Box<Expr>) -> Result<Box<Expr>> {
+    self.next();
+
+    let rhs = self.parse_expr_by_precedence(&Precedence::Highest)?;
+
+    match lhs.kind() {
+      ExprKind::Ident(..) => {
+        Ok(box ast::mk_expr(ast::mk_field_access(lhs, rhs)))
+      }
+      _ => Err(Error::Unexpected("Expected identifier after '.'")),
+    }
   }
 
   #[inline]

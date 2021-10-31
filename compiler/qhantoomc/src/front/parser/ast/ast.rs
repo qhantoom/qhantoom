@@ -1,5 +1,28 @@
 use crate::front::tokenizer::token::TokenKind;
 
+#[derive(Debug, Clone, PartialEq)]
+pub struct Visibility {
+  pub kind: VisibilityKind,
+}
+
+impl Visibility {
+  #[inline]
+  pub const fn new(kind: VisibilityKind) -> Self {
+    Self { kind }
+  }
+
+  #[inline]
+  pub fn kind(&self) -> &VisibilityKind {
+    &self.kind
+  }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum VisibilityKind {
+  Public,
+  Private,
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct Program {
   pub stmts: Vec<Stmt>,
@@ -36,6 +59,7 @@ pub enum StmtKind {
   Return(Option<Box<Expr>>),
   Break(Option<Box<Expr>>),
   Continue(Option<Box<Expr>>),
+  Struct(Box<Struct>),
   Expr(Box<Expr>),
 }
 
@@ -63,6 +87,31 @@ pub struct Local {
   pub name: Box<Expr>,
   pub immutable: bool,
   pub ty: Box<Ty>,
+  pub value: Box<Expr>,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct Struct {
+  pub name: Box<Expr>,
+  pub fields: Vec<Box<Field>>,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct Field {
+  pub name: Box<Expr>,
+  pub visibility: Visibility,
+  pub ty: Box<Ty>,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct StructExpr {
+  pub name: Box<Expr>,
+  pub fields: Vec<Box<FieldExpr>>,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct FieldExpr {
+  pub name: Box<Expr>,
   pub value: Box<Expr>,
 }
 
@@ -140,6 +189,11 @@ pub enum ExprKind {
     start: Box<Expr>,
     end: Box<Expr>,
     body: Box<Block>,
+  },
+  StructExpr(Box<StructExpr>),
+  FieldAccess {
+    lhs: Box<Expr>,
+    name: Box<Expr>,
   },
 }
 
@@ -349,6 +403,20 @@ pub const fn mk_continue(expr: Option<Box<Expr>>) -> StmtKind {
 }
 
 #[inline]
+pub const fn mk_struct_def(struct_def: Box<Struct>) -> StmtKind {
+  StmtKind::Struct(struct_def)
+}
+
+#[inline]
+pub const fn mk_field(name: Box<Expr>, ty: Box<Ty>) -> Field {
+  Field {
+    name,
+    ty,
+    visibility: Visibility::new(VisibilityKind::Public),
+  }
+}
+
+#[inline]
 pub const fn mk_expr(kind: ExprKind) -> Expr {
   Expr::new(kind)
 }
@@ -505,6 +573,21 @@ pub const fn mk_range(
   body: Box<Block>,
 ) -> ExprKind {
   ExprKind::Range { start, end, body }
+}
+
+#[inline]
+pub const fn mk_struct_expr(struct_expr: Box<StructExpr>) -> ExprKind {
+  ExprKind::StructExpr(struct_expr)
+}
+
+#[inline]
+pub const fn mk_field_expr(name: Box<Expr>, value: Box<Expr>) -> FieldExpr {
+  FieldExpr { name, value }
+}
+
+#[inline]
+pub const fn mk_field_access(lhs: Box<Expr>, name: Box<Expr>) -> ExprKind {
+  ExprKind::FieldAccess { lhs, name }
 }
 
 #[inline]

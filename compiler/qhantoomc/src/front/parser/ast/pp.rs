@@ -1,8 +1,8 @@
 use std::fmt;
 
 use super::ast::{
-  Arg, BinopKind, Block, Expr, ExprKind, Fun, Prototype, Stmt, StmtKind, Ty,
-  TyKind, UnopKind,
+  Arg, BinopKind, Block, Expr, ExprKind, Field, FieldExpr, Fun, Prototype,
+  Stmt, StmtKind, Struct, StructExpr, Ty, TyKind, UnopKind,
 };
 
 pub struct CommaSep<'a, T: 'a>(pub &'a [T]);
@@ -56,6 +56,20 @@ impl fmt::Display for Block {
   }
 }
 
+impl fmt::Display for Struct {
+  #[inline]
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "struct {} {}", self.name, CommaSep(&self.fields))
+  }
+}
+
+impl fmt::Display for Field {
+  #[inline]
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "{} : {}", self.name, self.ty)
+  }
+}
+
 impl fmt::Display for Stmt {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -100,7 +114,22 @@ impl fmt::Display for Stmt {
         }
       }
       StmtKind::Expr(ref expr) => write!(f, "{:?}", expr),
+      StmtKind::Struct(ref def) => write!(f, "{}", def),
     }
+  }
+}
+
+impl fmt::Display for StructExpr {
+  #[inline]
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "{} {{ {} }}", self.name, CommaSep(&self.fields))
+  }
+}
+
+impl fmt::Display for FieldExpr {
+  #[inline]
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "{} : {}", self.name, self.value)
   }
 }
 
@@ -160,6 +189,10 @@ impl fmt::Display for Expr {
         ref end,
         ref body,
       } => write!(f, "for {}..{} = (..) {}", start, end, body),
+      ExprKind::StructExpr(ref struct_expr) => write!(f, "{}", struct_expr),
+      ExprKind::FieldAccess { ref lhs, ref name } => {
+        write!(f, "{}.{}", lhs, name)
+      }
     }
   }
 }

@@ -1,0 +1,11 @@
+struct Vec2 {
+  x : uint,
+  y : uint,
+}
+
+mut vec2 := Vec2 {
+  x = 0,
+  y = 0,
+};
+
+vec2.x = 1;

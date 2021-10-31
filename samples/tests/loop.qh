@@ -5,6 +5,7 @@ loop {
     break;
   }
   
-  print(x);
   x += 1;
 }
+
+x;
