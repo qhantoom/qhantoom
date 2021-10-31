@@ -38,7 +38,12 @@ impl From<&TokenKind> for Precedence {
 
       TokenKind::PipePipe => Self::LOr,
 
-      TokenKind::Assign | TokenKind::Bang => Self::Assignment,
+      TokenKind::Assign
+      | TokenKind::AddAssign
+      | TokenKind::SubAssign
+      | TokenKind::MulAssign
+      | TokenKind::ModAssign
+      | TokenKind::Bang => Self::Assignment,
 
       _ => Self::Lowest,
     }

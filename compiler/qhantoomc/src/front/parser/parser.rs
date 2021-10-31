@@ -293,6 +293,11 @@ impl<'a> Parser<'a> {
   fn parse_binop_rhs(&mut self, lhs: Box<Expr>) -> Result<Box<Expr>> {
     match self.current.kind() {
       TokenKind::Assign => self.parse_assign_expr(lhs),
+      TokenKind::AddAssign => self.parse_assign_op_expr(lhs),
+      TokenKind::SubAssign => self.parse_assign_op_expr(lhs),
+      TokenKind::MulAssign => self.parse_assign_op_expr(lhs),
+      TokenKind::DivAssign => self.parse_assign_op_expr(lhs),
+      TokenKind::ModAssign => self.parse_assign_op_expr(lhs),
       TokenKind::OpenBracket => self.parse_index_expr(lhs),
       TokenKind::OpenParen => self.parse_call_expr(lhs),
       _ => self.parse_binop_expr(lhs),
@@ -308,6 +313,28 @@ impl<'a> Parser<'a> {
     self.expect_first(&TokenKind::Semicolon)?;
 
     Ok(box ast::mk_expr(ast::mk_assign(lhs, rhs)))
+  }
+
+  #[inline]
+  fn parse_assign_op_expr(&mut self, lhs: Box<Expr>) -> Result<Box<Expr>> {
+    let op = self.binop();
+
+    self.next();
+
+    let rhs = self.parse_expr_by_precedence(&Precedence::Lowest)?;
+
+    self.expect_first(&TokenKind::Semicolon)?;
+
+    let kind = match op {
+      BinopKind::AddOp => ast::mk_add_assign_op(lhs, rhs),
+      BinopKind::SubOp => ast::mk_sub_assign_op(lhs, rhs),
+      BinopKind::MulOp => ast::mk_mul_assign_op(lhs, rhs),
+      BinopKind::DivOp => ast::mk_div_assign_op(lhs, rhs),
+      BinopKind::RemOp => ast::mk_rem_assign_op(lhs, rhs),
+      _ => unreachable!(),
+    };
+
+    Ok(box ast::mk_expr(kind))
   }
 
   #[inline]

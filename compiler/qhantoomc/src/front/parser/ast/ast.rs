@@ -105,6 +105,11 @@ pub enum ExprKind {
     lhs: Box<Expr>,
     rhs: Box<Expr>,
   },
+  AssignOp {
+    op: BinopKind,
+    lhs: Box<Expr>,
+    rhs: Box<Expr>,
+  },
   Index {
     lhs: Box<Expr>,
     rhs: Box<Expr>,
@@ -153,6 +158,11 @@ pub enum BinopKind {
   Ge,
   Eq,
   Ne,
+  AddOp,
+  SubOp,
+  MulOp,
+  DivOp,
+  RemOp,
 }
 
 impl From<&TokenKind> for BinopKind {
@@ -172,6 +182,11 @@ impl From<&TokenKind> for BinopKind {
       TokenKind::Ge => Self::Ge,
       TokenKind::Equal => Self::Eq,
       TokenKind::NotAssign => Self::Ne,
+      TokenKind::AddAssign => Self::AddOp,
+      TokenKind::SubAssign => Self::SubOp,
+      TokenKind::MulAssign => Self::MulOp,
+      TokenKind::DivAssign => Self::DivOp,
+      TokenKind::ModAssign => Self::RemOp,
       k => unreachable!("{:?} is not a operator", k),
     }
   }
@@ -346,6 +361,51 @@ pub const fn mk_array(exprs: Vec<Box<Expr>>) -> ExprKind {
 #[inline]
 pub const fn mk_assign(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
   ExprKind::Assign { lhs, rhs }
+}
+
+#[inline]
+pub const fn mk_add_assign_op(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
+  ExprKind::AssignOp {
+    op: BinopKind::AddOp,
+    lhs,
+    rhs,
+  }
+}
+
+#[inline]
+pub const fn mk_sub_assign_op(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
+  ExprKind::AssignOp {
+    op: BinopKind::SubOp,
+    lhs,
+    rhs,
+  }
+}
+
+#[inline]
+pub const fn mk_mul_assign_op(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
+  ExprKind::AssignOp {
+    op: BinopKind::MulOp,
+    lhs,
+    rhs,
+  }
+}
+
+#[inline]
+pub const fn mk_div_assign_op(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
+  ExprKind::AssignOp {
+    op: BinopKind::DivOp,
+    lhs,
+    rhs,
+  }
+}
+
+#[inline]
+pub const fn mk_rem_assign_op(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
+  ExprKind::AssignOp {
+    op: BinopKind::RemOp,
+    lhs,
+    rhs,
+  }
 }
 
 #[inline]

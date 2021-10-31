@@ -130,6 +130,11 @@ impl<'a> Translator<'a> {
       } => self.translate_binop(op, lhs, rhs),
       ExprKind::Unop { ref op, ref rhs } => self.translate_unop(op, rhs),
       ExprKind::Assign { ref lhs, ref rhs } => self.translate_assign(lhs, rhs),
+      ExprKind::AssignOp {
+        ref op,
+        ref lhs,
+        ref rhs,
+      } => self.translate_assign_op(op, lhs, rhs),
       ExprKind::Array(ref exprs) => self.translate_array(exprs),
       ExprKind::Index { ref lhs, ref rhs } => self.translate_index(lhs, rhs),
       ExprKind::Closure(ref fun) => self.translate_closure(fun),
@@ -216,6 +221,7 @@ impl<'a> Translator<'a> {
       BinopKind::Ne => self.translate_ne_binop(lhs, rhs),
       BinopKind::Or => self.translate_or_binop(lhs, rhs),
       BinopKind::And => self.translate_and_binop(lhs, rhs),
+      _ => unreachable!(),
     }
   }
 
@@ -364,6 +370,37 @@ impl<'a> Translator<'a> {
     }
 
     rhs
+  }
+
+  #[inline]
+  fn translate_assign_op(
+    &mut self,
+    op: &BinopKind,
+    lhs: &Box<Expr>,
+    rhs: &Box<Expr>,
+  ) -> Value {
+    let rhs = self.translate_expr(rhs);
+
+    match lhs.kind() {
+      ExprKind::Ident(ref name) => {
+        let var = *self.scope_map.get_variable(name).unwrap();
+        let lhs = self.translate_expr(lhs);
+
+        let new_rhs = match op {
+          BinopKind::AddOp => self.translate_add_binop(lhs, rhs),
+          BinopKind::SubOp => self.translate_sub_binop(lhs, rhs),
+          BinopKind::MulOp => self.translate_mul_binop(lhs, rhs),
+          BinopKind::DivOp => self.translate_div_binop(lhs, rhs),
+          BinopKind::RemOp => self.translate_rem_binop(lhs, rhs),
+          _ => unreachable!(),
+        };
+
+        self.builder.def_var(var, new_rhs);
+
+        new_rhs
+      }
+      _ => unreachable!(),
+    }
   }
 
   #[inline]

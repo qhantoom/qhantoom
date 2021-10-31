@@ -117,6 +117,11 @@ impl fmt::Display for Expr {
       ExprKind::Array(ref data) => write!(f, "[{}]", CommaSep(data)),
       ExprKind::Index { ref lhs, ref rhs } => write!(f, "({}[{}])", lhs, rhs),
       ExprKind::Assign { ref lhs, ref rhs } => write!(f, "{} = {};", lhs, rhs),
+      ExprKind::AssignOp {
+        ref op,
+        ref lhs,
+        ref rhs,
+      } => write!(f, "{} {} {}", lhs, op, rhs),
       ExprKind::Unop { ref op, ref rhs } => write!(f, "({}{})", op, rhs),
       ExprKind::Binop {
         ref lhs,
@@ -205,6 +210,11 @@ impl fmt::Display for BinopKind {
       Self::Ge => write!(f, ">="),
       Self::Eq => write!(f, "=="),
       Self::Ne => write!(f, "!="),
+      Self::AddOp => write!(f, "+="),
+      Self::SubOp => write!(f, "-="),
+      Self::MulOp => write!(f, "*="),
+      Self::DivOp => write!(f, "/="),
+      Self::RemOp => write!(f, "%="),
     }
   }
 }
