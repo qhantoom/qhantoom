@@ -19,7 +19,7 @@ impl From<&TokenKind> for Precedence {
   #[inline]
   fn from(kind: &TokenKind) -> Precedence {
     match *kind {
-      TokenKind::Dot | TokenKind::OpenBrace => Precedence::Highest,
+      TokenKind::Dot => Precedence::Highest,
 
       TokenKind::OpenBracket => Self::Index,
 
