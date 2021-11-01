@@ -1,6 +1,6 @@
 // run the `help` command
 #[inline]
-pub fn run() {
+pub fn cmd() {
   usage();
 }
 

@@ -1,6 +1,6 @@
 use std::any::Any;
 
-use super::cmd::SUBCOMMAND_COMPILE_NAME;
+use super::cli::SUBCOMMAND_COMPILE_NAME;
 
 use qhantoomc::back;
 use qhantoomc::front;
@@ -13,7 +13,7 @@ pub const EXIT_FAILURE: i32 = 1;
 
 // run the `compile` command
 #[inline]
-pub fn run(args: ArgMatches<'static>) {
+pub fn cmd(args: ArgMatches<'static>) {
   match compile(args) {
     Ok(_) => std::process::exit(EXIT_SUCCESS),
     Err(_) => std::process::exit(EXIT_FAILURE),

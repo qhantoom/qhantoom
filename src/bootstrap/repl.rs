@@ -1,10 +1,8 @@
 use std::fmt::Write;
 
-use super::copyright;
-use super::exit;
+use super::cli::DEFAULT_VERSION;
+use super::compile::EXIT_SUCCESS;
 use super::help;
-use super::license;
-use super::version;
 
 use crate::util;
 
@@ -17,7 +15,7 @@ use qute::prelude::*;
 
 // run the `repl` command
 #[inline]
-pub fn run(args: ArgMatches<'static>) {
+pub fn cmd(args: ArgMatches<'static>) {
   match repl(args) {
     Ok(_) => return,
     Err(e) => panic!("{}", e),
@@ -51,10 +49,10 @@ fn processing(
   }
 
   match line {
-    l if l.starts_with("exit") => Ok(exit::run()),
-    l if l.starts_with("help") => Ok(help::run()),
-    l if l.starts_with("copyright") => Ok(copyright::run()),
-    l if l.starts_with("license") => Ok(license::run()),
+    l if l.starts_with("exit") => Ok(self::exit()),
+    l if l.starts_with("help") => Ok(self::help()),
+    l if l.starts_with("copyright") => Ok(self::copyright()),
+    l if l.starts_with("license") => Ok(self::license()),
     _ => match back::codegen::jit::compile::<i64>(jit, line) {
       Ok(v) => Ok(print!("🛰️  {}\n", v)),
       Err(e) => Err(format!("{}", e)),
@@ -84,13 +82,9 @@ pub fn banner() {
   write!(
     buf,
     "{}",
-    &format!(
-      "\nqhantoomc v{} ({})\n",
-      version::version(),
-      date_time_styled,
-    )
+    &format!("\nqhantoomc v{} ({})\n", self::version(), date_time_styled,)
   )
-  .unwrap();
+  .ok();
 
   write!(
     buf,
@@ -98,12 +92,12 @@ pub fn banner() {
     &format!(
       "welcome {} to qhantoom version {} {}/{}\n",
       username_styled,
-      version::version(),
+      self::version(),
       os.sysname(),
       os.machine(),
     )
   )
-  .unwrap();
+  .ok();
 
   write!(
     buf,
@@ -113,7 +107,41 @@ pub fn banner() {
       help_styled, copyright_styled, license_styled,
     )
   )
-  .unwrap();
+  .ok();
 
   print!("{}", buf);
+}
+
+// abort the program
+#[inline]
+pub fn exit() {
+  print!("\nTriForce.. 👋\n");
+  std::process::exit(EXIT_SUCCESS);
+}
+
+// print the copyright
+#[inline]
+pub fn copyright() {
+  print!("\nnot implemented yet\n\n");
+}
+
+// display the usage of the help command
+#[inline]
+pub fn help() {
+  help::cmd()
+}
+
+// get the current version from `cargo.toml`
+#[inline]
+pub fn version() -> &'static str {
+  DEFAULT_VERSION
+}
+
+// print the `LICENSE` if found
+#[inline]
+pub fn license() {
+  match util::read_file("LICENSE") {
+    Ok(s) => print!("\n{}\n", s),
+    Err(_) => print!("License not found"),
+  }
 }
