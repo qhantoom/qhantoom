@@ -1,3 +1,5 @@
+-- mut x := 0; loop { if x == 10 { break; } x += 1; } x;
+
 mut x := 0;
 
 loop {

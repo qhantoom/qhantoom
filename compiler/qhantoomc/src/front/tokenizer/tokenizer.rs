@@ -3,6 +3,8 @@ use std::str::Chars;
 use super::interface::TokenizerState;
 use super::token::{Token, TokenKind, TOKEN_EOF};
 
+use crate::{go, sh_trace, shorthand};
+
 use crate::util::ascii::{
   is_id_continue, is_id_start, is_number_continue, is_number_start,
   is_whitespace,
@@ -72,9 +74,15 @@ impl<'a> Tokenizer<'a> {
     Ok(tokens)
   }
 
-  // TODO: use macros
+  #[inline]
+  fn push(&mut self, c: char) {
+    self.buffer.push(c);
+  }
+
   #[inline]
   fn step(&mut self, c: char) -> Option<TokenKind> {
+    use super::token::TokenKind::*;
+
     match self.state {
       // read_idle_state
       TokenizerState::Idle => match c {
@@ -82,290 +90,146 @@ impl<'a> Tokenizer<'a> {
         c if is_whitespace(c) => {}
 
         // one character tokens
-        '\0' => return Some(TokenKind::EOF),
-        '\n' => return Some(TokenKind::Newline),
-        '\\' => return Some(TokenKind::BackSlash),
-        '(' => return Some(TokenKind::OpenParen),
-        ')' => return Some(TokenKind::CloseParen),
-        '{' => return Some(TokenKind::OpenBrace),
-        '}' => return Some(TokenKind::CloseBrace),
-        '[' => return Some(TokenKind::OpenBracket),
-        ']' => return Some(TokenKind::CloseBracket),
-        ',' => return Some(TokenKind::Comma),
-        ';' => return Some(TokenKind::Semicolon),
-        '?' => return Some(TokenKind::Question),
-        '@' => return Some(TokenKind::At),
+        '\0' => go!(self: emit_token_kind EOF),
+        '\n' => go!(self: emit_token_kind Newline),
+        '\\' => go!(self: emit_token_kind BackSlash),
+        '(' => go!(self: emit_token_kind OpenParen),
+        ')' => go!(self: emit_token_kind CloseParen),
+        '{' => go!(self: emit_token_kind OpenBrace),
+        '}' => go!(self: emit_token_kind CloseBrace),
+        '[' => go!(self: emit_token_kind OpenBracket),
+        ']' => go!(self: emit_token_kind CloseBracket),
+        ',' => go!(self: emit_token_kind Comma),
+        ';' => go!(self: emit_token_kind Semicolon),
+        '?' => go!(self: emit_token_kind Question),
+        '@' => go!(self: emit_token_kind At),
 
         // n characters tokens
-        '+' => self.state = TokenizerState::StartAdd,
-        '-' => self.state = TokenizerState::StartSub,
-        '*' => self.state = TokenizerState::StartMul,
-        '/' => self.state = TokenizerState::StartDiv,
-        '%' => self.state = TokenizerState::StartMod,
-        '=' => self.state = TokenizerState::StartAssign,
-        '&' => self.state = TokenizerState::StartAnd,
-        '!' => self.state = TokenizerState::StartBang,
-        '|' => self.state = TokenizerState::StartPipe,
-        '.' => self.state = TokenizerState::StartDot,
-        ':' => self.state = TokenizerState::StartColon,
-        '<' => self.state = TokenizerState::StartLt,
-        '>' => self.state = TokenizerState::StartGt,
-        '"' => self.state = TokenizerState::StartString,
-        '\'' => self.state = TokenizerState::StartChar,
+        '+' => go!(self: to StartAdd),
+        '-' => go!(self: to StartSub),
+        '*' => go!(self: to StartMul),
+        '/' => go!(self: to StartDiv),
+        '%' => go!(self: to StartMod),
+        '=' => go!(self: to StartAssign),
+        '&' => go!(self: to StartAnd),
+        '!' => go!(self: to StartBang),
+        '|' => go!(self: to StartPipe),
+        '.' => go!(self: to StartDot),
+        ':' => go!(self: to StartColon),
+        '<' => go!(self: to StartLt),
+        '>' => go!(self: to StartGt),
+        '"' => go!(self: to StartString),
+        '\'' => go!(self: to StartChar),
 
         // numbers
-        c if is_number_start(c) => {
-          self.state = TokenizerState::StartNumber;
-          self.buffer.push(c);
-        }
-        c if is_number_continue(c) => {
-          self.state = TokenizerState::Number;
-          self.buffer.push(c);
-        }
+        c if is_number_start(c) => go!(self: push c; to StartNumber),
+        c if is_number_continue(c) => go!(self: push c; to Number),
 
         // identifiers
-        c if is_id_start(c) => {
-          self.state = TokenizerState::Identifier;
-          self.buffer.push(c);
-        }
+        c if is_id_start(c) => go!(self: push c; to Identifier),
 
         // unexpected character
         _ => self.err(Error::UnexpectedCharacter(c)),
       },
       // read_start_add_state
       TokenizerState::StartAdd => match c {
-        '=' => {
-          self.state = TokenizerState::Idle;
-          return Some(TokenKind::AddAssign);
-        }
-        c => {
-          return self.reset_back(c, TokenKind::Add);
-        }
+        '=' => go!(self: to Idle; emit_token_kind AddAssign),
+        c => return self.reset_back(c, TokenKind::Add),
       },
       // read_start_sub_state
       TokenizerState::StartSub => match c {
-        '=' => {
-          self.state = TokenizerState::Idle;
-          return Some(TokenKind::SubAssign);
-        }
-        '>' => {
-          self.state = TokenizerState::Idle;
-          return Some(TokenKind::ThinArrow);
-        }
-        '-' => {
-          self.state = TokenizerState::CommentLine;
-        }
-        '!' => {
-          self.state = TokenizerState::CommentLineDoc;
-        }
-        '%' => {
-          self.state = TokenizerState::StartCommentBlock;
-        }
-        c => {
-          return self.reset_back(c, TokenKind::Sub);
-        }
+        '=' => go!(self: reset SubAssign),
+        '>' => go!(self: reset ThinArrow),
+        '-' => go!(self: to CommentLine),
+        '!' => go!(self: to CommentLineDoc),
+        '%' => go!(self: to StartCommentBlock),
+        c => return self.reset_back(c, TokenKind::Sub),
       },
       // read_start_mul_state
       TokenizerState::StartMul => match c {
-        '=' => {
-          self.state = TokenizerState::Idle;
-          return Some(TokenKind::MulAssign);
-        }
-        c => {
-          return self.reset_back(c, TokenKind::Mul);
-        }
+        '=' => go!(self: reset MulAssign),
+        c => return self.reset_back(c, TokenKind::Mul),
       },
       // read_start_div_state
       TokenizerState::StartDiv => match c {
-        '=' => {
-          self.state = TokenizerState::Idle;
-          return Some(TokenKind::DivAssign);
-        }
-        c => {
-          return self.reset_back(c, TokenKind::Div);
-        }
+        '=' => go!(self: reset DivAssign),
+        c => return self.reset_back(c, TokenKind::Div),
       },
       // read_start_mod_state
       TokenizerState::StartMod => match c {
-        '=' => {
-          self.state = TokenizerState::Idle;
-          return Some(TokenKind::ModAssign);
-        }
-        c => {
-          return self.reset_back(c, TokenKind::Mod);
-        }
+        '=' => go!(self: reset ModAssign),
+        c => return self.reset_back(c, TokenKind::Mod),
       },
       // read_start_assign_state
       TokenizerState::StartAssign => match c {
-        '=' => {
-          self.state = TokenizerState::Idle;
-          return Some(TokenKind::Equal);
-        }
-        '>' => {
-          self.state = TokenizerState::Idle;
-          return Some(TokenKind::FatArrow);
-        }
-        c => {
-          return self.reset_back(c, TokenKind::Assign);
-        }
+        '=' => go!(self: reset Equal),
+        '>' => go!(self: reset FatArrow),
+        c => return self.reset_back(c, TokenKind::Assign),
       },
       // read_start_and_state
       TokenizerState::StartAnd => match c {
-        '=' => {
-          self.state = TokenizerState::Idle;
-          return Some(TokenKind::AndAssign);
-        }
-        '&' => {
-          self.state = TokenizerState::Idle;
-          return Some(TokenKind::AndAnd);
-        }
-        c => {
-          return self.reset_back(c, TokenKind::And);
-        }
+        '=' => go!(self: reset AndAssign),
+        '&' => go!(self: reset AndAnd),
+        c => return self.reset_back(c, TokenKind::And),
       },
       // read_start_bang_state
       TokenizerState::StartBang => match c {
-        '=' => {
-          self.state = TokenizerState::Idle;
-          return Some(TokenKind::NotAssign);
-        }
-        c => {
-          return self.reset_back(c, TokenKind::Not);
-        }
+        '=' => go!(self: reset NotAssign),
+        c => return self.reset_back(c, TokenKind::Not),
       },
       // read_start_pipe_state
       TokenizerState::StartPipe => match c {
-        '=' => {
-          self.state = TokenizerState::Idle;
-          return Some(TokenKind::PipeAssign);
-        }
-        '|' => {
-          self.state = TokenizerState::Idle;
-          return Some(TokenKind::PipePipe);
-        }
-        c => {
-          return self.reset_back(c, TokenKind::Pipe);
-        }
+        '=' => go!(self: reset PipeAssign),
+        '|' => go!(self: reset PipePipe),
+        c => return self.reset_back(c, TokenKind::Pipe),
       },
       // read_start_dot_state
       TokenizerState::StartDot => match c {
-        '=' => {
-          self.state = TokenizerState::Idle;
-          return Some(TokenKind::DotAssign);
-        }
-        '.' => {
-          self.state = TokenizerState::Idle;
-          return Some(TokenKind::DotDot);
-        }
-        c => {
-          return self.reset_back(c, TokenKind::Dot);
-        }
+        '=' => go!(self: reset DotAssign),
+        '.' => go!(self: reset DotDot),
+        c => return self.reset_back(c, TokenKind::Dot),
       },
       // read_start_colon_state
       TokenizerState::StartColon => match c {
-        '=' => {
-          self.state = TokenizerState::Idle;
-          return Some(TokenKind::ColonAssign);
-        }
-        ':' => {
-          self.state = TokenizerState::Idle;
-          return Some(TokenKind::ColonColon);
-        }
-        c => {
-          return self.reset_back(c, TokenKind::Colon);
-        }
+        '=' => go!(self: reset ColonAssign),
+        ':' => go!(self: reset ColonColon),
+        c => return self.reset_back(c, TokenKind::Colon),
       },
       // read_start_lt_state
       TokenizerState::StartLt => match c {
-        '=' => {
-          self.state = TokenizerState::Idle;
-          return Some(TokenKind::Le);
-        }
-        '<' => {
-          self.state = TokenizerState::Idle;
-          return Some(TokenKind::Shl);
-        }
-        c => {
-          return self.reset_back(c, TokenKind::Lt);
-        }
+        '=' => go!(self: reset Le),
+        '<' => go!(self: reset Shl),
+        c => return self.reset_back(c, TokenKind::Lt),
       },
       // read_start_gt_state
       TokenizerState::StartGt => match c {
-        '=' => {
-          self.state = TokenizerState::Idle;
-          return Some(TokenKind::Ge);
-        }
-        '>' => {
-          self.state = TokenizerState::Idle;
-          return Some(TokenKind::Shr);
-        }
-        c => {
-          return self.reset_back(c, TokenKind::Gt);
-        }
+        '=' => go!(self: reset Ge),
+        '>' => go!(self: reset Shr),
+        c => return self.reset_back(c, TokenKind::Gt),
       },
       // read_start_char_state
-      TokenizerState::StartChar => {
-        self.state = TokenizerState::InnerChar;
-        self.buffer.push(c);
-      }
+      TokenizerState::StartChar => go!(self: push c; to InnerChar),
       // read_inner_char_state
       TokenizerState::InnerChar => match c {
-        '\'' => {
-          self.state = TokenizerState::EndChar;
-        }
-        _ => {
-          self.state = TokenizerState::InnerChar;
-          self.buffer.push(c);
-        }
+        '\'' => go!(self: to EndChar),
+        _ => go!(self: push c; to InnerChar),
       },
       // read_end_char_state
-      TokenizerState::EndChar => {
-        if self.buffer.len() == 1 {
-          self.state = TokenizerState::Idle;
-          let buffer = self.buffer.chars().next().expect("expected character");
-          self.buffer.clear();
-
-          return self.reset_back(c, TokenKind::CharAscii(buffer));
-        }
-
-        self.err(Error::UnexpectedLiteralChar(self.buffer.clone()));
-      }
+      TokenizerState::EndChar => go!(self: emit_char c),
       // read_start_string_state
-      TokenizerState::StartString => {
-        self.state = TokenizerState::InnerString;
-        self.buffer.push(c);
-      }
+      TokenizerState::StartString => go!(self: push c; to InnerString),
       // read_inner_string_state
       TokenizerState::InnerString => match c {
-        '"' => {
-          self.state = TokenizerState::EndString;
-        }
-        '\\' => {
-          self.state = TokenizerState::EscapeString;
-        }
-        _ => {
-          self.state = TokenizerState::InnerString;
-          self.buffer.push(c);
-        }
+        '"' => go!(self: to EndString),
+        '\\' => go!(self: to EscapeString),
+        _ => go!(self: push c; to InnerString),
       },
       // read_escape_string_state
       TokenizerState::EscapeString => match c {
-        '"' | '\\' => {
-          self.state = TokenizerState::InnerString;
-          self.buffer.push(c);
-        }
-        'r' => {
-          self.state = TokenizerState::InnerString;
-          self.buffer.push('\r');
-        }
-        'n' => {
-          self.state = TokenizerState::InnerString;
-          self.buffer.push('\n');
-        }
-        't' => {
-          self.state = TokenizerState::InnerString;
-          self.buffer.push('\t');
-        }
+        '"' | '\\' => go!(self: push c; to InnerString),
+        'r' => go!(self: push '\r'; to InnerString),
+        'n' => go!(self: push '\n'; to InnerString),
+        't' => go!(self: push '\t'; to InnerString),
         _ => self.err(Error::UnexpectedEscapeSequence(c)),
       },
       // read_end_string_state
@@ -381,70 +245,32 @@ impl<'a> Tokenizer<'a> {
         '1'..='9' => {
           self.err(Error::UnexpectedLiteralNumber(c));
         }
-        '.' => {
-          self.state = TokenizerState::NumberFloat;
-          self.buffer.push(c);
-        }
-        c => {
-          self.buffer.clear();
-
-          return self.reset_back(c, TokenKind::Int(0));
-        }
+        '.' => go!(self: push c; to NumberFloat),
+        c => go!(self: emit_zero c),
       },
       // read_number_state
       TokenizerState::Number => match c {
-        '0'..='9' => {
-          self.buffer.push(c);
-        }
-        '.' => {
-          self.state = TokenizerState::NumberFloat;
-          self.buffer.push(c);
-        }
-        c => {
-          let num = self.buffer.to_owned();
-          let num = num.parse::<i64>().unwrap();
-          self.buffer.clear();
-
-          return self.reset_back(c, TokenKind::Int(num));
-        }
+        '0'..='9' => go!(self: push c),
+        '.' => go!(self: push c; to NumberFloat),
+        c => go!(self: emit_int_number c),
       },
       // read_number_float_state
       TokenizerState::NumberFloat => match c {
-        '0'..='9' => {
-          self.buffer.push(c);
-        }
-        c => {
-          let num = self.buffer.to_owned();
-          let num = num.parse::<f64>().unwrap();
-          self.buffer.clear();
-
-          return self.reset_back(c, TokenKind::Float(num));
-        }
+        '0'..='9' => go!(self: push c),
+        c => go!(self: emit_float_number c),
       },
       // read_identifier_state
       TokenizerState::Identifier => match c {
-        c if is_id_continue(c) => {
-          self.buffer.push(c);
-        }
-        c => {
-          let buffer = self.buffer.to_owned();
-          self.buffer.clear();
-
-          if let Some(kind) = TokenKind::keywords(&buffer) {
-            return self.reset_back(c, kind);
-          }
-
-          return self.reset_back(c, TokenKind::Identifier(buffer));
-        }
+        c if is_id_continue(c) => go!(self: push c),
+        c => go!(self: emit_identifier c),
       },
       // read_comment_line_state
       TokenizerState::CommentLine => {
+        // go!(self: until c == '\n' || c == '\0');
         if c == '\n' || c == '\0' {
           self.state = TokenizerState::Idle;
           return Some(TokenKind::CommentLine);
         }
-
-        // TODO: error handling
       }
       // read_comment_doc_line_state
       TokenizerState::CommentLineDoc => {
@@ -452,25 +278,14 @@ impl<'a> Tokenizer<'a> {
           self.state = TokenizerState::Idle;
           return Some(TokenKind::CommentLineDoc);
         }
-
-        // TODO: error handling
       }
       // read_comment_block_state
-      TokenizerState::StartCommentBlock => {
-        self.state = TokenizerState::InnerCommentBlock;
-      }
+      TokenizerState::StartCommentBlock => go!(self: to InnerCommentBlock),
       // read_inner_comment_block_state
       TokenizerState::InnerCommentBlock => match c {
-        '%' => {
-          self.state = TokenizerState::EndCommentBlock;
-        }
-        '!' => {
-          // TODO: start comment block never detected
-          self.state = TokenizerState::StartCommentDocBlock;
-        }
-        _ => {
-          self.state = TokenizerState::InnerCommentBlock;
-        }
+        '%' => go!(self: to EndCommentBlock),
+        '!' => go!(self: to StartCommentDocBlock), // TODO: start comment block never detected
+        _ => go!(self: to InnerCommentBlock),
       },
       // read_end_comment_block_state
       TokenizerState::EndCommentBlock => {
@@ -478,21 +293,15 @@ impl<'a> Tokenizer<'a> {
           self.state = TokenizerState::Idle;
           return Some(TokenKind::CommentBlock);
         }
-
-        // TODO: error handling
       }
       // read_start_comment_doc_block_state
       TokenizerState::StartCommentDocBlock => {
-        self.state = TokenizerState::InnerCommentDocBlock;
+        go!(self: to InnerCommentDocBlock)
       }
       // read_inner_comment_doc_block_state
       TokenizerState::InnerCommentDocBlock => match c {
-        '%' => {
-          self.state = TokenizerState::EndCommentDocBlock;
-        }
-        _ => {
-          self.state = TokenizerState::InnerCommentDocBlock;
-        }
+        '%' => go!(self: to EndCommentDocBlock),
+        _ => go!(self: to InnerCommentDocBlock),
       },
       // read_end_comment_doc_block_state
       TokenizerState::EndCommentDocBlock => {
@@ -500,8 +309,6 @@ impl<'a> Tokenizer<'a> {
           self.state = TokenizerState::Idle;
           return Some(TokenKind::CommentDocBlock);
         }
-
-        // TODO: error handling
       }
     };
 
@@ -522,3 +329,77 @@ impl<'a> Tokenizer<'a> {
     self.reset(kind)
   }
 }
+
+// this implementation is based on https://github.com/servo/html5ever/blob/master/xml5ever/src/tokenizer/mod.rs
+#[macro_export]
+macro_rules! shorthand (
+  ( $me:ident : push $c:expr ) => ( $me.push($c) );
+  ( $me:ident : to $s:ident ) => ({ $me.state = TokenizerState::$s; });
+  ( $me:ident : reset $c:expr  ) => ( return $me.reset($c) );
+);
+
+#[macro_export]
+macro_rules! sh_trace ( ( $me:ident : $($cmds:tt)* ) => ( shorthand!($me: $($cmds)*) ) );
+
+#[macro_export]
+macro_rules! go (
+  ( $me:ident : $a:tt                   ; $($rest:tt)* ) => ({ sh_trace!($me: $a);          go!($me: $($rest)*); });
+  ( $me:ident : $a:tt $b:tt             ; $($rest:tt)* ) => ({ sh_trace!($me: $a $b);       go!($me: $($rest)*); });
+  ( $me:ident : $a:tt $b:tt $c:tt       ; $($rest:tt)* ) => ({ sh_trace!($me: $a $b $c);    go!($me: $($rest)*); });
+  ( $me:ident : $a:tt $b:tt $c:tt $d:tt ; $($rest:tt)* ) => ({ sh_trace!($me: $a $b $c $d); go!($me: $($rest)*); });
+
+  ( $me:ident : emit_char $c:ident ) => ({
+    if $me.buffer.len() == 1 {
+      $me.state = TokenizerState::Idle;
+      let buffer = $me.buffer.chars().next().expect("expected character");
+      $me.buffer.clear();
+
+      return $me.reset_back($c, TokenKind::CharAscii(buffer));
+    }
+
+    $me.err(Error::UnexpectedLiteralChar($me.buffer.clone()));
+  });
+
+  ( $me:ident : emit_zero $c:ident ) => ({
+    $me.buffer.clear();
+
+    return $me.reset_back($c, TokenKind::Int(0));
+  });
+
+  ( $me:ident : emit_token_kind $kind:expr ) => ({
+    return Some($kind);
+  });
+
+  ( $me:ident : emit_int_number $c:expr) => ({
+    let num = $me.buffer.to_owned();
+    let num = num.parse::<i64>().unwrap();
+
+    $me.buffer.clear();
+
+    return $me.reset_back($c, TokenKind::Int(num));
+  });
+
+  ( $me:ident : emit_float_number $c:expr) => ({
+    let num = $me.buffer.to_owned();
+    let num = num.parse::<f64>().unwrap();
+
+    $me.buffer.clear();
+
+    return $me.reset_back($c, TokenKind::Float(num));
+  });
+
+  ( $me:ident : emit_identifier $c:expr) => ({
+    let buffer = $me.buffer.to_owned();
+    $me.buffer.clear();
+
+    if let Some(kind) = TokenKind::keywords(&buffer) {
+      return $me.reset_back($c, kind);
+    }
+
+    return $me.reset_back($c, TokenKind::Identifier(buffer));
+  });
+
+  ( $me:ident : $($cmd:tt)+ ) => ( sh_trace!($me: $($cmd)+) );
+
+  ( $me:ident : ) => (());
+);
