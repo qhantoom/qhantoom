@@ -1,5 +1,6 @@
 fun main() {
   val a : uint = 3;
   val b : uint = 39;
-  val ab : uint = a + b;
+
+  b = a + b;
 }

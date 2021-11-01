@@ -1,6 +1,6 @@
 struct Button {
-  id: uint,
-  name: str,
+  id : uint,
+  name : str,
 }
 
 set Button {

@@ -1,6 +1,6 @@
 -- this is a line comments
 
-fun main() { -- this is a line comments
+fun main() : uint { -- this is a line comments
   -- this is a line comments
   val x : uint = 3; -- this is a line comments
   

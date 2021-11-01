@@ -1,10 +1,16 @@
+action Vec2 {
+  fun mul(x : uint) : uint;
+}
+
 struct Point {
   x: f32,
   x: f32,
 }
 
 set Vec2 for Point {
-  fun mul(x : f32) : f32 { x * x }
+  fun mul(x : f32) : f32 {
+    x * x
+  }
 }
 
 fun main() {}
