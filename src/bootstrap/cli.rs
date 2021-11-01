@@ -2,7 +2,7 @@ use super::compile;
 use super::help;
 use super::repl;
 
-use clap::{App, Arg, ArgMatches, SubCommand};
+use clap::{App, Arg, SubCommand};
 
 pub const DEFAULT_APP_NAME: &str = "qc";
 pub const DEFAULT_BIN_NAME: &str = env!("CARGO_CRATE_NAME");
@@ -18,7 +18,13 @@ pub const SUBCOMMAND_REPL_DESCRIPTION: &str = "Run the qhantoom REPL";
 // run a command
 #[inline]
 pub fn run() {
-  let matches = App::new(DEFAULT_APP_NAME)
+  cmd()
+}
+
+// launch a command to run with arguments
+#[inline]
+fn cmd() {
+  let args = App::new(DEFAULT_APP_NAME)
     .about(DEFAULT_DESCRIPTION)
     .author(DEFAULT_AUTHORS)
     .bin_name(DEFAULT_BIN_NAME)
@@ -42,15 +48,9 @@ pub fn run() {
     )
     .get_matches();
 
-  command(matches)
-}
-
-// launch a command to run with arguments
-#[inline]
-fn command(args: ArgMatches<'static>) {
   match args.subcommand_name() {
-    Some(SUBCOMMAND_COMPILE_NAME) => compile::run(args),
-    Some(SUBCOMMAND_REPL_NAME) => repl::run(args),
-    _ => help::run(),
+    Some(SUBCOMMAND_COMPILE_NAME) => compile::cmd(args),
+    Some(SUBCOMMAND_REPL_NAME) => repl::cmd(args),
+    _ => help::cmd(),
   }
 }
