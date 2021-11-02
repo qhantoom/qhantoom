@@ -154,7 +154,7 @@ val x, y, z := 0;
 
 ```
 fun square(x : uint) : uint { x * x }
-val square : uint = (x : uint) -> x * x;
+val square : uint = fn (x : uint) -> x * x;
 ```
 
 ## Branches

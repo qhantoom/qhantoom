@@ -1,4 +1,5 @@
 |> inline.
 fun foo() {}
 
+#> debug.
 fun main() {}

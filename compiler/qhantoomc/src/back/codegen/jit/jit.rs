@@ -2,7 +2,10 @@ use std::mem;
 
 use super::translator::Translator;
 
-use crate::back::codegen::context::{print_builtin, ScopeMap};
+use crate::back::codegen::context::{
+  print_builtin, print_char_builtin, print_str_builtin, ScopeMap,
+};
+
 use crate::front::parser;
 use crate::front::parser::ast::Program;
 use crate::util::error::Result;
@@ -13,6 +16,7 @@ use cranelift::prelude::{
 };
 
 use cranelift_codegen::binemit::{NullStackMapSink, NullTrapSink};
+use cranelift_codegen::ir::GlobalValue;
 use cranelift_codegen::Context;
 use cranelift_jit::{JITBuilder, JITModule};
 use cranelift_module::{default_libcall_names, DataContext, Linkage, Module};
@@ -33,7 +37,7 @@ pub struct Jit {
   data_ctx: DataContext,
   index: usize,
   module: JITModule,
-  scope_map: ScopeMap<Variable>,
+  scope_map: ScopeMap<GlobalValue, Variable>,
 }
 
 impl Jit {
@@ -42,7 +46,12 @@ impl Jit {
     let mut builder = JITBuilder::new(default_libcall_names());
 
     let print_addr = print_builtin as *const u8;
+    let print_str_addr = print_str_builtin as *const u8;
+    let print_char_addr = print_char_builtin as *const u8;
+
     builder.symbol("print", print_addr);
+    builder.symbol("print_str", print_str_addr);
+    builder.symbol("print_char", print_char_addr); // FIXME: not working
 
     let module = JITModule::new(builder);
 

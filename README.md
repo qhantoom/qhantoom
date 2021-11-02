@@ -10,7 +10,7 @@
 
 under development | under development | under development
 
-[roadmap](./src/doc/roadmap.md) — [syntax](./src/doc/syntax.md)
+[design](./src/doc/design.md) - [roadmap](./src/doc/roadmap.md) — [syntax](./src/doc/syntax.md)
 
 ## Usage
 
@@ -20,7 +20,7 @@ load std::math::(min, max);
 ext cos(x : uint) : uint;
 ext abs(x : uint) : uint;
 
-fun main() : void {
+fun main() {
   val min : uint = min(1, 3);
   val max := max(1, 3);
 
@@ -36,7 +36,7 @@ fun main() : void {
 ## Goals
 
 * no gc
-* type system
+* hybrid type system
 * high performance (fast compilation time)
 * backend (`aot` and `jit`) | `cranelift`
 * small binaries size

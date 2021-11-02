@@ -45,9 +45,11 @@ fn compiling(args: ArgMatches) {
     let pathname = matches.value_of("file").unwrap();
 
     // read the file from the path
-    let file = match crate::util::read_file(&pathname) {
-      Ok(f) => f,
-      Err(e) => panic!("io error: {}", e),
+    let file = {
+      match crate::util::read_file(&pathname) {
+        Ok(f) => f,
+        Err(e) => panic!("io error: {}", e),
+      }
     };
 
     print!("\nfile: {}\n", file);

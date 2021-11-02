@@ -1,4 +1,0 @@
-fun main() {
-  val a = (x : uint) : uint -> x * x;
-  val b := (x) -> x * x;
-}

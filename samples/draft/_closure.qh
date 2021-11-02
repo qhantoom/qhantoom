@@ -1,0 +1,4 @@
+fun main() {
+  val a = fn (x : uint) : uint -> x * x;
+  val b := fn (x) -> x * x;
+}

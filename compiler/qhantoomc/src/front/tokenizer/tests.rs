@@ -1,6 +1,8 @@
 use super::token::{Token, TokenKind};
 use super::tokenizer;
 
+use crate::util::symbol::Symbol;
+
 #[test]
 fn tokenize_empty_token() {
   let file = read_file("../../samples/tokens/empty.qh");
@@ -159,10 +161,10 @@ fn tokenize_strings_token() {
   let tokens = tokenize(&file);
 
   let expected = vec![
-    TokenKind::StrBuffer("hello, world! 👽".into()),
-    TokenKind::StrBuffer("yo la mif".into()),
-    TokenKind::StrBuffer("你好!".into()),
-    TokenKind::StrBuffer("hello, \"world\"! 👽\nwesh la famille! 🤘".into()),
+    TokenKind::StrBuffer(Symbol(0)),
+    TokenKind::StrBuffer(Symbol(1)),
+    TokenKind::StrBuffer(Symbol(2)),
+    TokenKind::StrBuffer(Symbol(3)),
     TokenKind::EOF,
   ];
 
@@ -175,15 +177,15 @@ fn tokenize_identifiers_token() {
   let tokens = tokenize(&file);
 
   let expected = vec![
-    TokenKind::Identifier("square".into()),
-    TokenKind::Identifier("cosinus".into()),
-    TokenKind::Identifier("degrees".into()),
-    TokenKind::Identifier("_tmp".into()),
-    TokenKind::Identifier("add_tmp".into()),
-    TokenKind::Identifier("to_tmp_".into()),
-    TokenKind::Identifier("vector1".into()),
-    TokenKind::Identifier("vector2".into()),
-    TokenKind::Identifier("vector3".into()),
+    TokenKind::Identifier(Symbol(0)),
+    TokenKind::Identifier(Symbol(1)),
+    TokenKind::Identifier(Symbol(2)),
+    TokenKind::Identifier(Symbol(3)),
+    TokenKind::Identifier(Symbol(4)),
+    TokenKind::Identifier(Symbol(5)),
+    TokenKind::Identifier(Symbol(6)),
+    TokenKind::Identifier(Symbol(7)),
+    TokenKind::Identifier(Symbol(8)),
     TokenKind::EOF,
   ];
 

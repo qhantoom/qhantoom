@@ -1,4 +1,0 @@
-fun a(x : uint) : uint { x * x }
-fun b(x) { x * x }
-
-fun main() {}

@@ -5,6 +5,10 @@ use crate::front::parser::ast::{
   StmtKind, Struct, StructExpr, UnopKind,
 };
 
+use crate::util::symbol::Symbol;
+
+use cranelift_codegen::ir::GlobalValue;
+
 use cranelift::prelude::{
   types, EntityRef, FunctionBuilder, InstBuilder, IntCC, Value, Variable,
 };
@@ -17,7 +21,7 @@ pub struct Translator<'a> {
   pub module: &'a mut dyn Module,
   pub ty: types::Type,
   pub index: usize,
-  pub scope_map: &'a mut ScopeMap<Variable>,
+  pub scope_map: &'a mut ScopeMap<GlobalValue, Variable>,
 }
 
 impl<'a> Translator<'a> {
@@ -198,13 +202,13 @@ impl<'a> Translator<'a> {
   }
 
   #[inline]
-  fn translate_str(&mut self, _buf: &String) -> Value {
+  fn translate_str(&mut self, _buf: &Symbol) -> Value {
     todo!()
   }
 
   #[inline]
-  fn translate_ident(&mut self, name: &str) -> Value {
-    let var = self.scope_map.get_variable(&name).unwrap();
+  fn translate_ident(&mut self, name: &Symbol) -> Value {
+    let var = self.scope_map.get_variable(&name.to_string()).unwrap();
 
     self.builder.use_var(*var)
   }
@@ -373,7 +377,7 @@ impl<'a> Translator<'a> {
 
     match lhs.kind() {
       ExprKind::Ident(ref name) => {
-        let var = *self.scope_map.get_variable(name).unwrap();
+        let var = *self.scope_map.get_variable(&name.to_string()).unwrap();
 
         self.builder.def_var(var, rhs);
       }
@@ -394,7 +398,7 @@ impl<'a> Translator<'a> {
 
     match lhs.kind() {
       ExprKind::Ident(ref name) => {
-        let var = *self.scope_map.get_variable(name).unwrap();
+        let var = *self.scope_map.get_variable(&name.to_string()).unwrap();
         let lhs = self.translate_expr(lhs);
 
         let new_rhs = match op {

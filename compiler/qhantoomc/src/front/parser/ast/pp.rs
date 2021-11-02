@@ -2,8 +2,10 @@ use std::fmt;
 
 use super::ast::{
   Arg, BinopKind, Block, Expr, ExprKind, Field, FieldExpr, Fun, Prototype,
-  Stmt, StmtKind, Struct, StructExpr, Ty, TyKind, UnopKind,
+  Stmt, StmtKind, Struct, StructExpr, UnopKind,
 };
+
+use super::ty::{Ty, TyKind};
 
 pub struct CommaSep<'a, T: 'a>(pub &'a [T]);
 
@@ -220,7 +222,7 @@ impl fmt::Display for Ty {
       TyKind::Dynamic => write!(f, "dynamic"),
       TyKind::Array(ref ty) => write!(f, "[{}]", ty),
       TyKind::Fun(ref tys, ref ret_ty) => {
-        write!(f, "({}) -> {}", CommaSep(tys), ret_ty)
+        write!(f, "Fn ({}) -> {}", CommaSep(tys), ret_ty)
       }
     }
   }

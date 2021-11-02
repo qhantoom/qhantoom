@@ -4,18 +4,19 @@ use crate::back::codegen::context::ScopeMap;
 use crate::front::parser::ast::Program;
 use crate::util::error::Result;
 
+use cranelift::prelude::{
+  types, AbiParam, FunctionBuilder, FunctionBuilderContext, InstBuilder,
+  Variable,
+};
+
 use cranelift_codegen::binemit::{NullStackMapSink, NullTrapSink};
+use cranelift_codegen::ir::GlobalValue;
 use cranelift_codegen::settings::Flags;
 use cranelift_codegen::{settings, Context};
 use cranelift_module::{default_libcall_names, DataContext, Linkage, Module};
 use cranelift_native::builder;
 use cranelift_object::{ObjectBuilder, ObjectModule};
 use cranelift_preopt::optimize;
-
-use cranelift::prelude::{
-  types, AbiParam, FunctionBuilder, FunctionBuilderContext, InstBuilder,
-  Variable,
-};
 
 #[inline]
 pub fn generate(ast: &Program) -> Result<Vec<u8>> {
@@ -28,7 +29,7 @@ pub struct Aot {
   ctx: Context,
   data_ctx: DataContext,
   module: ObjectModule,
-  scope_map: ScopeMap<Variable>,
+  scope_map: ScopeMap<GlobalValue, Variable>,
 }
 
 impl Aot {

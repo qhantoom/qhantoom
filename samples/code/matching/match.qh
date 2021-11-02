@@ -1,0 +1,17 @@
+fun calculate(op: str, x : uint, y : uint) {
+  match op {
+    "+" => x + y,
+    "-" => x - y,
+    "*" => x * y,
+    "/" => x / y,
+    "%" => x % y,
+  }
+}
+
+fun main() {
+  val add = calculate("+", 3, 39);
+  val sub = calculate("-", 3, 39);
+  val mul = calculate("*", 3, 39);
+  val div = calculate("/", 3, 39);
+  val rem = calculate("%", 3, 39);
+}
