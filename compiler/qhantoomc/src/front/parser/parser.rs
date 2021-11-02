@@ -13,13 +13,18 @@ use crate::front::tokenizer::token::{Token, TokenKind, TOKEN_EOF};
 use crate::front::tokenizer::Tokenizer;
 use crate::util::error::{Error, Result};
 
+use crate::util::symbol::SymbolTable;
+
 // parse a source code into an AST
 #[inline]
 pub fn parse(src: &str) -> Result<Program> {
-  let mut tokenizer = Tokenizer::new(src);
+  let mut symbol_table = SymbolTable::new();
+  let mut tokenizer = Tokenizer::new(src, &mut symbol_table);
   let mut parser = Parser::new(&mut tokenizer);
+  let ast = parser.parse();
 
-  parser.parse()
+  symbol_table.store();
+  ast
 }
 
 pub struct Parser<'a> {
@@ -560,9 +565,7 @@ impl<'a> Parser<'a> {
   #[inline]
   fn parse_str_expr(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
-      TokenKind::StrBuffer(ref buf) => {
-        Ok(box ast::mk_expr(ast::mk_str(buf.into())))
-      }
+      TokenKind::StrBuffer(ref buf) => Ok(box ast::mk_expr(ast::mk_str(*buf))),
       _ => Err(Error::ExpectedExpr(
         "str",
         format!("{:?}", self.current.kind()),
@@ -574,7 +577,7 @@ impl<'a> Parser<'a> {
   fn parse_ident_expr(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
       TokenKind::Identifier(ref name) => {
-        Ok(box ast::mk_expr(ast::mk_ident(name.into())))
+        Ok(box ast::mk_expr(ast::mk_ident(*name)))
       }
       _ => Err(Error::ExpectedExpr(
         "ident",

@@ -1,4 +1,4 @@
-use crate::front::tokenizer::token::TokenKind;
+use crate::{front::tokenizer::token::TokenKind, util::symbol::Symbol};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Visibility {
@@ -138,8 +138,8 @@ pub enum ExprKind {
   Int(i64),
   Float(f64),
   Char(char),
-  Str(String),
-  Ident(String),
+  Str(Symbol),
+  Ident(Symbol),
   Array(Vec<Box<Expr>>),
   Binop {
     lhs: Box<Expr>,
@@ -506,12 +506,12 @@ pub const fn mk_char(value: char) -> ExprKind {
 }
 
 #[inline]
-pub const fn mk_str(value: String) -> ExprKind {
+pub const fn mk_str(value: Symbol) -> ExprKind {
   ExprKind::Str(value)
 }
 
 #[inline]
-pub const fn mk_ident(name: String) -> ExprKind {
+pub const fn mk_ident(name: Symbol) -> ExprKind {
   ExprKind::Ident(name)
 }
 

@@ -12,10 +12,13 @@ use crate::util::ascii::{
 
 use crate::util::error::{Error, Result};
 
+use crate::util::symbol::SymbolTable;
+
 // tokenize a string into a vector of tokens
 #[inline]
 pub fn tokenize(src: &str) -> Result<Vec<Token>> {
-  let mut tokenizer = Tokenizer::new(&src);
+  let mut symbol_table = SymbolTable::new();
+  let mut tokenizer = Tokenizer::new(&src, &mut symbol_table);
 
   tokenizer.tokenize()
 }
@@ -25,16 +28,18 @@ pub struct Tokenizer<'a> {
   input: Chars<'a>,
   next: Option<char>,
   state: TokenizerState,
+  symbol_table: &'a mut SymbolTable,
 }
 
 impl<'a> Tokenizer<'a> {
   #[inline]
-  pub fn new(input: &'a str) -> Self {
+  pub fn new(input: &'a str, symbol_table: &'a mut SymbolTable) -> Self {
     Self {
       buffer: String::new(),
       input: input.chars(),
       next: None,
       state: TokenizerState::Idle,
+      symbol_table,
     }
   }
 
@@ -238,7 +243,9 @@ impl<'a> Tokenizer<'a> {
         let buffer = self.buffer.to_owned();
         self.buffer.clear();
 
-        return self.reset_back(c, TokenKind::StrBuffer(buffer));
+        let sym = self.symbol_table.intern(&buffer);
+
+        return self.reset_back(c, TokenKind::StrBuffer(sym));
       }
       // read_start_number_state
       TokenizerState::StartNumber => match c {
@@ -396,7 +403,9 @@ macro_rules! go (
       return $me.reset_back($c, kind);
     }
 
-    return $me.reset_back($c, TokenKind::Identifier(buffer));
+    let sym = $me.symbol_table.intern(&buffer);
+
+    return $me.reset_back($c, TokenKind::Identifier(sym));
   });
 
   ( $me:ident : $($cmd:tt)+ ) => ( sh_trace!($me: $($cmd)+) );

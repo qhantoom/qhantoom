@@ -1,3 +1,5 @@
+use crate::util::symbol::Symbol;
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum TokenKind {
   EOF,
@@ -5,8 +7,8 @@ pub enum TokenKind {
   Int(i64),
   Float(f64),
   CharAscii(char),
-  StrBuffer(String),
-  Identifier(String),
+  StrBuffer(Symbol),
+  Identifier(Symbol),
 
   // comments
   CommentLine,

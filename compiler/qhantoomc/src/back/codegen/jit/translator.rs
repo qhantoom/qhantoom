@@ -5,6 +5,10 @@ use crate::front::parser::ast::{
   StmtKind, Struct, StructExpr, UnopKind,
 };
 
+use crate::util::symbol::Symbol;
+
+use cranelift_codegen::ir::GlobalValue;
+
 use cranelift::prelude::{
   types, AbiParam, EntityRef, FunctionBuilder, InstBuilder, IntCC, Value,
   Variable,
@@ -19,7 +23,7 @@ pub struct Translator<'a> {
   pub module: &'a mut JITModule,
   pub ty: types::Type,
   pub index: usize,
-  pub scope_map: &'a mut ScopeMap<Variable>,
+  pub scope_map: &'a mut ScopeMap<GlobalValue, Variable>,
 }
 
 impl<'a> Translator<'a> {
@@ -198,14 +202,40 @@ impl<'a> Translator<'a> {
     todo!()
   }
 
+  // FIXME: can only print the same string literal value once
   #[inline]
-  fn translate_str(&mut self, _buf: &String) -> Value {
-    todo!()
+  fn translate_str(&mut self, buf: &Symbol) -> Value {
+    let str_ptr = match self.scope_map.get_data(&buf.to_string()) {
+      Some(data) => *data,
+      None => {
+        let name = format!("str{}", buf.as_usize());
+        let buf = buf.to_string();
+
+        let data_id = self
+          .module
+          .declare_data(&name, Linkage::Local, false, false)
+          .unwrap();
+
+        let mut data_ctx = DataContext::new();
+
+        data_ctx.define(buf.as_str().to_owned().into_boxed_str().into());
+        self.module.define_data(data_id, &data_ctx).unwrap();
+
+        let str_ptr =
+          self.module.declare_data_in_func(data_id, self.builder.func);
+
+        self.scope_map.add_data(buf.to_owned(), str_ptr).unwrap();
+
+        str_ptr
+      }
+    };
+
+    self.builder.ins().global_value(self.ty, str_ptr)
   }
 
   #[inline]
-  fn translate_ident(&mut self, name: &str) -> Value {
-    let var = self.scope_map.get_variable(&name).unwrap();
+  fn translate_ident(&mut self, name: &Symbol) -> Value {
+    let var = self.scope_map.get_variable(&name.to_string()).unwrap();
 
     self.builder.use_var(*var)
   }
@@ -376,7 +406,7 @@ impl<'a> Translator<'a> {
 
     match lhs.kind() {
       ExprKind::Ident(ref name) => {
-        let var = self.scope_map.get_variable(name).unwrap();
+        let var = self.scope_map.get_variable(&name.to_string()).unwrap();
 
         self.builder.def_var(*var, rhs);
       }
@@ -397,7 +427,7 @@ impl<'a> Translator<'a> {
 
     match lhs.kind() {
       ExprKind::Ident(ref name) => {
-        let var = *self.scope_map.get_variable(name).unwrap();
+        let var = *self.scope_map.get_variable(&name.to_string()).unwrap();
         let lhs = self.translate_expr(lhs);
 
         let new_rhs = match op {
