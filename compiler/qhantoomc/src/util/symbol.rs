@@ -7,19 +7,6 @@ thread_local!(static SYMBOLS: RefCell<Vec<String>> = RefCell::new(Vec::new()));
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Copy, Debug)]
 pub struct Symbol(pub u32);
 
-impl Symbol {
-  #[inline]
-  pub fn as_usize(self) -> usize {
-    self.0 as usize
-  }
-}
-
-#[derive(Clone)]
-pub struct SymbolTable {
-  syms: Vec<String>,
-  table: HashMap<String, Symbol>,
-}
-
 impl fmt::Display for Symbol {
   #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -32,6 +19,19 @@ impl<'a> PartialEq<&'a str> for Symbol {
   fn eq(&self, other: &&'a str) -> bool {
     SYMBOLS.with(|syms| syms.borrow()[self.0 as usize] == *other)
   }
+}
+
+impl Symbol {
+  #[inline]
+  pub fn as_usize(self) -> usize {
+    self.0 as usize
+  }
+}
+
+#[derive(Clone)]
+pub struct SymbolTable {
+  syms: Vec<String>,
+  table: HashMap<String, Symbol>,
 }
 
 impl SymbolTable {

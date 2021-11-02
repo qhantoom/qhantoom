@@ -10,7 +10,7 @@
 
 under development | under development | under development
 
-[roadmap](./src/doc/roadmap.md) — [syntax](./src/doc/syntax.md)
+[design](./src/doc/design.md) - [roadmap](./src/doc/roadmap.md) — [syntax](./src/doc/syntax.md)
 
 ## Usage
 
