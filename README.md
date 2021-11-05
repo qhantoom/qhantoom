@@ -38,7 +38,7 @@ fun main() {
 * no gc
 * hybrid type system
 * high performance (fast compilation time)
-* backend (`aot` and `jit`) | `cranelift`
+* cranelift backend | `aot` and `jit`
 * small binaries size
 
 ## Development

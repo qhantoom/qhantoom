@@ -296,6 +296,7 @@ impl<'a> Parser<'a> {
 
     fields.push(self.parse_field()?);
 
+    // TODO: should be use TokenKind::CloseBrace
     while self.first.is(TokenKind::Comma) {
       self.next();
 
@@ -389,11 +390,11 @@ impl<'a> Parser<'a> {
     self.expect_first(&TokenKind::Semicolon)?;
 
     let kind = match op {
-      BinopKind::AddOp => ast::mk_add_assign_op(lhs, rhs),
-      BinopKind::SubOp => ast::mk_sub_assign_op(lhs, rhs),
-      BinopKind::MulOp => ast::mk_mul_assign_op(lhs, rhs),
-      BinopKind::DivOp => ast::mk_div_assign_op(lhs, rhs),
-      BinopKind::RemOp => ast::mk_rem_assign_op(lhs, rhs),
+      BinopKind::AddAssignOp => ast::mk_add_assign_op(lhs, rhs),
+      BinopKind::SubAssignOp => ast::mk_sub_assign_op(lhs, rhs),
+      BinopKind::MulAssignOp => ast::mk_mul_assign_op(lhs, rhs),
+      BinopKind::DivAssignOp => ast::mk_div_assign_op(lhs, rhs),
+      BinopKind::RemAssignOp => ast::mk_rem_assign_op(lhs, rhs),
       _ => unreachable!(),
     };
 

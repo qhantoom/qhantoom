@@ -237,6 +237,8 @@ impl fmt::Display for BinopKind {
       Self::Mul => write!(f, "*"),
       Self::Div => write!(f, "/"),
       Self::Rem => write!(f, "%"),
+      Self::BitAndOp => write!(f, "&"),
+      Self::BitOrOp => write!(f, "|"),
       Self::And => write!(f, "&&"),
       Self::Or => write!(f, "||"),
       Self::Lt => write!(f, "<"),
@@ -245,11 +247,11 @@ impl fmt::Display for BinopKind {
       Self::Ge => write!(f, ">="),
       Self::Eq => write!(f, "=="),
       Self::Ne => write!(f, "!="),
-      Self::AddOp => write!(f, "+="),
-      Self::SubOp => write!(f, "-="),
-      Self::MulOp => write!(f, "*="),
-      Self::DivOp => write!(f, "/="),
-      Self::RemOp => write!(f, "%="),
+      Self::AddAssignOp => write!(f, "+="),
+      Self::SubAssignOp => write!(f, "-="),
+      Self::MulAssignOp => write!(f, "*="),
+      Self::DivAssignOp => write!(f, "/="),
+      Self::RemAssignOp => write!(f, "%="),
     }
   }
 }

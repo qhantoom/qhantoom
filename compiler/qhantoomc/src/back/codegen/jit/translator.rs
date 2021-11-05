@@ -117,8 +117,23 @@ impl<'a> Translator<'a> {
   }
 
   #[inline]
-  fn translate_continue(&mut self, _expr: &Option<Box<Expr>>) -> Value {
-    todo!()
+  fn translate_continue(&mut self, expr: &Option<Box<Expr>>) -> Value {
+    let mut value = self.builder.ins().iconst(self.ty, 0);
+    let end_block = *self.scope_map.blocks().last().unwrap();
+
+    if let Some(ref e) = expr {
+      value = self.translate_expr(e);
+      self.builder.ins().jump(end_block, &[value]);
+    } else {
+      self.builder.ins().jump(end_block, &[]);
+    }
+
+    let new_block = self.builder.create_block();
+
+    self.builder.seal_block(new_block);
+    self.builder.switch_to_block(new_block);
+
+    value
   }
 
   #[inline]
@@ -205,7 +220,7 @@ impl<'a> Translator<'a> {
   // FIXME: can only print the same string literal value once
   #[inline]
   fn translate_str(&mut self, buf: &Symbol) -> Value {
-    let str_ptr = match self.scope_map.get_data(&buf.to_string()) {
+    let id = match self.scope_map.get_data(&buf.to_string()) {
       Some(data) => *data,
       None => {
         let name = format!("str{}", buf.as_usize());
@@ -221,16 +236,16 @@ impl<'a> Translator<'a> {
         data_ctx.define(buf.as_str().to_owned().into_boxed_str().into());
         self.module.define_data(data_id, &data_ctx).unwrap();
 
-        let str_ptr =
-          self.module.declare_data_in_func(data_id, self.builder.func);
+        let id = self.module.declare_data_in_func(data_id, self.builder.func);
 
-        self.scope_map.add_data(buf.to_owned(), str_ptr).unwrap();
+        self.scope_map.add_data(buf.to_owned(), id).unwrap();
 
-        str_ptr
+        id
       }
     };
 
-    self.builder.ins().global_value(self.ty, str_ptr)
+    self.builder.ins().global_value(self.ty, id)
+    // self.builder.ins().symbol_value(types::I64, id)
   }
 
   // TODO: does global data can be used for `char` support?
@@ -269,14 +284,16 @@ impl<'a> Translator<'a> {
       BinopKind::Mul => self.translate_mul_binop(lhs, rhs),
       BinopKind::Div => self.translate_div_binop(lhs, rhs),
       BinopKind::Rem => self.translate_rem_binop(lhs, rhs),
+      BinopKind::Or => self.translate_or_binop(lhs, rhs),
+      BinopKind::And => self.translate_and_binop(lhs, rhs),
+      BinopKind::BitAndOp => self.translate_bit_and_binop(lhs, rhs),
+      BinopKind::BitOrOp => self.translate_bit_or_binop(lhs, rhs),
       BinopKind::Lt => self.translate_lt_binop(lhs, rhs),
       BinopKind::Gt => self.translate_gt_binop(lhs, rhs),
       BinopKind::Le => self.translate_le_binop(lhs, rhs),
       BinopKind::Ge => self.translate_ge_binop(lhs, rhs),
       BinopKind::Eq => self.translate_eq_binop(lhs, rhs),
       BinopKind::Ne => self.translate_ne_binop(lhs, rhs),
-      BinopKind::Or => self.translate_or_binop(lhs, rhs),
-      BinopKind::And => self.translate_and_binop(lhs, rhs),
       _ => unreachable!(),
     }
   }
@@ -304,6 +321,16 @@ impl<'a> Translator<'a> {
   #[inline]
   fn translate_rem_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     self.builder.ins().srem(lhs, rhs)
+  }
+
+  #[inline]
+  fn translate_bit_and_binop(&mut self, lhs: Value, rhs: Value) -> Value {
+    self.builder.ins().band(lhs, rhs)
+  }
+
+  #[inline]
+  fn translate_bit_or_binop(&mut self, lhs: Value, rhs: Value) -> Value {
+    self.builder.ins().bor(lhs, rhs)
   }
 
   #[inline]
@@ -399,7 +426,10 @@ impl<'a> Translator<'a> {
 
     match op {
       UnopKind::Neg => self.builder.ins().ineg(rhs),
-      _ => unimplemented!(),
+      UnopKind::Not => {
+        let value = self.builder.ins().icmp_imm(IntCC::Equal, rhs, 0);
+        self.builder.ins().bint(types::I64, value)
+      }
     }
   }
 
@@ -444,11 +474,11 @@ impl<'a> Translator<'a> {
         let lhs = self.translate_expr(lhs);
 
         let new_rhs = match op {
-          BinopKind::AddOp => self.translate_add_binop(lhs, rhs),
-          BinopKind::SubOp => self.translate_sub_binop(lhs, rhs),
-          BinopKind::MulOp => self.translate_mul_binop(lhs, rhs),
-          BinopKind::DivOp => self.translate_div_binop(lhs, rhs),
-          BinopKind::RemOp => self.translate_rem_binop(lhs, rhs),
+          BinopKind::AddAssignOp => self.translate_add_binop(lhs, rhs),
+          BinopKind::SubAssignOp => self.translate_sub_binop(lhs, rhs),
+          BinopKind::MulAssignOp => self.translate_mul_binop(lhs, rhs),
+          BinopKind::DivAssignOp => self.translate_div_binop(lhs, rhs),
+          BinopKind::RemAssignOp => self.translate_rem_binop(lhs, rhs),
           _ => unreachable!(),
         };
 
@@ -577,9 +607,9 @@ impl<'a> Translator<'a> {
     self.builder.ins().jump(header_block, &[]);
     self.builder.switch_to_block(header_block);
 
-    let cond = self.translate_expr(condition);
+    let condition_value = self.translate_expr(condition);
 
-    self.builder.ins().brz(cond, end_block, &[]);
+    self.builder.ins().brz(condition_value, end_block, &[]);
     self.builder.ins().jump(body_block, &[]);
     self.scope_map.blocks().push(end_block);
     self.builder.seal_block(body_block);

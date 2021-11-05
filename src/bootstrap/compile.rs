@@ -1,4 +1,5 @@
 use std::any::Any;
+use std::time::Instant;
 
 use super::cli::SUBCOMMAND_COMPILE_NAME;
 
@@ -44,6 +45,8 @@ fn compiling(args: ArgMatches) {
   if let Some(matches) = args.subcommand_matches(SUBCOMMAND_COMPILE_NAME) {
     let pathname = matches.value_of("file").unwrap();
 
+    let front_start_time = Instant::now();
+
     // read the file from the path
     let file = {
       match crate::util::read_file(&pathname) {
@@ -79,6 +82,9 @@ fn compiling(args: ArgMatches) {
     front::analyzer::maincheck::analyze(&ast);
     front::analyzer::typecheck::analyze(&ast);
 
+    let front_end_time = front_start_time.elapsed();
+    let back_start_time = Instant::now();
+
     // code generation from an AST to machine code
     let code = {
       match back::codegen::aot::generate(&ast) {
@@ -87,10 +93,29 @@ fn compiling(args: ArgMatches) {
       }
     };
 
-    print!("code: {:?}\n", code);
+    print!("\ncode: {:?}\n", code);
+
+    let back_end_time = back_start_time.elapsed();
+    let global = front_end_time + back_end_time;
 
     // write machine code to file
     let _ = util::writer::write("test.o", code);
+
+    print!(
+      r#"
+Front-end time: {}.{} secs.
+ Back-end time: {}.{} secs.
+    Total time: {}.{} secs.
+   Total lines: {}
+"#,
+      front_end_time.as_secs(),
+      front_end_time.subsec_nanos(),
+      back_end_time.as_secs(),
+      back_end_time.subsec_nanos(),
+      global.as_secs(),
+      global.subsec_nanos(),
+      file.lines().count(),
+    );
 
     // print success message
     print!("\ncompiled successfully..\n");

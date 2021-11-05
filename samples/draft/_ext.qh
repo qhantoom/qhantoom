@@ -1,3 +1,0 @@
-ext cos(x : uint) : uint;
-
-fun main() {}

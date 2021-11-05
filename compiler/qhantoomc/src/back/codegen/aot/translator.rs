@@ -229,14 +229,16 @@ impl<'a> Translator<'a> {
       BinopKind::Mul => self.translate_mul_binop(lhs, rhs),
       BinopKind::Div => self.translate_div_binop(lhs, rhs),
       BinopKind::Rem => self.translate_rem_binop(lhs, rhs),
+      BinopKind::Or => self.translate_or_binop(lhs, rhs),
+      BinopKind::And => self.translate_and_binop(lhs, rhs),
+      BinopKind::BitAndOp => self.translate_bit_and_binop(lhs, rhs),
+      BinopKind::BitOrOp => self.translate_bit_or_binop(lhs, rhs),
       BinopKind::Lt => self.translate_lt_binop(lhs, rhs),
       BinopKind::Gt => self.translate_gt_binop(lhs, rhs),
       BinopKind::Le => self.translate_le_binop(lhs, rhs),
       BinopKind::Ge => self.translate_ge_binop(lhs, rhs),
       BinopKind::Eq => self.translate_eq_binop(lhs, rhs),
       BinopKind::Ne => self.translate_ne_binop(lhs, rhs),
-      BinopKind::Or => self.translate_or_binop(lhs, rhs),
-      BinopKind::And => self.translate_and_binop(lhs, rhs),
       _ => unreachable!(),
     }
   }
@@ -264,6 +266,16 @@ impl<'a> Translator<'a> {
   #[inline]
   fn translate_rem_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     self.builder.ins().srem(lhs, rhs)
+  }
+
+  #[inline]
+  fn translate_bit_and_binop(&mut self, lhs: Value, rhs: Value) -> Value {
+    self.builder.ins().band(lhs, rhs)
+  }
+
+  #[inline]
+  fn translate_bit_or_binop(&mut self, lhs: Value, rhs: Value) -> Value {
+    self.builder.ins().bor(lhs, rhs)
   }
 
   #[inline]
@@ -357,7 +369,10 @@ impl<'a> Translator<'a> {
 
     match op {
       UnopKind::Neg => self.builder.ins().ineg(rhs),
-      _ => unimplemented!(),
+      UnopKind::Not => {
+        let value = self.builder.ins().icmp_imm(IntCC::Equal, rhs, 0);
+        self.builder.ins().bint(types::I64, value)
+      }
     }
   }
 
@@ -402,11 +417,11 @@ impl<'a> Translator<'a> {
         let lhs = self.translate_expr(lhs);
 
         let new_rhs = match op {
-          BinopKind::AddOp => self.translate_add_binop(lhs, rhs),
-          BinopKind::SubOp => self.translate_sub_binop(lhs, rhs),
-          BinopKind::MulOp => self.translate_mul_binop(lhs, rhs),
-          BinopKind::DivOp => self.translate_div_binop(lhs, rhs),
-          BinopKind::RemOp => self.translate_rem_binop(lhs, rhs),
+          BinopKind::AddAssignOp => self.translate_add_binop(lhs, rhs),
+          BinopKind::SubAssignOp => self.translate_sub_binop(lhs, rhs),
+          BinopKind::MulAssignOp => self.translate_mul_binop(lhs, rhs),
+          BinopKind::DivAssignOp => self.translate_div_binop(lhs, rhs),
+          BinopKind::RemAssignOp => self.translate_rem_binop(lhs, rhs),
           _ => unreachable!(),
         };
 
