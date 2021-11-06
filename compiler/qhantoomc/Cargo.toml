@@ -19,3 +19,5 @@ cranelift-module = "0.77.0"
 cranelift-native = "0.77.0"
 cranelift-object = "0.77.0"
 cranelift-preopt = "0.77.0"
+# TODO: should be used for the management of errors
+# ariadne = "0.1.3"

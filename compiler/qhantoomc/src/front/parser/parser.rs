@@ -13,17 +13,17 @@ use crate::front::tokenizer::token::{Token, TokenKind, TOKEN_EOF};
 use crate::front::tokenizer::Tokenizer;
 use crate::util::error::{Error, Result};
 
-use crate::util::symbol::SymbolTable;
+use crate::util::symbol::Symbols;
 
 // parse a source code into an AST
 #[inline]
 pub fn parse(src: &str) -> Result<Program> {
-  let mut symbol_table = SymbolTable::new();
-  let mut tokenizer = Tokenizer::new(src, &mut symbol_table);
+  let mut syms = Symbols::new();
+  let mut tokenizer = Tokenizer::new(src, &mut syms);
   let mut parser = Parser::new(&mut tokenizer);
   let ast = parser.parse();
 
-  symbol_table.store();
+  syms.store();
   ast
 }
 

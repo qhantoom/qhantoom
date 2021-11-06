@@ -93,7 +93,7 @@ impl<'a> Translator<'a> {
       return self.translate_expr(e);
     }
 
-    self.builder.ins().iconst(types::I64, 0)
+    self.builder.ins().iconst(self.ty, 0)
   }
 
   #[inline]
@@ -245,7 +245,7 @@ impl<'a> Translator<'a> {
     };
 
     self.builder.ins().global_value(self.ty, id)
-    // self.builder.ins().symbol_value(types::I64, id)
+    // self.builder.ins().symbol_value(self.ty, id)
   }
 
   // TODO: does global data can be used for `char` support?
@@ -425,10 +425,12 @@ impl<'a> Translator<'a> {
     let rhs = self.translate_expr(rhs);
 
     match op {
+      // TODO: self.translate_neg_unop(op, rhs)
       UnopKind::Neg => self.builder.ins().ineg(rhs),
+      // TODO: self.translate_not_unop(op, rhs)
       UnopKind::Not => {
         let value = self.builder.ins().icmp_imm(IntCC::Equal, rhs, 0);
-        self.builder.ins().bint(types::I64, value)
+        self.builder.ins().bint(self.ty, value)
       }
     }
   }

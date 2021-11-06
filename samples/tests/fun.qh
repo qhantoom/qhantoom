@@ -1,4 +1,4 @@
--- fun main() : uint { mut y := 9; mut z := 23; x + y }
+-- fun main() : uint { mut y := 9; mut y := 23; x + y }
 
 fun main() : uint {
   val x : uint = 3;

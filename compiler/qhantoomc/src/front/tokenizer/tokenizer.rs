@@ -11,14 +11,13 @@ use crate::util::ascii::{
 };
 
 use crate::util::error::{Error, Result};
-
-use crate::util::symbol::SymbolTable;
+use crate::util::symbol::Symbols;
 
 // tokenize a string into a vector of tokens
 #[inline]
 pub fn tokenize(src: &str) -> Result<Vec<Token>> {
-  let mut symbol_table = SymbolTable::new();
-  let mut tokenizer = Tokenizer::new(&src, &mut symbol_table);
+  let mut syms = Symbols::new();
+  let mut tokenizer = Tokenizer::new(&src, &mut syms);
 
   tokenizer.tokenize()
 }
@@ -28,18 +27,18 @@ pub struct Tokenizer<'a> {
   input: Chars<'a>,
   next: Option<char>,
   state: TokenizerState,
-  symbol_table: &'a mut SymbolTable,
+  pub syms: &'a mut Symbols,
 }
 
 impl<'a> Tokenizer<'a> {
   #[inline]
-  pub fn new(input: &'a str, symbol_table: &'a mut SymbolTable) -> Self {
+  pub fn new(input: &'a str, syms: &'a mut Symbols) -> Self {
     Self {
       buffer: String::new(),
       input: input.chars(),
       next: None,
       state: TokenizerState::Idle,
-      symbol_table,
+      syms,
     }
   }
 
@@ -241,6 +240,7 @@ impl<'a> Tokenizer<'a> {
       TokenizerState::EndString => go!(self: emit_str c),
       // read_start_number_state
       TokenizerState::StartNumber => match c {
+        'x' | 'X' => go!(self: push c; to NumberHex),
         '1'..='9' => self.err(Error::UnexpectedLiteralNumber(c)),
         '.' => go!(self: push c; to NumberFloat),
         c => go!(self: emit_zero c),
@@ -255,6 +255,11 @@ impl<'a> Tokenizer<'a> {
       TokenizerState::NumberFloat => match c {
         '0'..='9' => go!(self: push c),
         c => go!(self: emit_float_number c),
+      },
+      // read_number_float_state
+      TokenizerState::NumberHex => match c {
+        '0'..='9' | 'a'..='f' | 'A'..='F' => go!(self: push c),
+        c => go!(self: emit_hex_number c),
       },
       // read_identifier_state
       TokenizerState::Identifier => match c {
@@ -398,11 +403,29 @@ macro_rules! go (
     return $me.reset_back($c, TokenKind::Float(num));
   });
 
+  ( $me:ident : emit_hex_number $c:expr) => ({
+    if $me.buffer.len() == 0 {
+      $me.err(Error::Custom("invalid hex literal (need digits)"));
+    }
+
+    let buf = $me.buffer.to_owned();
+    let without_prefix = buf.trim_start_matches("0x");
+    let num = i64::from_str_radix(without_prefix, 16);
+
+    match num {
+      Ok(n) => {
+        $me.buffer.clear();
+        return $me.reset_back($c, TokenKind::Int(n));
+      },
+      Err(_) => $me.err(Error::Custom("invalid hex literal (need digits)")),
+    }
+  });
+
   ( $me:ident : emit_str $c:expr) => ({
     let buffer = $me.buffer.to_owned();
     $me.buffer.clear();
 
-    let sym = $me.symbol_table.intern(&buffer);
+    let sym = $me.syms.intern(&buffer);
 
     return $me.reset_back($c, TokenKind::StrBuffer(sym));
   });
@@ -415,7 +438,7 @@ macro_rules! go (
       return $me.reset_back($c, kind);
     }
 
-    let sym = $me.symbol_table.intern(&buffer);
+    let sym = $me.syms.intern(&buffer);
 
     return $me.reset_back($c, TokenKind::Identifier(sym));
   });

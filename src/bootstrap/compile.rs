@@ -14,7 +14,7 @@ pub const EXIT_FAILURE: i32 = 1;
 
 // run the `compile` command
 #[inline]
-pub fn cmd(args: ArgMatches<'static>) {
+pub fn run(args: ArgMatches<'static>) {
   match compile(args) {
     Ok(_) => std::process::exit(EXIT_SUCCESS),
     Err(_) => std::process::exit(EXIT_FAILURE),
@@ -43,12 +43,10 @@ fn compiling(args: ArgMatches) {
   print!("compiling..\n");
 
   if let Some(matches) = args.subcommand_matches(SUBCOMMAND_COMPILE_NAME) {
-    let pathname = matches.value_of("file").unwrap();
+    let pathname = matches.value_of("input").unwrap();
 
-    let front_start_time = Instant::now();
-
-    // read the file from the path
     let file = {
+      // read the source file from the path
       match crate::util::read_file(&pathname) {
         Ok(f) => f,
         Err(e) => panic!("io error: {}", e),
@@ -58,8 +56,8 @@ fn compiling(args: ArgMatches) {
     print!("\nfile: {}\n", file);
 
     // TMP: this is used just for printing the tokenize output
-    // transform source code into tokens
     let tokens = {
+      // transform source code into tokens
       match front::tokenizer::tokenize(&file) {
         Ok(t) => t,
         Err(e) => panic!("tokenizer error: {}", e),
@@ -68,8 +66,10 @@ fn compiling(args: ArgMatches) {
 
     print!("\ntokens: {:#?}\n", tokens);
 
-    // transform source code into AST
+    let front_start_time = Instant::now();
+
     let ast = {
+      // transform source code into AST
       match front::parser::parse(&file) {
         Ok(a) => a,
         Err(e) => panic!("io error: {}", e),
@@ -85,8 +85,8 @@ fn compiling(args: ArgMatches) {
     let front_end_time = front_start_time.elapsed();
     let back_start_time = Instant::now();
 
-    // code generation from an AST to machine code
     let code = {
+      // code generation from an AST to machine code
       match back::codegen::aot::generate(&ast) {
         Ok(c) => c,
         Err(e) => panic!("codegen error: {}", e),

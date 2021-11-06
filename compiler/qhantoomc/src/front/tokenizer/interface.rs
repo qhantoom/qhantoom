@@ -24,6 +24,7 @@ pub enum TokenizerState {
   StartNumber,
   Number,
   NumberFloat,
+  NumberHex,
   Identifier,
   CommentLine,
   CommentLineDoc,

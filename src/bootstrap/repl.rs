@@ -15,7 +15,7 @@ use qute::prelude::*;
 
 // run the `repl` command
 #[inline]
-pub fn cmd(args: ArgMatches<'static>) {
+pub fn run(args: ArgMatches<'static>) {
   match repl(args) {
     Ok(_) => return,
     Err(e) => panic!("{}", e),
@@ -128,7 +128,7 @@ pub fn copyright() {
 // display the usage of the help command
 #[inline]
 pub fn help() {
-  help::cmd()
+  help::run()
 }
 
 // get the current version from `cargo.toml`

@@ -188,7 +188,7 @@ impl<'a> Translator<'a> {
 
   #[inline]
   fn translate_int(&mut self, num: &i64) -> Value {
-    self.builder.ins().iconst(types::I64, *num)
+    self.builder.ins().iconst(self.ty, *num)
   }
 
   #[inline]
@@ -320,7 +320,7 @@ impl<'a> Translator<'a> {
     let op_code = IntCC::SignedLessThan;
     let boolean = self.builder.ins().icmp(op_code, lhs, rhs);
 
-    self.builder.ins().bint(types::I64, boolean)
+    self.builder.ins().bint(self.ty, boolean)
   }
 
   #[inline]
@@ -328,7 +328,7 @@ impl<'a> Translator<'a> {
     let op_code = IntCC::SignedGreaterThan;
     let boolean = self.builder.ins().icmp(op_code, lhs, rhs);
 
-    self.builder.ins().bint(types::I64, boolean)
+    self.builder.ins().bint(self.ty, boolean)
   }
 
   #[inline]
@@ -336,7 +336,7 @@ impl<'a> Translator<'a> {
     let op_code = IntCC::SignedLessThanOrEqual;
     let boolean = self.builder.ins().icmp(op_code, lhs, rhs);
 
-    self.builder.ins().bint(types::I64, boolean)
+    self.builder.ins().bint(self.ty, boolean)
   }
 
   #[inline]
@@ -344,7 +344,7 @@ impl<'a> Translator<'a> {
     let op_code = IntCC::SignedGreaterThanOrEqual;
     let boolean = self.builder.ins().icmp(op_code, lhs, rhs);
 
-    self.builder.ins().bint(types::I64, boolean)
+    self.builder.ins().bint(self.ty, boolean)
   }
 
   #[inline]
@@ -352,7 +352,7 @@ impl<'a> Translator<'a> {
     let op_code = IntCC::Equal;
     let boolean = self.builder.ins().icmp(op_code, lhs, rhs);
 
-    self.builder.ins().bint(types::I64, boolean)
+    self.builder.ins().bint(self.ty, boolean)
   }
 
   #[inline]
@@ -360,7 +360,7 @@ impl<'a> Translator<'a> {
     let op_code = IntCC::NotEqual;
     let boolean = self.builder.ins().icmp(op_code, lhs, rhs);
 
-    self.builder.ins().bint(types::I64, boolean)
+    self.builder.ins().bint(self.ty, boolean)
   }
 
   #[inline]
@@ -371,7 +371,7 @@ impl<'a> Translator<'a> {
       UnopKind::Neg => self.builder.ins().ineg(rhs),
       UnopKind::Not => {
         let value = self.builder.ins().icmp_imm(IntCC::Equal, rhs, 0);
-        self.builder.ins().bint(types::I64, value)
+        self.builder.ins().bint(self.ty, value)
       }
     }
   }

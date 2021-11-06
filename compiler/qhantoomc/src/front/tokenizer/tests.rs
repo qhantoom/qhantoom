@@ -132,7 +132,22 @@ fn tokenize_floats_token() {
   run_test(5, tokens, expected);
 }
 
-// fn tokenize_hex_token() {}
+#[test]
+fn tokenize_hex_token() {
+  let file = read_file("../../samples/tokens/hex.qh");
+  let tokens = tokenize(&file);
+
+  let expected = vec![
+    TokenKind::Int(100),
+    TokenKind::Int(2736),
+    TokenKind::Int(41120),
+    TokenKind::Int(64250),
+    TokenKind::Int(256),
+    TokenKind::EOF,
+  ];
+
+  run_test(6, tokens, expected);
+}
 
 #[test]
 fn tokenize_chars_token() {

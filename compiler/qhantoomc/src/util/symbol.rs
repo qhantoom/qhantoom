@@ -29,12 +29,12 @@ impl Symbol {
 }
 
 #[derive(Clone)]
-pub struct SymbolTable {
+pub struct Symbols {
   syms: Vec<String>,
   table: HashMap<String, Symbol>,
 }
 
-impl SymbolTable {
+impl Symbols {
   #[inline]
   pub fn new() -> Self {
     let syms = SYMBOLS.with(|s| s.borrow().clone());

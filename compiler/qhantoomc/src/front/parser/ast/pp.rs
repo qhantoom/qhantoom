@@ -1,8 +1,8 @@
 use std::fmt;
 
 use super::ast::{
-  Arg, BinopKind, Block, Expr, ExprKind, Field, FieldExpr, Fun, Prototype,
-  Stmt, StmtKind, Struct, StructExpr, UnopKind,
+  Arg, BinopKind, Block, Expr, ExprKind, Field, FieldExpr, Fun, Program,
+  Prototype, Stmt, StmtKind, Struct, StructExpr, UnopKind,
 };
 
 use super::ty::{Ty, TyKind};
@@ -20,6 +20,19 @@ impl<'a, T: fmt::Display> fmt::Display for CommaSep<'a, T> {
       .join(", ");
 
     write!(f, "{}", exprs)
+  }
+}
+
+impl fmt::Display for Program {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let stmts = self
+      .stmts
+      .iter()
+      .map(|a| a.to_string())
+      .collect::<Vec<String>>()
+      .join("\n");
+
+    write!(f, "{}", stmts)
   }
 }
 
@@ -115,7 +128,7 @@ impl fmt::Display for Stmt {
           write!(f, "continue;")
         }
       }
-      StmtKind::Expr(ref expr) => write!(f, "{:?}", expr),
+      StmtKind::Expr(ref expr) => write!(f, "{}", expr),
       StmtKind::Struct(ref def) => write!(f, "{}", def),
     }
   }
