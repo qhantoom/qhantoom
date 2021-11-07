@@ -7,6 +7,8 @@ use crate::front::parser::ast::{
 
 use crate::util::symbol::Symbol;
 
+use cranelift::frontend::FunctionBuilderContext;
+use cranelift_codegen::binemit::{NullStackMapSink, NullTrapSink};
 use cranelift_codegen::ir::GlobalValue;
 
 use cranelift::prelude::{
@@ -15,7 +17,7 @@ use cranelift::prelude::{
 };
 
 use cranelift_jit::JITModule;
-use cranelift_module::{DataContext, Linkage, Module};
+use cranelift_module::{DataContext, FuncId, Linkage, Module};
 
 pub struct Translator<'a> {
   pub builder: FunctionBuilder<'a>,
@@ -37,6 +39,22 @@ impl<'a> Translator<'a> {
     self.index += 1;
 
     var
+  }
+
+  fn mk_var(
+    &mut self,
+    builder: &mut FunctionBuilder,
+    value: Value,
+  ) -> Variable {
+    let variable = Variable::new(self.index);
+
+    builder.declare_var(variable, self.ty);
+
+    self.index += 1;
+
+    builder.def_var(variable, value);
+
+    variable
   }
 
   #[inline]
@@ -72,8 +90,95 @@ impl<'a> Translator<'a> {
   }
 
   #[inline]
-  fn translate_fun(&mut self, _fun: &Box<Fun>) -> Value {
+  fn translate_fun(&mut self, fun: &Box<Fun>) -> Value {
+    let mut context = self.module.make_context();
+    let signature = &mut context.func.signature;
+    let args = &fun.prototype.args;
+
+    for _arg in args {
+      signature.params.push(AbiParam::new(self.ty));
+    }
+
+    signature.returns.push(AbiParam::new(self.ty));
+
+    // let fun_name = fun.prototype.name.to_string();
+    let fun_id = self.translate_prototype(&fun.prototype);
+    let mut builder_context = FunctionBuilderContext::new();
+
+    let mut builder =
+      FunctionBuilder::new(&mut context.func, &mut builder_context);
+
+    let entry_block = builder.create_block();
+
+    builder.append_block_params_for_function_params(entry_block);
+    builder.switch_to_block(entry_block);
+    builder.seal_block(entry_block);
+
+    print!("\nvar_name: {:?}\n", args);
+
+    for (i, arg) in args.iter().enumerate() {
+      let value = builder.block_params(entry_block)[i];
+      let variable = self.mk_var(&mut builder, value);
+
+      self
+        .scope_map
+        .add_variable(arg.name.to_string(), variable)
+        .unwrap();
+    }
+
+    let mut return_value = builder.ins().iconst(self.ty, 0);
+
+    for stmt in &fun.body.stmts {
+      return_value = self.translate_stmt(stmt);
+    }
+
+    builder.ins().return_(&[return_value]);
+    builder.finalize();
+    println!("{}", context.func.display(None).to_string());
+
+    let mut trap_sink = NullTrapSink {};
+    let mut stack_map_sink = NullStackMapSink {};
+
+    self
+      .module
+      .define_function(
+        fun_id,
+        &mut context,
+        &mut trap_sink,
+        &mut stack_map_sink,
+      )
+      .unwrap();
+
+    self.module.clear_context(&mut context);
+    self.module.finalize_definitions();
+
+    let code: fn() -> i64 = unsafe {
+      std::mem::transmute(self.module.get_finalized_function(fun_id))
+    };
+
+    print!("\n code: {:?}\n", code);
     todo!()
+  }
+
+  #[inline]
+  fn translate_prototype(&mut self, prototype: &Prototype) -> FuncId {
+    let fun_name = &prototype.name.to_string();
+    let args = &prototype.args;
+
+    let mut signature = self.module.make_signature();
+
+    for _arg in args {
+      signature.params.push(AbiParam::new(self.ty));
+    }
+
+    signature.returns.push(AbiParam::new(self.ty));
+
+    let id = self
+      .module
+      .declare_function(&fun_name, Linkage::Export, &signature)
+      .unwrap();
+
+    id
   }
 
   #[inline]

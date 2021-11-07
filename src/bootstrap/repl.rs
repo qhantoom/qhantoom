@@ -7,7 +7,8 @@ use super::help;
 use crate::util;
 
 use qhantoomc::back;
-use qhantoomc::back::codegen::jit::Jit;
+use qhantoomc::back::codegen::compiler::Codegen;
+// use qhantoomc::back::codegen::jit::Jit;
 
 use clap::ArgMatches;
 use platform_info::Uname;
@@ -25,13 +26,15 @@ pub fn run(args: ArgMatches<'static>) {
 // read a line of input from stdin
 #[inline]
 fn repl(args: ArgMatches<'static>) -> Result<(), String> {
-  let mut jit = Jit::new();
+  // let mut jit = Jit::new();
+  let mut codegen = Codegen::new();
 
   banner();
 
   loop {
     match util::read_line("📡") {
-      Ok(ref line) => processing(&mut jit, &args, line),
+      // Ok(ref line) => processing(&mut jit, &args, line),
+      Ok(ref line) => processing(&mut codegen, &args, line),
       Err(e) => Err(format!("{}", e)),
     }?;
   }
@@ -40,7 +43,8 @@ fn repl(args: ArgMatches<'static>) -> Result<(), String> {
 // process the line of input from stdin
 #[inline]
 fn processing(
-  jit: &mut Jit,
+  // jit: &mut Jit,
+  codegen: &mut Codegen,
   _args: &ArgMatches,
   line: &str,
 ) -> Result<(), String> {
@@ -53,10 +57,14 @@ fn processing(
     l if l.starts_with("help") => Ok(self::help()),
     l if l.starts_with("copyright") => Ok(self::copyright()),
     l if l.starts_with("license") => Ok(self::license()),
-    _ => match back::codegen::jit::compile::<i64>(jit, line) {
+    _ => match back::codegen::compiler::codegen(codegen, line) {
       Ok(v) => Ok(print!("🛰️  {}\n", v)),
       Err(e) => Err(format!("{}", e)),
     },
+    // _ => match back::codegen::jit::compile::<i64>(jit, line) {
+    //   Ok(v) => Ok(print!("🛰️  {}\n", v)),
+    //   Err(e) => Err(format!("{}", e)),
+    // },
   }
 }
 
