@@ -15,3 +15,9 @@ set Button {
 fun main() {
   val btn : Button = Button::new("btn-name");
 }
+
+
+struct Button1 {
+  id : uint = 0,
+  name : str = "okok",
+}

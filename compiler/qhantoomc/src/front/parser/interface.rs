@@ -8,7 +8,9 @@ pub enum Precedence {
   LAnd,
   Conditional,
   BitOr,
+  BitXor,
   BitAnd,
+  Shift,
   Sum,
   Exponent,
   Unary,
@@ -33,7 +35,11 @@ impl From<&TokenKind> for Precedence {
 
       TokenKind::Add | TokenKind::Sub => Self::Sum,
 
+      TokenKind::Shl | TokenKind::Shr => Self::Shift,
+
       TokenKind::And => Self::BitAnd,
+
+      TokenKind::Caret => Self::BitXor,
 
       TokenKind::Pipe => Self::BitOr,
 
@@ -52,7 +58,10 @@ impl From<&TokenKind> for Precedence {
       | TokenKind::AddAssign
       | TokenKind::SubAssign
       | TokenKind::MulAssign
-      | TokenKind::ModAssign => Self::Assignment,
+      | TokenKind::ModAssign
+      | TokenKind::CaretAssign
+      | TokenKind::AndAssign
+      | TokenKind::PipeAssign => Self::Assignment,
 
       _ => Self::Lowest,
     }

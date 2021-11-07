@@ -214,13 +214,19 @@ pub enum BinopKind {
   Ge,
   Eq,
   Ne,
-  AddAssignOp,
-  SubAssignOp,
-  MulAssignOp,
-  DivAssignOp,
-  RemAssignOp,
-  BitAndOp,
-  BitOrOp,
+  Shl,
+  Shr,
+  BitAnd,
+  BitOr,
+  BitXor,
+  AddAssign,
+  SubAssign,
+  MulAssign,
+  DivAssign,
+  RemAssign,
+  BitXorAssign,
+  BitAndAssign,
+  BitOrAssign,
 }
 
 impl From<&TokenKind> for BinopKind {
@@ -232,21 +238,27 @@ impl From<&TokenKind> for BinopKind {
       TokenKind::Mul => Self::Mul,
       TokenKind::Div => Self::Div,
       TokenKind::Mod => Self::Rem,
-      TokenKind::And => Self::BitAndOp,
-      TokenKind::Pipe => Self::BitOrOp,
-      TokenKind::AndAnd => Self::And,
-      TokenKind::PipePipe => Self::Or,
       TokenKind::Lt => Self::Lt,
       TokenKind::Gt => Self::Gt,
       TokenKind::Le => Self::Le,
       TokenKind::Ge => Self::Ge,
       TokenKind::Equal => Self::Eq,
       TokenKind::NotAssign => Self::Ne,
-      TokenKind::AddAssign => Self::AddAssignOp,
-      TokenKind::SubAssign => Self::SubAssignOp,
-      TokenKind::MulAssign => Self::MulAssignOp,
-      TokenKind::DivAssign => Self::DivAssignOp,
-      TokenKind::ModAssign => Self::RemAssignOp,
+      TokenKind::AndAnd => Self::And,
+      TokenKind::PipePipe => Self::Or,
+      TokenKind::Shl => Self::Shl,
+      TokenKind::Shr => Self::Shr,
+      TokenKind::And => Self::BitAnd,
+      TokenKind::Caret => Self::BitXor,
+      TokenKind::Pipe => Self::BitOr,
+      TokenKind::AddAssign => Self::AddAssign,
+      TokenKind::SubAssign => Self::SubAssign,
+      TokenKind::MulAssign => Self::MulAssign,
+      TokenKind::DivAssign => Self::DivAssign,
+      TokenKind::ModAssign => Self::RemAssign,
+      TokenKind::CaretAssign => Self::BitXorAssign,
+      TokenKind::AndAssign => Self::BitAndAssign,
+      TokenKind::PipeAssign => Self::BitOrAssign,
       k => unreachable!("{:?} is not a operator", k),
     }
   }
@@ -375,7 +387,7 @@ pub const fn mk_assign(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
 #[inline]
 pub const fn mk_add_assign_op(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
   ExprKind::AssignOp {
-    op: BinopKind::AddAssignOp,
+    op: BinopKind::AddAssign,
     lhs,
     rhs,
   }
@@ -384,7 +396,7 @@ pub const fn mk_add_assign_op(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
 #[inline]
 pub const fn mk_sub_assign_op(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
   ExprKind::AssignOp {
-    op: BinopKind::SubAssignOp,
+    op: BinopKind::SubAssign,
     lhs,
     rhs,
   }
@@ -393,7 +405,7 @@ pub const fn mk_sub_assign_op(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
 #[inline]
 pub const fn mk_mul_assign_op(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
   ExprKind::AssignOp {
-    op: BinopKind::MulAssignOp,
+    op: BinopKind::MulAssign,
     lhs,
     rhs,
   }
@@ -402,7 +414,7 @@ pub const fn mk_mul_assign_op(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
 #[inline]
 pub const fn mk_div_assign_op(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
   ExprKind::AssignOp {
-    op: BinopKind::DivAssignOp,
+    op: BinopKind::DivAssign,
     lhs,
     rhs,
   }
@@ -411,7 +423,34 @@ pub const fn mk_div_assign_op(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
 #[inline]
 pub const fn mk_rem_assign_op(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
   ExprKind::AssignOp {
-    op: BinopKind::RemAssignOp,
+    op: BinopKind::RemAssign,
+    lhs,
+    rhs,
+  }
+}
+
+#[inline]
+pub const fn mk_bit_and_assign_op(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
+  ExprKind::AssignOp {
+    op: BinopKind::BitAndAssign,
+    lhs,
+    rhs,
+  }
+}
+
+#[inline]
+pub const fn mk_bit_xor_assign_op(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
+  ExprKind::AssignOp {
+    op: BinopKind::BitXorAssign,
+    lhs,
+    rhs,
+  }
+}
+
+#[inline]
+pub const fn mk_bit_or_assign_op(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
+  ExprKind::AssignOp {
+    op: BinopKind::BitOrAssign,
     lhs,
     rhs,
   }

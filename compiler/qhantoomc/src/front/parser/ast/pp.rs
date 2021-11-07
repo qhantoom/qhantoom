@@ -233,10 +233,6 @@ impl fmt::Display for Ty {
       TyKind::Char => write!(f, "char"),
       TyKind::Void => write!(f, "void"),
       TyKind::Dynamic => write!(f, "dynamic"),
-      TyKind::Array(ref ty) => write!(f, "[{}]", ty),
-      TyKind::Fun(ref tys, ref ret_ty) => {
-        write!(f, "Fn ({}) -> {}", CommaSep(tys), ret_ty)
-      }
     }
   }
 }
@@ -250,8 +246,6 @@ impl fmt::Display for BinopKind {
       Self::Mul => write!(f, "*"),
       Self::Div => write!(f, "/"),
       Self::Rem => write!(f, "%"),
-      Self::BitAndOp => write!(f, "&"),
-      Self::BitOrOp => write!(f, "|"),
       Self::And => write!(f, "&&"),
       Self::Or => write!(f, "||"),
       Self::Lt => write!(f, "<"),
@@ -260,11 +254,19 @@ impl fmt::Display for BinopKind {
       Self::Ge => write!(f, ">="),
       Self::Eq => write!(f, "=="),
       Self::Ne => write!(f, "!="),
-      Self::AddAssignOp => write!(f, "+="),
-      Self::SubAssignOp => write!(f, "-="),
-      Self::MulAssignOp => write!(f, "*="),
-      Self::DivAssignOp => write!(f, "/="),
-      Self::RemAssignOp => write!(f, "%="),
+      Self::AddAssign => write!(f, "+="),
+      Self::SubAssign => write!(f, "-="),
+      Self::MulAssign => write!(f, "*="),
+      Self::DivAssign => write!(f, "/="),
+      Self::RemAssign => write!(f, "%="),
+      Self::BitXorAssign => write!(f, "^="),
+      Self::BitOrAssign => write!(f, "|="),
+      Self::BitAndAssign => write!(f, "&="),
+      Self::BitAnd => write!(f, "&"),
+      Self::BitXor => write!(f, "^"),
+      Self::BitOr => write!(f, "|"),
+      Self::Shl => write!(f, "<<"),
+      Self::Shr => write!(f, ">>"),
     }
   }
 }

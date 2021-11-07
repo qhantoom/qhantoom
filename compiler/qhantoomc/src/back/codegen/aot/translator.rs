@@ -229,16 +229,19 @@ impl<'a> Translator<'a> {
       BinopKind::Mul => self.translate_mul_binop(lhs, rhs),
       BinopKind::Div => self.translate_div_binop(lhs, rhs),
       BinopKind::Rem => self.translate_rem_binop(lhs, rhs),
-      BinopKind::Or => self.translate_or_binop(lhs, rhs),
-      BinopKind::And => self.translate_and_binop(lhs, rhs),
-      BinopKind::BitAndOp => self.translate_bit_and_binop(lhs, rhs),
-      BinopKind::BitOrOp => self.translate_bit_or_binop(lhs, rhs),
       BinopKind::Lt => self.translate_lt_binop(lhs, rhs),
       BinopKind::Gt => self.translate_gt_binop(lhs, rhs),
       BinopKind::Le => self.translate_le_binop(lhs, rhs),
       BinopKind::Ge => self.translate_ge_binop(lhs, rhs),
       BinopKind::Eq => self.translate_eq_binop(lhs, rhs),
       BinopKind::Ne => self.translate_ne_binop(lhs, rhs),
+      BinopKind::Or => self.translate_or_binop(lhs, rhs),
+      BinopKind::And => self.translate_and_binop(lhs, rhs),
+      BinopKind::Shl => self.translate_shl_binop(lhs, rhs),
+      BinopKind::Shr => self.translate_shr_binop(lhs, rhs),
+      BinopKind::BitAnd => self.translate_bit_and_binop(lhs, rhs),
+      BinopKind::BitXor => self.translate_bit_xor_binop(lhs, rhs),
+      BinopKind::BitOr => self.translate_bit_or_binop(lhs, rhs),
       _ => unreachable!(),
     }
   }
@@ -269,8 +272,23 @@ impl<'a> Translator<'a> {
   }
 
   #[inline]
+  fn translate_shl_binop(&mut self, lhs: Value, rhs: Value) -> Value {
+    self.builder.ins().ishl(lhs, rhs)
+  }
+
+  #[inline]
+  fn translate_shr_binop(&mut self, lhs: Value, rhs: Value) -> Value {
+    self.builder.ins().sshr(lhs, rhs)
+  }
+
+  #[inline]
   fn translate_bit_and_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     self.builder.ins().band(lhs, rhs)
+  }
+
+  #[inline]
+  fn translate_bit_xor_binop(&mut self, lhs: Value, rhs: Value) -> Value {
+    self.builder.ins().bxor(lhs, rhs)
   }
 
   #[inline]
@@ -417,11 +435,14 @@ impl<'a> Translator<'a> {
         let lhs = self.translate_expr(lhs);
 
         let new_rhs = match op {
-          BinopKind::AddAssignOp => self.translate_add_binop(lhs, rhs),
-          BinopKind::SubAssignOp => self.translate_sub_binop(lhs, rhs),
-          BinopKind::MulAssignOp => self.translate_mul_binop(lhs, rhs),
-          BinopKind::DivAssignOp => self.translate_div_binop(lhs, rhs),
-          BinopKind::RemAssignOp => self.translate_rem_binop(lhs, rhs),
+          BinopKind::AddAssign => self.translate_add_binop(lhs, rhs),
+          BinopKind::SubAssign => self.translate_sub_binop(lhs, rhs),
+          BinopKind::MulAssign => self.translate_mul_binop(lhs, rhs),
+          BinopKind::DivAssign => self.translate_div_binop(lhs, rhs),
+          BinopKind::RemAssign => self.translate_rem_binop(lhs, rhs),
+          BinopKind::BitAndAssign => self.translate_bit_and_binop(lhs, rhs),
+          BinopKind::BitXorAssign => self.translate_bit_xor_binop(lhs, rhs),
+          BinopKind::BitOrAssign => self.translate_bit_or_binop(lhs, rhs),
           _ => unreachable!(),
         };
 

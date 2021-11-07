@@ -114,6 +114,7 @@ impl<'a> Tokenizer<'a> {
         '*' => go!(self: to StartMul),
         '/' => go!(self: to StartDiv),
         '%' => go!(self: to StartMod),
+        '^' => go!(self: to StartCaret),
         '=' => go!(self: to StartAssign),
         '&' => go!(self: to StartAnd),
         '!' => go!(self: to StartBang),
@@ -138,7 +139,7 @@ impl<'a> Tokenizer<'a> {
       // read_start_add_state
       TokenizerState::StartAdd => match c {
         '=' => go!(self: to Idle; emit_token_kind AddAssign),
-        c => return self.reset_back(c, TokenKind::Add),
+        c => return self.reset_back(c, Add),
       },
       // read_start_sub_state
       TokenizerState::StartSub => match c {
@@ -147,69 +148,74 @@ impl<'a> Tokenizer<'a> {
         '-' => go!(self: to CommentLine),
         '!' => go!(self: to CommentLineDoc),
         '%' => go!(self: to StartCommentBlock),
-        c => return self.reset_back(c, TokenKind::Sub),
+        c => return self.reset_back(c, Sub),
       },
       // read_start_mul_state
       TokenizerState::StartMul => match c {
         '=' => go!(self: reset MulAssign),
-        c => return self.reset_back(c, TokenKind::Mul),
+        c => return self.reset_back(c, Mul),
       },
       // read_start_div_state
       TokenizerState::StartDiv => match c {
         '=' => go!(self: reset DivAssign),
-        c => return self.reset_back(c, TokenKind::Div),
+        c => return self.reset_back(c, Div),
       },
       // read_start_mod_state
       TokenizerState::StartMod => match c {
         '=' => go!(self: reset ModAssign),
-        c => return self.reset_back(c, TokenKind::Mod),
+        c => return self.reset_back(c, Mod),
+      },
+      // read_start_caret_state
+      TokenizerState::StartCaret => match c {
+        '=' => go!(self: reset CaretAssign),
+        c => return self.reset_back(c, Caret),
       },
       // read_start_assign_state
       TokenizerState::StartAssign => match c {
         '=' => go!(self: reset Equal),
         '>' => go!(self: reset FatArrow),
-        c => return self.reset_back(c, TokenKind::Assign),
+        c => return self.reset_back(c, Assign),
       },
       // read_start_and_state
       TokenizerState::StartAnd => match c {
         '=' => go!(self: reset AndAssign),
         '&' => go!(self: reset AndAnd),
-        c => return self.reset_back(c, TokenKind::And),
+        c => return self.reset_back(c, And),
       },
       // read_start_bang_state
       TokenizerState::StartBang => match c {
         '=' => go!(self: reset NotAssign),
-        c => return self.reset_back(c, TokenKind::Not),
+        c => return self.reset_back(c, Not),
       },
       // read_start_pipe_state
       TokenizerState::StartPipe => match c {
         '=' => go!(self: reset PipeAssign),
         '|' => go!(self: reset PipePipe),
-        c => return self.reset_back(c, TokenKind::Pipe),
+        c => return self.reset_back(c, Pipe),
       },
       // read_start_dot_state
       TokenizerState::StartDot => match c {
         '=' => go!(self: reset DotAssign),
         '.' => go!(self: reset DotDot),
-        c => return self.reset_back(c, TokenKind::Dot),
+        c => return self.reset_back(c, Dot),
       },
       // read_start_colon_state
       TokenizerState::StartColon => match c {
         '=' => go!(self: reset ColonAssign),
         ':' => go!(self: reset ColonColon),
-        c => return self.reset_back(c, TokenKind::Colon),
+        c => return self.reset_back(c, Colon),
       },
       // read_start_lt_state
       TokenizerState::StartLt => match c {
         '=' => go!(self: reset Le),
         '<' => go!(self: reset Shl),
-        c => return self.reset_back(c, TokenKind::Lt),
+        c => return self.reset_back(c, Lt),
       },
       // read_start_gt_state
       TokenizerState::StartGt => match c {
         '=' => go!(self: reset Ge),
         '>' => go!(self: reset Shr),
-        c => return self.reset_back(c, TokenKind::Gt),
+        c => return self.reset_back(c, Gt),
       },
       // read_start_char_state
       TokenizerState::StartChar => go!(self: push c; to InnerChar),
@@ -270,14 +276,14 @@ impl<'a> Tokenizer<'a> {
       TokenizerState::CommentLine => {
         if c == '\n' || c == '\0' {
           self.state = TokenizerState::Idle;
-          return Some(TokenKind::CommentLine);
+          return Some(CommentLine);
         }
       }
       // read_comment_doc_line_state
       TokenizerState::CommentLineDoc => {
         if c == '\n' || c == '\0' {
           self.state = TokenizerState::Idle;
-          return Some(TokenKind::CommentLineDoc);
+          return Some(CommentLineDoc);
         }
       }
       // read_comment_block_state
@@ -293,7 +299,7 @@ impl<'a> Tokenizer<'a> {
       TokenizerState::EndCommentBlock => {
         if c == '-' {
           self.state = TokenizerState::Idle;
-          return Some(TokenKind::CommentBlock);
+          return Some(CommentBlock);
         }
       }
       // read_start_comment_doc_block_state
@@ -309,7 +315,7 @@ impl<'a> Tokenizer<'a> {
       TokenizerState::EndCommentDocBlock => {
         if c == '-' {
           self.state = TokenizerState::Idle;
-          return Some(TokenKind::CommentDocBlock);
+          return Some(CommentDocBlock);
         }
       }
     };

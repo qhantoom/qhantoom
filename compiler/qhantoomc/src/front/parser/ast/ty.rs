@@ -36,8 +36,6 @@ pub enum TyKind {
   Char,
   Void,
   Dynamic,
-  Array(Box<Ty>),
-  Fun(Vec<Box<Ty>>, Box<Ty>),
 }
 
 impl From<&TokenKind> for TyKind {
@@ -60,7 +58,7 @@ impl From<&TokenKind> for TyKind {
       TokenKind::Char => Self::Char,
       TokenKind::Str => Self::Str,
       TokenKind::Void => Self::Void,
-      _ => unreachable!(),
+      _ => Self::Dynamic,
     }
   }
 }
