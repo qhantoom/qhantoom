@@ -390,11 +390,14 @@ impl<'a> Parser<'a> {
     self.expect_first(&TokenKind::Semicolon)?;
 
     let kind = match op {
-      BinopKind::AddAssignOp => ast::mk_add_assign_op(lhs, rhs),
-      BinopKind::SubAssignOp => ast::mk_sub_assign_op(lhs, rhs),
-      BinopKind::MulAssignOp => ast::mk_mul_assign_op(lhs, rhs),
-      BinopKind::DivAssignOp => ast::mk_div_assign_op(lhs, rhs),
-      BinopKind::RemAssignOp => ast::mk_rem_assign_op(lhs, rhs),
+      BinopKind::AddAssign => ast::mk_add_assign_op(lhs, rhs),
+      BinopKind::SubAssign => ast::mk_sub_assign_op(lhs, rhs),
+      BinopKind::MulAssign => ast::mk_mul_assign_op(lhs, rhs),
+      BinopKind::DivAssign => ast::mk_div_assign_op(lhs, rhs),
+      BinopKind::RemAssign => ast::mk_rem_assign_op(lhs, rhs),
+      BinopKind::BitAndAssign => ast::mk_bit_and_assign_op(lhs, rhs),
+      BinopKind::BitXorAssign => ast::mk_bit_xor_assign_op(lhs, rhs),
+      BinopKind::BitOrAssign => ast::mk_bit_or_assign_op(lhs, rhs),
       _ => unreachable!(),
     };
 

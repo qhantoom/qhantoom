@@ -6,6 +6,7 @@ pub enum TokenizerState {
   StartMul,
   StartDiv,
   StartMod,
+  StartCaret,
   StartAssign,
   StartAnd,
   StartBang,
