@@ -1,4 +1,0 @@
-fun main() {
-  mut y : uint = 14;
-  mut x := 3;
-}

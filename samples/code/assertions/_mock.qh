@@ -1,0 +1,3 @@
+unit {
+  mock mock_name() {}
+}

@@ -1,7 +1,0 @@
-enum MyEnum {
-  BasicEnum,
-  TupleEnum(),
-  StructEnum { x : uint },
-}
-
-fun main() {}

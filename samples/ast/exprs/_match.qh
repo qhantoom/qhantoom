@@ -1,9 +1,0 @@
-fun main() {
-  match op {
-    '+' => add(x, y),
-    '-' => sub(x, y),
-    '*' => mul(x, y),
-    '/' => div(x, y),
-    _ => #abort("with msg"),
-  }
-}

@@ -1,7 +1,0 @@
-fun a() : uint {
-  return 0;
-}
-
-fun main() {
-  return a();
-}

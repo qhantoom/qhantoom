@@ -1,4 +1,0 @@
-fun main() {
-  fun bar() : void {}
-  fun foo() {}
-}

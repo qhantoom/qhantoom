@@ -1,9 +1,0 @@
-fun main() {
-  if true {
-    #print("true");
-  } else if false {
-    #print("false");
-  } else {
-    #abort("!")
-  }
-}

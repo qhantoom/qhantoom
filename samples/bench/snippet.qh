@@ -1,0 +1,7 @@
+fun add(x : uint, y : uint) : uint { x + y }
+
+fun main() {
+  let adder = add(3, 14);
+
+  print("{adder}");
+}

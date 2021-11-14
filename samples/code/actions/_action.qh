@@ -1,0 +1,14 @@
+action Vec2 {
+  fun sqrt(x : int) : int;
+}
+
+struct Point {
+  x : uint,
+  y : uint,
+}
+
+impl Vec2 for Point {
+  fun sqrt(x : int) : int {
+    x * x
+  }
+}

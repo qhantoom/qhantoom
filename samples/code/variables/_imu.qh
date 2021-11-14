@@ -1,0 +1,3 @@
+imu x : uint = 9;
+
+fun main() {}

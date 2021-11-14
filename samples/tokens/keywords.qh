@@ -1,7 +1,0 @@
-action  as        async       await   bench   bind
-break   chan      continue    else    enum    exp
-ext     false     fun         for     if      imu
-load    loop      match       Me      me      mock
-mod     mut       pub         ref     return  set
-spawn   struct    test        type    unit    val
-void    wasm      where       while

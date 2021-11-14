@@ -1,0 +1,5 @@
+fun sqrt(x : uint) : uint { x * x }
+
+fun main() {
+  sqrt(8);
+}

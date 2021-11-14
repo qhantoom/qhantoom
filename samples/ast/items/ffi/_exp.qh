@@ -1,5 +1,0 @@
-exp cos(x : uint) : uint;
-
-fun main() {
-  cos(3)
-}

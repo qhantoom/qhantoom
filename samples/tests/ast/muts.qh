@@ -1,0 +1,2 @@
+mut c : uint = 0;
+mut d := 1;

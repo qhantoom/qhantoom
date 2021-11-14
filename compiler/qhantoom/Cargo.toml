@@ -1,0 +1,24 @@
+cargo-features = ["edition2021"]
+
+[package]
+description = "a toy programming language"
+edition = "2021"
+name = "qhantoom"
+readme = "README.md"
+version = "0.0.0"
+
+[lib]
+doctest = false
+name = "qhantoom"
+path = "src/lib.rs"
+
+[dependencies]
+cranelift = "0.77.0"
+cranelift-codegen = "0.77.0"
+cranelift-jit = "0.77.0"
+cranelift-module = "0.77.0"
+cranelift-native = "0.77.0"
+cranelift-object = "0.77.0"
+cranelift-preopt = "0.77.0"
+# TODO: should be used for errors
+# ariadne = "0.1.3"

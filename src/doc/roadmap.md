@@ -10,6 +10,7 @@
 * [ ] middle-end | *needs help*
 
 * [ ] back-end | *needs help*
+  * [ ] cranelift
   * [ ] `codegen` | *wip*
   * [x] emit native object `.o` file
   * [x] create an executable
@@ -32,8 +33,8 @@
   * [x] `==`, `!=`, `<`, `<=`, `>`, `>=`
   * [x] `=`
   * [x] `+=`, `-=`, `*=`, `/=`
-  * [ ] `|=`, `&=`,
-  * [ ] `|`, `&`
+  * [x] `|=`, `&=`,
+  * [x] `|`, `&`
   * [x] `||`, `&&`
   * [ ] `<<`, `>>`
 
@@ -43,8 +44,8 @@
 
 * [ ] numbers
   * [x] `integers`
-  * [ ] `floats`
-  * [ ] `hexadecimals`
+  * [x] `floats`
+  * [x] `hexadecimals`
 
 * [ ] variables
   * [ ] `imu`
@@ -86,7 +87,7 @@
   * [ ] `for`
   * [x] `while`
   * [x] `break`
-  * [ ] `continue`
+  * [x] `continue`
 
 * [ ] data structures
   * [ ] `action`

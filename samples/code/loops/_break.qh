@@ -1,0 +1,11 @@
+fun main() {
+  mut x := 0;
+
+  loop {
+    if x == 3 {
+      break;
+    }
+
+    x += 1;
+  }
+}

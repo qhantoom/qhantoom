@@ -1,4 +1,0 @@
-fun main() {
-  val add1 := fn (x) -> fn (y) -> x + y;
-  val add2 := cur fn (x, y) -> x + y;
-}

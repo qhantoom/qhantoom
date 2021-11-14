@@ -1,0 +1,4 @@
+fun main() {
+  val sqrt1 : Fn(x : uint) -> uint = x * x;
+  val sqrt2 := fn (x) -> x * x;
+}

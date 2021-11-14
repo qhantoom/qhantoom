@@ -1,6 +1,0 @@
-struct Button {
-  id : uint,
-  name : str,
-}
-
-fun main() {}

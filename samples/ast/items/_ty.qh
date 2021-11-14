@@ -1,3 +1,0 @@
-type Symbol : s32;
-
-fun main() {}

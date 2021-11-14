@@ -1,6 +1,0 @@
-fun main() {
-  val a : uint = 3;
-  val b : uint = 39;
-
-  b = a + b;
-}

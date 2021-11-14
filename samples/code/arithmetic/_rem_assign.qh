@@ -1,0 +1,4 @@
+fun main() {
+  mut x : uint = 0;
+  x %= 1;
+}
