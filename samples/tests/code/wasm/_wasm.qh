@@ -1,0 +1,4 @@
+-- enable webassembly
+wasm fun main() {
+  -- do some stuff
+}

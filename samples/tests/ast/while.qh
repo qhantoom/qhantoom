@@ -1,0 +1,8 @@
+mut x : uint = 0;
+
+while x < 3 {
+  x += 1;
+}
+
+-- returns 3
+x

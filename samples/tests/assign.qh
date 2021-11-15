@@ -1,8 +1,0 @@
--- val x : uint = 3; mut y : uint = 39; y = x + y; y;
-
-val x : uint = 3;
-mut y : uint = 39;
-
-y = x + y;
-y += 1;
-y;

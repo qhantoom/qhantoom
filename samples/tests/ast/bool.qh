@@ -1,0 +1,5 @@
+-- inferred type
+val t := true;
+
+-- with explicit type annotation
+val f : bool = false; 

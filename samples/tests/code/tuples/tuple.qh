@@ -1,0 +1,12 @@
+val a : (s32, f64, u8) = (1, 2.0, 3);
+val (x, y, z) = a;
+
+#print("x: {x}, y: {y}, z: {z}");
+
+val b : (s32, f64, u8) = (1, 2.0, 3);
+
+val x := b.0;
+val y := b.1;
+val z := b.2;
+
+#print("x: {x}, y: {y}, z: {z}");

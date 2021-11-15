@@ -1,0 +1,13 @@
+enum Test {
+  One,
+  Two,
+}
+
+fun main() {
+  val m : Test = Test::One;
+
+  match m {
+    Test::One => "one",
+    Test::Two => "two",
+  }
+}

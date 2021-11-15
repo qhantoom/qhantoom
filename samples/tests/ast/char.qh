@@ -1,0 +1,5 @@
+val x : char = '\n';
+val y : char = '\r';
+
+-- emoji support
+val z : char = '👽';

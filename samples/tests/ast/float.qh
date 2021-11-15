@@ -1,0 +1,5 @@
+-- f32 type declaration 
+val y : f32 = 3.0;
+
+-- f64 by default
+val x := 2.0;

@@ -1,0 +1,5 @@
+fun main() {}
+
+unit {
+  mock mock_name() {}
+}

@@ -1,7 +1,0 @@
-fun a() {}
-fun b() {}
-
-fun main() {
-  a();
-  b();
-}

@@ -1,0 +1,16 @@
+fun main() {
+  -- integer numbers
+  val x : s8 = 1;
+  
+  -- binary numbers
+  val x : s32 = 0b1001;
+
+  -- octal numbers
+  val x : uint = 0o777;
+
+  -- hexadecimal numbers
+  val x : uint = 0x64;
+
+  -- float numbers
+  val x : f32 = 1.0;
+}

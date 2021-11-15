@@ -1,0 +1,2 @@
+-- call foreign a rust function
+mod cos(x : int) : int;

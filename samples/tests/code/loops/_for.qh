@@ -1,0 +1,9 @@
+fun main() {
+  -- block for loop
+  for 0..3 take n {
+    x += 1;
+  }
+
+  -- inline for loop
+  for 0..3 take (n) -> n += 1;
+}

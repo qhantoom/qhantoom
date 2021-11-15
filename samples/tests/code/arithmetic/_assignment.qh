@@ -1,0 +1,31 @@
+-- assignment
+fun main() {
+  -- declare a mutable variable
+  mut x : uint = 0;
+  
+  -- assign x by 1
+  x = 1;
+
+  -- increment x by 1
+  x += 1;
+
+  -- decrement x by 1
+  x -= 1;
+
+  -- multiply x by 1
+  x *= 1;
+
+  -- divide x by 1
+  x /= 1;
+
+  -- modulo x by 1
+  x %= 1;
+
+  x ^= 1;
+
+  mut y : bool = true;
+
+  y &= false;
+
+  y |= true;
+}

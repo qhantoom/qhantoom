@@ -1,0 +1,4 @@
+-- type declaration
+type vec2 = uint;
+
+fun main() {}

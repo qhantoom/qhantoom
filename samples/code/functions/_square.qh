@@ -1,5 +1,0 @@
-fun square(x : uint) : uint { x * x }
-
-fun main() {
-  #print(square(2));
-}

@@ -1,0 +1,4 @@
+-- string type
+fun main() {
+  val x : str = "hello, world!";
+}

@@ -1,0 +1,12 @@
+mut x := 0;
+
+loop {
+  if x == 10 {
+    break;
+  }
+  
+  x += 1;
+}
+
+-- returns 10
+x

@@ -1,0 +1,10 @@
+-- function declaration
+fun add(x : uint, y : uint) : uint { x + y }
+
+fun main() {
+  -- store the value
+  val adder : uint = add(3, 14);
+
+  -- print the value
+  print("{adder}");
+}

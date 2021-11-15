@@ -1,0 +1,5 @@
+-- boolean not op
+fun main() {
+  val x : bool = !true;
+  val y : bool = -1;
+}

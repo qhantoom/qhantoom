@@ -1,0 +1,4 @@
+-- char type
+fun main() {
+  val x : char = 'a';
+}

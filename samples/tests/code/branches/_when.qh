@@ -1,0 +1,4 @@
+-- single line when statement ~unimplemented
+fun main() {
+  val x : uint = when true ? 1 : 2;
+}

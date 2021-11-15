@@ -1,0 +1,3 @@
+async fun main() {
+  await #print("hello, async world!")
+}

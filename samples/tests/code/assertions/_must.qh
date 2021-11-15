@@ -1,0 +1,17 @@
+fun main() {}
+
+-- unit testing
+unit {
+  -- mocking your stuff
+  mock mock_name() {
+    -- do something
+  }
+
+  -- testing your stuff
+  test test_name() {
+    -- assertions with the must macro
+    #must(0 eq 0);
+    #must(0 ne 0);
+    #must(die: { #abort() });
+  } 
+}

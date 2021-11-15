@@ -1,0 +1,8 @@
+-- mut keyword
+
+fun main() {
+  -- declare a mutable variable
+  mut x : uint = 9;
+
+  #print("{x}");
+}

@@ -1,6 +1,0 @@
-imu LIMIT, CPU : s8 = 8;
-
-fun main() {
-  val a, b, c : s8 = 0;
-  mut x, y, z := 0;
-}

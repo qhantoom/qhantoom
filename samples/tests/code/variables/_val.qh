@@ -1,0 +1,6 @@
+fun main() {
+  -- declare a immutable variable
+  val x : uint = 9;
+
+  #print("{x}");
+}

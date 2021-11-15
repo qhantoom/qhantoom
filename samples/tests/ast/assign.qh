@@ -1,0 +1,20 @@
+val x : uint = 3;
+mut y : uint = 39;
+
+-- assginment
+y = x + y;
+
+-- addition assignment
+y += 1;
+
+-- subtract assignment
+y -= 2;
+
+-- multiply assignment
+y *= 3;
+
+-- divide assignment
+y /= 4;
+
+-- remainder assignment
+y %= 5;

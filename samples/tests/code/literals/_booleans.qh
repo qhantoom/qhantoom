@@ -1,0 +1,4 @@
+-- booleans type
+fun main() {
+  val x : bool = true;
+}

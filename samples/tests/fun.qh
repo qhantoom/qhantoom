@@ -1,8 +1,0 @@
--- fun main() : uint { mut y := 9; mut y := 23; x + y }
-
-fun main() : uint {
-  val x : uint = 3;
-  val y := 39;
-  
-  x + y
-}

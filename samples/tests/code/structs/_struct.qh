@@ -1,0 +1,5 @@
+-- structure declaration
+struct Point {
+  x : uint,
+  y : uint,
+}

@@ -1,0 +1,5 @@
+-- function declaration
+fun sqrt(x : uint) : uint { x * x }
+
+-- call function
+sqrt(2);

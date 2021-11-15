@@ -1,5 +1,0 @@
-wasm fun bar() {
-  -- something to do
-}
-
-fun main() {}

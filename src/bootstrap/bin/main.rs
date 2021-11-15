@@ -1,4 +1,6 @@
+use bootstrap::cmd;
+
 #[inline]
 fn main() {
-  bootstrap::cli::run();
+  cmd::run()
 }

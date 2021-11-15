@@ -1,0 +1,2 @@
+-- calculate square
+fun sqrt(x : uint) : uint { x * x }

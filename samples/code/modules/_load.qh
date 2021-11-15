@@ -1,5 +1,0 @@
-load std::regex;
-load lib::matrix::perspective;
-load lib::matrix::math::(min, max);
-
-fun main() {}

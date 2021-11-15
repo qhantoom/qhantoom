@@ -1,0 +1,7 @@
+-- declare a constant variable
+imu x : uint = 9;
+
+fun main() {
+  -- prints 9
+  #print("{x}");
+}

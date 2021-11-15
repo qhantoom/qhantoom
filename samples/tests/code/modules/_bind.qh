@@ -1,0 +1,2 @@
+-- expose a item
+bind a::b;

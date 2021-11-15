@@ -1,4 +1,0 @@
-fun main() {
-  val x : uint = 0;
-  val x := 1;
-}
