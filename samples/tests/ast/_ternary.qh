@@ -1,0 +1,2 @@
+-- ternary cannot be nested
+when true ? 1 : 2;

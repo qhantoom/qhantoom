@@ -1,4 +1,21 @@
+fun say_hello(name : Option<str>) {
+  match name {
+    Some(n) => #println("hello, {}!", n),
+    None => #println("hello, World!")
+  }
+}
+
 fun main() {
-  val x := None;
+  mut x := None;
+
   x = Some(1);
+
+  if let Some(x) = x {
+    #print("{}\n", x);
+  }
+
+  #print("{}\n", x.unwrap);
+  #print("{}\n", x.unwrap_or -> 2); -- wip
+
+  say_hello("incognito");
 }

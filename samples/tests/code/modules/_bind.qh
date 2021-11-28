@@ -1,2 +1,5 @@
--- expose a item
+-- expose a item privately
 bind a::b;
+
+-- expose a item publicly
+pub bind c::d;

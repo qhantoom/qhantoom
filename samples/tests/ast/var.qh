@@ -1,15 +1,21 @@
 -%
- * immutable variables
+  constants variables
+%-
+
+val x : uint = 0;
+
+-%
+  immutable variables
 %-
 
 -- explicit type annotation
-val a : uint = 0;
+imu a : uint = 0;
 
 -- inferred type
-val b := 1;
+imu b := 1;
 
 -%
- * mutable variables
+  mutable variables
 %-
 
 -- explicit type annotation

@@ -4,7 +4,7 @@ struct Vec2 {
   y : f32,
 }
 
-val vec2 := Vec2 {
+imu vec2 := Vec2 {
   x = 0,
   y = 0,
 };

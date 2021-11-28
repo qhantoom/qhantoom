@@ -1,0 +1,20 @@
+-- structure declaration
+struct Point {
+  x : uint,
+  y : uint,
+}
+
+impl Point {
+  -- setter
+  set fun x(&mut self, x : uint) {
+    self.x = x;
+  }
+}
+
+fun main() {
+  mut p = Point { x = 0, y = 0 };
+
+  p.x = 10;
+
+  #print("p.x = {}", p.x);
+}

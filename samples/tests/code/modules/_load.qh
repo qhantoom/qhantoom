@@ -1,2 +1,8 @@
 -- use a item
 load a::b;
+
+--
+load pack::a::b::c;
+
+--
+load lib::a::b::c;

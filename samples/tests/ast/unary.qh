@@ -1,6 +1,6 @@
-val a : bool = !0;
-val b : bool = !1;
-val c : bool = !true;
-val d : bool = !false;
-val e : uint = -1;
-val f : uint = -42.0;
+imu a : bool = !0;
+imu b : bool = !1;
+imu c : bool = !true;
+imu d : bool = !false;
+imu e : uint = -1;
+imu f : uint = -42.0;

@@ -1,7 +1,7 @@
 -- currying
 fun main() {
   -- sum
-  val add := fn (x) -> fn (y) -> x + y;
-  val adder := add(1);
-  val add_two := adder(2);
+  imu add := fn (x) -> fn (y) -> x + y;
+  imu adder := add(1);
+  imu add_two := adder(2);
 }

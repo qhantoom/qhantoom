@@ -1,5 +1,12 @@
--- still in research
+fun run() : Result<uint, Error> {
+  match true {
+    true => Ok(42),
+    false => Err(Error::new("this is an error")),
+  }
+}
+
 fun main() {
-  val x := Ok(1);
-  val y := unwrap x;
+  imu x := Ok(1);
+  imu y := x.unwrap;
+  imu z := run().unwrap;
 }

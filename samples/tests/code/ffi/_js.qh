@@ -1,2 +1,2 @@
--- call foreign a javascript function
-exp cos(x : int) : int;
+-- js ffi
+req cos(x : uint) : uint;

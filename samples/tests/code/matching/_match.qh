@@ -4,7 +4,7 @@ enum Test {
 }
 
 fun main() {
-  val m : Test = Test::One;
+  imu m : Test = Test::One;
 
   match m {
     Test::One => "one",

@@ -1,0 +1,7 @@
+fun thread() {
+  #print("Hello from thread!");
+}
+
+fun main() {
+  imu x := spawn thread();
+}

@@ -1,5 +1,9 @@
-macro foo() {}
+-- macro declaration
+macro foo() {
+  () {}
+}
 
 fun main() {
+  -- macro call
   #foo();
 }

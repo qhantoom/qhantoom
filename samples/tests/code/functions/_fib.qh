@@ -1,0 +1,9 @@
+fun fib_rec(n: uint): uint {
+  match n {
+    0 => 0,
+    1 | 2 => 1,
+    _ => fib(n - 1) + fib(n - 2),
+  }
+}
+
+fun main() {}

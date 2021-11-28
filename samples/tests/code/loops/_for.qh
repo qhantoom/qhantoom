@@ -1,9 +1,9 @@
 fun main() {
-  -- block for loop
-  for 0..3 take n {
-    x += 1;
+  -- longhand
+  for n := 0..3 {
+    n += 1
   }
 
-  -- inline for loop
-  for 0..3 take (n) -> n += 1;
+  -- shorthand
+  for n := 0..3 -> n += 1;
 }

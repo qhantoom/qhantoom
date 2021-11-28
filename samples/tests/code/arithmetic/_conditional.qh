@@ -1,25 +1,25 @@
 fun main() {
   -- less than
-  val lt : uint = 2 < 1;
+  imu lt : uint = 2 < 1;
 
   -- greater than
-  val gt : uint = 1 > 1;
+  imu gt : uint = 1 > 1;
 
   -- less than or equal
-  val le : uint = 1 <= 1;
+  imu le : uint = 1 <= 1;
 
   -- greater than or equal
-  val ge : uint = 1 >= 1;
+  imu ge : uint = 1 >= 1;
 
   -- equals
-  val eq : uint = 1 == 1;
+  imu eq : uint = 1 == 1;
 
   -- not equals
-  val ne : uint = 1 != 1;
+  imu ne : uint = 1 != 1;
 
   -- or
-  val or : bool = 1 < 2 || 1 == 1;
+  imu or : bool = 1 < 2 || 1 == 1;
 
   -- and
-  val and : bool = 1 < 2 && 1 == 1;
+  imu and : bool = 1 < 2 && 1 == 1;
 }

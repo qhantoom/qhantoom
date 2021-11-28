@@ -21,11 +21,14 @@ fun main() {
   -- modulo x by 1
   x %= 1;
 
+  -- bitwize-xor x by 1
   x ^= 1;
 
   mut y : bool = true;
 
+  -- bitwise-and
   y &= false;
 
+  -- bitwise-or
   y |= true;
 }

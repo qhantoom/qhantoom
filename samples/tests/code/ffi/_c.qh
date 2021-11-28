@@ -1,2 +1,2 @@
 -- call foreign a c function
-ext cos(x : int) : int;
+ext cos(x : uint) : uint;

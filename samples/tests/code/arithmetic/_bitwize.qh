@@ -1,7 +1,7 @@
 fun main() {
-  val a : uint = 5;
-  val b : uint = 10;
-  val c : uint = a | b;
-  val d : uint = 1 ^ 1;
-  val e : bool = true & true;
+  imu a : uint = 5;
+  imu b : uint = 10;
+  imu c : uint = a | b;
+  imu d : uint = a ^ b;
+  imu e : bool = true & true;
 }

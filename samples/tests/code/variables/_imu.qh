@@ -1,7 +1,9 @@
--- declare a constant variable
-imu x : uint = 9;
+-- `imu` keyword
 
 fun main() {
+  -- declare a immutable variable
+  imu x : uint = 9;
+
   -- prints 9
   #print("{x}");
 }

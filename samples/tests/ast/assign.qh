@@ -1,4 +1,4 @@
-val x : uint = 3;
+imu x : uint = 3;
 mut y : uint = 39;
 
 -- assginment

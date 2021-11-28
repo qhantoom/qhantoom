@@ -1,2 +1,2 @@
 -- string
-val b : uint = "hello, world!";
+imu hello : uint = "hello, world!";

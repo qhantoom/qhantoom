@@ -1,4 +1,4 @@
 -- string type
 fun main() {
-  val x : str = "hello, world!";
+  imu x : str = "hello, world!";
 }

@@ -1,0 +1,17 @@
+fun thread(c : chan uint, value: uint) {
+  -- sleep in ms duration
+  sleep 1000;
+
+  -- send a value from a channel
+  c <- value;
+}
+
+fun main() {
+  -- declare a channel
+  imu c : uint = chan 0;
+
+  spawn thread(c, 1);
+  spawn thread(c, 2);
+
+  #print("{}", <-c);
+}

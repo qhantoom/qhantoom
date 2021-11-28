@@ -1,0 +1,14 @@
+fun main() {
+  imu a : (s32, f64, u8) = (1, 2.0, 3);
+  imu (x, y, z) = a;
+
+  #print("x: {x}, y: {y}, z: {z}");
+
+  imu b : (s32, f64, u8) = (1, 2.0, 3);
+
+  imu x := b.0;
+  imu y := b.1;
+  imu z := b.2;
+
+  #print("x: {x}, y: {y}, z: {z}");
+}

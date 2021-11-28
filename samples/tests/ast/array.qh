@@ -1,5 +1,5 @@
 -- static array of `f32`
-val arrf : [f32; 3] = [1.0, 2.0, 3.0];
+imu arrf : [3; f32] = [1.0, 2.0, 3.0];
 
 -- static array of `str`
-val arrs : [str; 3] = ["hello ", ", world", "!"];
+imu arrs : [3; str] = ["hello ", ", world", "!"];

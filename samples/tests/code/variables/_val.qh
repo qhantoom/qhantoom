@@ -1,6 +1,9 @@
-fun main() {
-  -- declare a immutable variable
-  val x : uint = 9;
+-- `val` keyword
 
+-- declare a constant variable
+val x : uint = 9;
+
+fun main() {
+  -- prints 9
   #print("{x}");
 }

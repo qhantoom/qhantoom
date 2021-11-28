@@ -1,7 +1,7 @@
 fun main() {
   -- shift left op
-  val x : uint = 1 << 3;
+  imu x : uint = 1 << 3;
 
   -- shift right op
-  val x : uint = 1 >> 3;
+  imu y : uint = 1 >> 3;
 }

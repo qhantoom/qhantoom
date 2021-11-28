@@ -1,0 +1,18 @@
+-- structure declaration
+struct Point {
+  x : uint,
+  y : uint,
+}
+
+impl Point {
+  -- getter
+  get fun x(&self) : uint {
+    self.x
+  }
+}
+
+fun main() {
+  imu p = Point { x = 0, y = 0 };
+  
+  #print("p.x = {}", p.x);
+}

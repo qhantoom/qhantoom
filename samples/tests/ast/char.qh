@@ -1,5 +1,3 @@
-val x : char = '\n';
-val y : char = '\r';
-
--- emoji support
-val z : char = '👽';
+imu x : char = '\n';
+imu y : char = '\r';
+imu z : char = '👽'; -- emoji support

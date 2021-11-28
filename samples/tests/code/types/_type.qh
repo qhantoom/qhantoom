@@ -1,4 +1,6 @@
 -- type declaration
-type vec2 = uint;
+type Symbol = uint;
 
-fun main() {}
+fun main() {
+  imu x : Symbol = 0;
+}

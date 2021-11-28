@@ -1,9 +1,10 @@
 fun main() {
   mut x := 0;
 
+  -- the exiting condition is executed before each loop
   while x < 3 {
     x += 1;
   }
 
-  #print(x);
+  #print("{x}");
 }

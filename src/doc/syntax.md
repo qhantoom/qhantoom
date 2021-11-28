@@ -2,30 +2,71 @@
 
 ## Comments
 
-`--` comment line symbol    
+`--` line comment    
 
-`-!` doc comment line
+`-%` - comment block scope start   
+`%-` - comment block scope end   
 
-`-%` - comment block scope start symbol   
-`%-` - comment block scope end symbol   
+`---` doc line comment    
 
-`-%!` - comment block doc scope start symbol   
-`%-` - comment block doc symbol   
+`--!` top-level doc line comment   
+
+`--!` - block doc comment start   
+`!--` - block doc comment end   
 
 ```
 -- this is a line comments
--! this is a doc line comments
 -% this is a block comments %-
--! this is a doc comments !-
+--- this is a doc line comments
+--! this is a top-level doc comments
+--! this is a doc comments !--
+```
+
+## Shebang comments
+
+```
+#!/usr/bin/env qhantoomc
+```
+
+## Identifiers
+
+an identifier cannot start with a number
+
+```
+square    cosinus   degrees
+_tmp      add_tmp   to_tmp_
+vector1   vector2   vector3 
+```
+
+## Keywords
+
+```
+action  as        async       await   bench   bind
+break   chan      continue    else    enum    ext     
+false   fun       for         if      imu     load    
+loop    match     Me          me      mock    mod     
+mut     pub       ref         req     return  set
+spawn   struct    test        type    unit    val
+void    wasm      while
+```
+
+## Types
+
+**primitive types**
+
+```
+u8    u16   u32   u64   uint   
+s8    s16   s32   s64   sint    
+f32   f64   str   char  bool    
 ```
 
 ## Operators
 
 ```
-+   -   *   /   %   !   =   &   |   <   >   .   :   ;   \   ?   @   _
++   -   *   /   %   !   =   &   |   <   >   .   :   ;   #   ?   @   _
                         ==  &&  ||  <<  >>  ..  ::
 +=  -=  *=  /=  %=  !=      &=  |=  <=  >=  .=  :=
-		->                  =>
+		->                  =>          <-
 ```
 
 ## Delimiters
@@ -42,16 +83,55 @@ true false
 
 ## Numbers
 
-**int**
+**decimal**
 
 ```
 0 10 1000 1000000 10000000000
+```
+
+**binary**
+
+```
+0b0111
+```
+
+**octal**
+
+```
+0o72
+```
+
+**hexadecimal**
+
+```
+0xfff
 ```
 
 **float**
 
 ```
 0.5 1.0 230.47 30949.374
+```
+
+**separators**
+
+```
+1_000_000_000_000
+0b1010_0001_1000_0101
+0o7_7_3_4
+0xf_f_f_f_f
+```
+
+## Arrays
+
+```
+[10, 23, 12, 3]
+```
+
+## Tuples
+
+```
+(1, 2, 3)
 ```
 
 ## Chars
@@ -70,91 +150,49 @@ true false
 "hello, \"world\"! 👽\nwesh la famille! 🤘"
 ```
 
-## Identifiers
-
-an identifier cannot start with a number
-
-```
-square    cosinus   degrees
-_tmp      add_tmp   to_tmp_
-vector1   vector2   vector3 
-```
-
-## Keywords
-
-```
-action  as        async       await   bench   bind
-break   chan      continue    else    enum    exp
-ext     false     fun         for     if      imu
-load    loop      match       Me      me      mock
-mod     mut       pub         ref     return  set
-spawn   struct    test        type    unit    val
-void    wasm      where       while
-```
-
-## Types
-
-**primitive types**
-
-```
-u8    u16   u32   u64   uint   
-s8    s16   s32   s64   sint    
-f32   f64   str   char  bool    
-```
-
 **derived types**
-
-*still in research*
 
 ```
 type Symbol = s32;
 ```
 
-## Arrays
-
-```
-[10, 23, 12, 3]
-```
-
 ## Bindings
 
-`imu` immutable constant variable keyword   
-`val` immutable local variable keyword    
+`val` constant variable keyword (constant are known at compile-time)   
+`imu` immutable local variable keyword    
 `mut` mutable local variable keyword    
 
 **preview**
 
 ```
-imu x : uint = 1;
-val y : uint = 2;
+val y : uint = 1;
+imu x : uint = 2;
 mut z : uint = 3;
 ```
 
 **inferred types**
 
 ```
-val a := true;
-val b := false;
-val c := a == b;
+imu a := true;
+imu b := false;
+imu c := a == b;
 ```
 
 **multiple assignments**
 
 ```
-val x, y, z : s8 = 0;
-val x, y, z := 0;
+imu x, y, z : s8 = 0;
+imu x, y, z := 0;
 ```
 
 ## Functions
-
-*still in research*
 
 `fun` function declaration    
 `fn` arrow function declaration    
 
 ```
 fun square(x : uint) : uint { x * x }
-val square : uint = fn (x : uint) -> x * x;
+imu square : Fn(x : uint) -> uint = fn (x : uint) -> x * x;
 ```
 
 ## Branches
@@ -183,6 +221,12 @@ if a < b {
 }
 ```
 
+**ternary**
+
+```
+when true ? 1 : 0;
+```
+
 ## Loops
 
 **loop**
@@ -194,11 +238,29 @@ loop {}
 **for**
 
 ```
-for 0..4 = (num) {}
-for nums = (num) {}
+-- longhand
+for n := 0..3 {
+  n += 1
+}
+```
+
+```
+-- shorthand
+for n := 0..3 -> n += 1;
+```
+
+**until**
+
+the exiting condition is executed after each loop   
+
+```
+until true {}
+until 0 < 1 {}
 ```
 
 **while**
+
+the exiting condition is executed before each loop    
 
 ```
 while true {}
@@ -213,7 +275,7 @@ struct Button {
   name: str,
 }
 
-set Button {
+impl Button {
   fun new(name : str) : Button {
     Button {
       id = 0,
@@ -223,13 +285,15 @@ set Button {
 }
 ```
 
-## Actions
+## Traits
 
-actions are simply interfaces that allow a new behaviour to be assigned 
+**wip**
+
+`behaviors` are simply interfaces that allow a new behavior to be assigned 
 
 ```
-action Vec2 {
-  fun mul(uint) : uint;
+behavior Vec2 {
+  fun mul(x : uint) : uint;
 }
 
 struct Point {
@@ -237,7 +301,7 @@ struct Point {
   x: f32,
 }
 
-set Vec2 for Point {
+impl Vec2 for Point {
   fun mul(x : uint) : uint { x * x }
 }
 ```
@@ -250,8 +314,8 @@ set Vec2 for Point {
 **bind**
 
 ```
-pub bind matrix;
 bind opengl;
+pub bind matrix;
 ```
 
 **load**
@@ -274,11 +338,11 @@ match op {
 }
 ```
 
-Attributes
+## Attributes
 
 ```
-|> repr: c
-|> derive: clone, debug.
+#> repr: c.
+#> derive: clone, debug.
 ```
 
 ## Enums
@@ -294,7 +358,9 @@ enum MyEnum {
 ## Macros
 
 ```
-macro foo() {}
+macro foo() {
+  () {}
+}
 
 #foo();
 ```
@@ -312,16 +378,24 @@ async {
 
 ## Channels
 
-*still in research*
-
 `chan` - make channel keyword   
-`spawn` - make thread keyword   
 
 ```
-chan (tx, rx) = 0;
-spawn tx.send(1);
+-- send a value from a channel
+fun thread(c : chan uint, value : uint) {
+  c <- value;
+}
 
-#print("received: {}", rx.on());
+-- declare a channel
+imu c : uint = chan 0;
+
+spawn thread(c, 3);
+
+-- retrieve a value from a channel
+imu x : uint = <-x;
+
+-- prints 3
+#print("received: {}", x);
 ```
 
 ## Assertions
@@ -329,6 +403,7 @@ spawn tx.send(1);
 `unit` - assertion unit keyword   
 `mock` - assertion mock keyword   
 `test` - assertion test keyword   
+`must` - assertion must keyword   
 
 **unit**
 
@@ -354,6 +429,16 @@ test tokenization_test() {
 }
 ```
 
+**must**
+
+```
+unit {
+  test my_test() {
+    #must(0 eq 0);
+  }
+}
+```
+
 ## Benchmarks
 
 `bench` - bench computation keyword   
@@ -368,10 +453,8 @@ bench tokenization_benchmark() {
 
 ## FFI
 
-*still in research*
-
 `ext` - call a c function keyword   
-`exp` - call a javascript function keyword    
+`req` - call a javascript function keyword    
 `mod` - call a rust function keyword    
 
 **c**
@@ -383,7 +466,7 @@ ext fun cos(x : uint) : uint;
 **javascript**
 
 ```
-exp fun cos(x : uint) : uint;
+req fun cos(x : uint) : uint;
 ```
 
 **rust**

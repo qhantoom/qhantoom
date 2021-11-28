@@ -1,5 +1,5 @@
 -- boolean not op
 fun main() {
-  val x : bool = !true;
-  val y : bool = -1;
+  imu x : bool = !true;
+  imu y : bool = -1;
 }

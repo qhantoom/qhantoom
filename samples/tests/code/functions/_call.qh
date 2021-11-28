@@ -1,5 +1,7 @@
 -- function declarations
-fun sqrt(x : uint) : uint { x * x }
+fun sqrt(x : uint) : uint {
+  x * x
+}
 
 fun main() {
   -- call function

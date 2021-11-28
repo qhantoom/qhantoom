@@ -1,8 +1,8 @@
 -- closures
 fun main() {
   -- with explicit type annotation
-  val sqrt1 : Fn(x : uint) -> uint = fn (x) -> x * x;
+  imu sqrt1 : Fn(x : uint) -> uint = fn (x) -> x * x;
 
   -- with type inference
-  val sqrt2 := fn (x) -> x * x;
+  imu sqrt2 := fn (x) -> x * x;
 }

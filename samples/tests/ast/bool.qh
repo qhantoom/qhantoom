@@ -1,5 +1,5 @@
 -- inferred type
-val t := true;
+imu t := true;
 
 -- with explicit type annotation
-val f : bool = false; 
+imu f : bool = false; 

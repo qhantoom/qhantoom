@@ -1,4 +1,4 @@
 -- char type
 fun main() {
-  val x : char = 'a';
+  imu x : char = 'a';
 }

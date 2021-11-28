@@ -1,5 +1,9 @@
 -- this is a line comments
 -- this is another line comments
--! this is a doc line comments
--! this is another doc line comments
+
 -% this is a block comments %-
+
+--- this is a doc line comments
+
+--! this is a top-level doc line comments
+--! this is another top-level doc line comments

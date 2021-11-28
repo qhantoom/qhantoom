@@ -1,0 +1,4 @@
+-- bench declaration
+bench bench_name() {
+  -- do stuff
+}

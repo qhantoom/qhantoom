@@ -1,4 +1,4 @@
-action Vec2 {
+behavior Vec2 {
   fun sqrt(x : uint) : uint;
 }
 

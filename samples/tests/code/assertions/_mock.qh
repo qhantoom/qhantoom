@@ -1,5 +1,9 @@
 fun main() {}
 
+-- unit testing
 unit {
-  mock mock_name() {}
+  -- mocking your stuff
+  mock mock_name() {
+    -- then do stuff
+  }
 }

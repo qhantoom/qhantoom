@@ -1,3 +1,9 @@
+async fun thread() {
+  #print("hello, async world!");
+}
+
+-- declare an asynchronous function
 async fun main() {
-  await #print("hello, async world!")
+  -- wait for the result of the asynchronous function
+  thread().await;
 }

@@ -15,8 +15,16 @@ under development | under development | under development
 ## Usage
 
 ```c
+fun fib(n: uint): [s32] {
+  mut x = [1, 1];
+
+  for i := 2..n -> x.push(x[i - 1] + x[i - 2]);
+
+  x
+}
+
 fun main() {
-  #print("hello, world! 👋");
+  #print("{:?}", fib(42));
 }
 ```
 

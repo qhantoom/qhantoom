@@ -1,0 +1,6 @@
+fun main() {
+  imu x := 0;
+  imu y := 1;
+
+  #print("{x} : {y}");
+}

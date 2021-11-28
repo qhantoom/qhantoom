@@ -1,0 +1,17 @@
+-- send a value from a channel
+fun thread(c : chan uint, value : uint) {
+  c <- value;
+}
+
+fun main() {
+  -- declare a channel
+  imu c : uint = chan 0;
+
+  spawn thread(c, 3);
+
+  -- retrieve a value from a channel
+  imu x : uint = <-x;
+
+  -- prints 3
+  #print("received: {}", x);
+}

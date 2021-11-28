@@ -1,25 +1,23 @@
--- bin number
-val bin : uint = 0b111_111_11001_0000;
+-- binray number
+imu bin : uint = 0b111_111_11001_0000;
 
 -- octal number
-val oct : uint = 0o0761;
+imu oct : uint = 0o0761;
 
--- decimal number
-val dec : uint = 1000;
+-- integer number
+imu dec : uint = 1000;
 
 -- hexadecimal number
-val hex : uint = 0xA0A0;
+imu hex : uint = 0xA0A0;
 
--- just an idea
+-- parse to binary number
+imu bina : uint = b#30; -- 0b1111
 
--- in this example `bin` is a keyword
-val bina : uint = bin 30; -- 0b1111
+-- parse to octal number
+imu octa : uint = o#75; -- 0o113
 
--- in this example `oct` is a keyword
-val octa : uint = oct 75; -- 0o113
+-- parse to integer number
+imu deci : uint = d#25.0; -- 25
 
--- in this example `dec` is a keyword
-val deci : uint = dec 25; -- 25
-
--- in this example `hex` is a keyword
-val hexa : uint = hex 76; -- 0xA
+-- parse to hexadecimal number
+imu hexa : uint = h#76; -- 0xA

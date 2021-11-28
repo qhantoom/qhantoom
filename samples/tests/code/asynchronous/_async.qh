@@ -1,1 +1,4 @@
-async fun main() {}
+-- declare an asynchronous function
+async fun main() {
+  -- do async stuff
+}

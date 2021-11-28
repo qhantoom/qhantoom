@@ -1,16 +1,31 @@
 fun main() {
   -- integer numbers
-  val x : s8 = 1;
+  imu x : s8 = 1;
   
   -- binary numbers
-  val x : s32 = 0b1001;
+  imu x : s32 = 0b1001;
 
   -- octal numbers
-  val x : uint = 0o777;
+  imu x : uint = 0o777;
 
   -- hexadecimal numbers
-  val x : uint = 0x64;
+  imu x : uint = 0x64;
 
   -- float numbers
-  val x : f32 = 1.0;
+  imu x : f32 = 1.0;
+
+  -- parse to integer
+  imu x : s8 = d#1.0; -- 1
+
+  -- parse to binary
+  imu x : s32 = b#30; -- 0b1111
+
+  -- parse to octal
+  imu x : uint = o#75; -- 0o113
+
+  -- parse to hexadecimal
+  imu x : uint = h#75; -- 0xA
+
+  -- parse to float
+  imu x : f32 = f#1; -- 1.0
 }
