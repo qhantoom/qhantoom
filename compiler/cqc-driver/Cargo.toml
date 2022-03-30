@@ -1,0 +1,14 @@
+cargo-features = ["edition2021"]
+
+[package]
+edition = "2021"
+name = "cqc-driver"
+version = "0.0.0"
+
+[lib]
+crate-type = ["dylib"]
+
+[dependencies]
+cqc-back = {path = "../cqc-back"}
+cqc-front = {path = "../cqc-front"}
+cqc-middle = {path = "../cqc-middle"}

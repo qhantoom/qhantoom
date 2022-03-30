@@ -1,6 +1,6 @@
-use bootstrap::cmd;
+// use bootstrap::cmd;
 
 #[inline]
 fn main() {
-  cmd::run()
+  // cmd::run()
 }

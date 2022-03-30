@@ -1,0 +1,10 @@
+cargo-features = ["edition2021"]
+
+[package]
+edition = "2021"
+name = "cqc-front"
+version = "0.0.0"
+
+[dependencies]
+# TODO: should be used for errors
+# ariadne = "0.1.3"

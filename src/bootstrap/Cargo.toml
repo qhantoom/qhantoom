@@ -21,6 +21,6 @@ test = false
 [dependencies]
 chrono = "0.4.19"
 platform-info = "0.1.0"
-qhantoom = {path = "../../compiler/qhantoom"}
+# qhantoom = {path = "../../compiler/qhantoom"}
 qute = "0.0.13"
 slowprint = "0.1.0"

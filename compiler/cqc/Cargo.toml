@@ -1,0 +1,9 @@
+cargo-features = ["edition2021"]
+
+[package]
+edition = "2021"
+name = "cqc"
+version = "0.0.0"
+
+[dependencies]
+cqc-driver = {path = "../cqc-driver"}
