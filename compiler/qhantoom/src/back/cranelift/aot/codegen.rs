@@ -8,7 +8,6 @@ use cranelift::prelude::{
   Variable,
 };
 
-use cranelift_codegen::binemit::{NullStackMapSink, NullTrapSink};
 use cranelift_codegen::ir::GlobalValue;
 use cranelift_codegen::settings::Flags;
 use cranelift_codegen::{settings, Context};
@@ -29,7 +28,7 @@ impl Codegen {
   pub fn new() -> Self {
     let flag_builder = settings::builder();
     let isa_builder = builder().unwrap();
-    let isa = isa_builder.finish(Flags::new(flag_builder));
+    let isa = isa_builder.finish(Flags::new(flag_builder)).unwrap();
 
     let object_builder =
       ObjectBuilder::new(isa, "qhantoom".to_string(), default_libcall_names())
@@ -54,14 +53,7 @@ impl Codegen {
       .declare_function("main", Linkage::Export, &self.ctx.func.signature)
       .unwrap();
 
-    let mut trap_sink = NullTrapSink {};
-    let mut stack_map_sink = NullStackMapSink {};
-
-    self
-      .module
-      .define_function(id, &mut self.ctx, &mut trap_sink, &mut stack_map_sink)
-      .unwrap();
-
+    self.module.define_function(id, &mut self.ctx).unwrap();
     self.module.clear_context(&mut self.ctx);
 
     let object = self.module.finish();
@@ -103,6 +95,6 @@ impl Codegen {
     translator.builder.ins().return_(&[return_value]);
     translator.builder.finalize();
     optimize(&mut self.ctx, self.module.isa()).unwrap();
-    println!("\nir: {}", self.ctx.func.display(None).to_string());
+    println!("\nir: {}", self.ctx.func.display().to_string());
   }
 }

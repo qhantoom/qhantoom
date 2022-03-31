@@ -1,7 +1,6 @@
 use super::translator::Translator;
 
 use crate::back::context::{print_builtin, print_str_builtin, ScopeMap};
-
 use crate::front::parser::ast::Program;
 
 use cranelift::prelude::{
@@ -9,7 +8,6 @@ use cranelift::prelude::{
   Variable,
 };
 
-use cranelift_codegen::binemit::{NullStackMapSink, NullTrapSink};
 use cranelift_codegen::ir::GlobalValue;
 use cranelift_codegen::Context;
 use cranelift_jit::{JITBuilder, JITModule};
@@ -28,7 +26,7 @@ pub struct Codegen {
 impl Codegen {
   #[inline]
   pub fn new() -> Self {
-    let mut builder = JITBuilder::new(default_libcall_names());
+    let mut builder = JITBuilder::new(default_libcall_names()).unwrap();
 
     let print_addr = print_builtin as *const u8;
     let print_str_addr = print_str_builtin as *const u8;
@@ -62,14 +60,7 @@ impl Codegen {
       )
       .unwrap();
 
-    let mut trap_sink = NullTrapSink {};
-    let mut stack_map_sink = NullStackMapSink {};
-
-    self
-      .module
-      .define_function(id, &mut self.ctx, &mut trap_sink, &mut stack_map_sink)
-      .unwrap();
-
+    self.module.define_function(id, &mut self.ctx).unwrap();
     self.module.clear_context(&mut self.ctx);
     self.module.finalize_definitions();
 
