@@ -11,7 +11,6 @@ use qhantoom::front::parser::Parser;
 use qhantoom::front::tokenizer::Tokenizer;
 use qhantoom::util::symbol::Symbols;
 
-#[inline]
 pub fn run(args: Vec<String>) {
   match compile(args) {
     Ok(_) => process::exit(EXIT_SUCCESS),
@@ -19,12 +18,10 @@ pub fn run(args: Vec<String>) {
   }
 }
 
-#[inline]
 fn compile(args: Vec<String>) -> Result<(), Box<(dyn Any + Send + 'static)>> {
   thread::spawn(move || compiling(args)).join()
 }
 
-#[inline]
 fn compiling(args: Vec<String>) {
   print!("compiling...\n");
 

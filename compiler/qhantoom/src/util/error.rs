@@ -32,7 +32,6 @@ pub enum Error {
 }
 
 impl fmt::Display for Error {
-  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match *self {
       Self::Custom(ref msg) => write!(f, "{}", msg),
@@ -72,42 +71,36 @@ impl fmt::Display for Error {
 }
 
 impl From<CodegenError> for Error {
-  #[inline]
   fn from(error: CodegenError) -> Self {
     Self::CraneliftCodegen(error)
   }
 }
 
 impl From<io::Error> for Error {
-  #[inline]
   fn from(error: io::Error) -> Self {
     Self::Io(error)
   }
 }
 
 impl From<LookupError> for Error {
-  #[inline]
   fn from(error: LookupError) -> Self {
     Self::CraneLiftIsa(error)
   }
 }
 
 impl From<ModuleError> for Error {
-  #[inline]
   fn from(error: ModuleError) -> Self {
     Self::CraneliftModule(error)
   }
 }
 
 impl From<object::write::Error> for Error {
-  #[inline]
   fn from(error: object::write::Error) -> Self {
     Self::CraneliftObject(error)
   }
 }
 
 impl From<ParseFloatError> for Error {
-  #[inline]
   fn from(error: ParseFloatError) -> Self {
     Self::ParseFloat(error)
   }

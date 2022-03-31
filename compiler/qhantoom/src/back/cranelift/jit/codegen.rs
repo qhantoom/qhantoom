@@ -24,7 +24,6 @@ pub struct Codegen {
 }
 
 impl Codegen {
-  #[inline]
   pub fn new() -> Self {
     let mut builder = JITBuilder::new(default_libcall_names()).unwrap();
 
@@ -46,7 +45,6 @@ impl Codegen {
     }
   }
 
-  #[inline]
   pub fn generate(&mut self, program: &Program) -> *const u8 {
     self.translate(program);
     self.index += 1;
@@ -69,7 +67,6 @@ impl Codegen {
     code
   }
 
-  #[inline]
   fn translate(&mut self, program: &Program) {
     self
       .ctx

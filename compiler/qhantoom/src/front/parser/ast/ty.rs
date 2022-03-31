@@ -6,12 +6,10 @@ pub struct Ty {
 }
 
 impl Ty {
-  #[inline]
   pub const fn new(kind: TyKind) -> Self {
     Self { kind }
   }
 
-  #[inline]
   pub fn kind(&self) -> &TyKind {
     &self.kind
   }
@@ -39,7 +37,6 @@ pub enum TyKind {
 }
 
 impl From<&TokenKind> for TyKind {
-  #[inline]
   fn from(kind: &TokenKind) -> Self {
     match kind {
       TokenKind::U8 => Self::U8,
@@ -63,7 +60,6 @@ impl From<&TokenKind> for TyKind {
   }
 }
 
-#[inline]
 pub const fn mk_ty(kind: TyKind) -> Ty {
   Ty::new(kind)
 }

@@ -1,11 +1,9 @@
 use super::{compile, help, repl, version};
 
-#[inline]
 pub fn run() {
   cmd()
 }
 
-#[inline]
 fn cmd() {
   let args = std::env::args().skip(1).collect::<Vec<String>>();
 

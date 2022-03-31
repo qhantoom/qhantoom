@@ -26,7 +26,6 @@ pub struct Tokenizer<'a> {
 }
 
 impl<'a> Tokenizer<'a> {
-  #[inline]
   pub fn new(input: &'a str, syms: &'a mut Symbols) -> Self {
     Self {
       buffer: String::new(),
@@ -37,7 +36,6 @@ impl<'a> Tokenizer<'a> {
     }
   }
 
-  #[inline]
   pub fn next(&mut self) -> Token {
     loop {
       let c = match self.next.take().or_else(|| self.input.next()) {
@@ -51,12 +49,10 @@ impl<'a> Tokenizer<'a> {
     }
   }
 
-  #[inline]
   fn err(&self, error: Error) {
     panic!("{}", error);
   }
 
-  #[inline]
   pub fn tokenize(&mut self) -> Vec<Token> {
     let mut tokens = vec![];
 
@@ -75,12 +71,10 @@ impl<'a> Tokenizer<'a> {
     tokens
   }
 
-  #[inline]
   fn push(&mut self, c: char) {
     self.buffer.push(c);
   }
 
-  #[inline]
   fn step(&mut self, c: char) -> Option<TokenKind> {
     use super::token::TokenKind::*;
 
@@ -332,14 +326,12 @@ impl<'a> Tokenizer<'a> {
     None
   }
 
-  #[inline]
   fn reset(&mut self, kind: TokenKind) -> Option<TokenKind> {
     self.state = TokenizerState::Idle;
 
     Some(kind)
   }
 
-  #[inline]
   fn reset_back(&mut self, c: char, kind: TokenKind) -> Option<TokenKind> {
     self.next = Some(c);
 

@@ -15,7 +15,6 @@ use qhantoom::util::symbol::Symbols;
 use qute::prelude::*;
 use slowprint::slow_print;
 
-#[inline]
 pub fn run() {
   match repl() {
     Ok(_) => (),
@@ -26,7 +25,6 @@ pub fn run() {
   }
 }
 
-#[inline]
 fn repl() -> Result<(), String> {
   let mut jit = Codegen::new();
 
@@ -40,7 +38,6 @@ fn repl() -> Result<(), String> {
   }
 }
 
-#[inline]
 fn banner() {
   let help_fmt = format!("{}", "\"help\"");
   let help_styled = qute!(&help_fmt).cyan().italic();
@@ -88,7 +85,6 @@ fn banner() {
   slow_print(&buf, delay);
 }
 
-#[inline]
 fn processing(codegen: &mut Codegen, line: &str) -> Result<(), String> {
   if line.is_empty() {
     return Ok(());
@@ -105,7 +101,6 @@ fn processing(codegen: &mut Codegen, line: &str) -> Result<(), String> {
   Ok(())
 }
 
-#[inline]
 fn compile(codegen: &mut Codegen, line: &str) {
   // create symbol table
   let mut syms = Symbols::new();
@@ -132,23 +127,19 @@ fn compile(codegen: &mut Codegen, line: &str) {
   print!("{}\n", code_fn())
 }
 
-#[inline]
 fn copyright() {
   print!("\nnot implemented yet\n\n");
 }
 
-#[inline]
 fn exit() {
   print!("\nTriForce.. 👋\n");
   std::process::exit(EXIT_SUCCESS);
 }
 
-#[inline]
 fn help() {
   help::run()
 }
 
-#[inline]
 fn license() {
   match util::reader::read_file("LICENSE") {
     Ok(s) => print!("\n{}\n", s),
@@ -156,7 +147,6 @@ fn license() {
   }
 }
 
-#[inline]
 fn version() -> &'static str {
   VERSION
 }

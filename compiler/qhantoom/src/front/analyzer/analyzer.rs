@@ -7,12 +7,10 @@ pub struct Analyzer<'a> {
 }
 
 impl<'a> Analyzer<'a> {
-  #[inline]
   pub fn new(program: &'a Program) -> Self {
     Self { program }
   }
 
-  #[inline]
   pub fn analyze(&mut self) -> bool {
     let mainchecked = maincheck::analyze(&self.program);
     let semachecked = semacheck::analyze(&self.program);

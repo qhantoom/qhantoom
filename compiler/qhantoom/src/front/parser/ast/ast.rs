@@ -18,12 +18,10 @@ pub struct Stmt {
 }
 
 impl Stmt {
-  #[inline]
   pub const fn new(kind: StmtKind) -> Self {
     Self { kind }
   }
 
-  #[inline]
   pub fn kind(&self) -> &StmtKind {
     &self.kind
   }
@@ -99,12 +97,10 @@ pub struct Expr {
 }
 
 impl Expr {
-  #[inline]
   pub const fn new(kind: ExprKind) -> Self {
     Self { kind }
   }
 
-  #[inline]
   pub fn kind(&self) -> &ExprKind {
     &self.kind
   }
@@ -166,7 +162,6 @@ pub enum BinopKind {
 }
 
 impl From<&TokenKind> for BinopKind {
-  #[inline]
   fn from(kind: &TokenKind) -> Self {
     match kind {
       TokenKind::Add => Self::Add,
@@ -207,7 +202,6 @@ pub enum UnopKind {
 }
 
 impl From<&TokenKind> for UnopKind {
-  #[inline]
   fn from(kind: &TokenKind) -> Self {
     match kind {
       TokenKind::Sub => Self::Neg,
@@ -217,27 +211,22 @@ impl From<&TokenKind> for UnopKind {
   }
 }
 
-#[inline]
 pub const fn mk_program(stmts: Vec<Stmt>) -> Program {
   Program { stmts }
 }
 
-#[inline]
 pub const fn mk_block(stmts: Vec<Stmt>) -> Block {
   Block { stmts }
 }
 
-#[inline]
 pub const fn mk_stmt(kind: StmtKind) -> Stmt {
   Stmt::new(kind)
 }
 
-#[inline]
 pub const fn mk_fun(fun: Box<Fun>) -> StmtKind {
   StmtKind::Fun(fun)
 }
 
-#[inline]
 pub const fn mk_prototype(
   name: Box<Expr>,
   ty: Box<Ty>,
@@ -246,22 +235,18 @@ pub const fn mk_prototype(
   Prototype { name, ty, args }
 }
 
-#[inline]
 pub const fn mk_arg(name: Box<Expr>, ty: Box<Ty>) -> Arg {
   Arg { name, ty }
 }
 
-#[inline]
 pub const fn mk_mut(local: Box<Local>) -> StmtKind {
   StmtKind::Mut(local)
 }
 
-#[inline]
 pub const fn mk_val(local: Box<Local>) -> StmtKind {
   StmtKind::Val(local)
 }
 
-#[inline]
 pub const fn mk_local(
   name: Box<Expr>,
   immutable: bool,
@@ -276,47 +261,38 @@ pub const fn mk_local(
   }
 }
 
-#[inline]
 pub const fn mk_return(expr: Option<Box<Expr>>) -> StmtKind {
   StmtKind::Return(expr)
 }
 
-#[inline]
 pub const fn mk_break(expr: Option<Box<Expr>>) -> StmtKind {
   StmtKind::Break(expr)
 }
 
-#[inline]
 pub const fn mk_continue(expr: Option<Box<Expr>>) -> StmtKind {
   StmtKind::Continue(expr)
 }
 
-#[inline]
 pub const fn mk_struct_def(struct_def: Box<Struct>) -> StmtKind {
   StmtKind::Struct(struct_def)
 }
 
-#[inline]
 pub const fn mk_field(name: Box<Expr>, ty: Box<Ty>) -> Field {
   Field { name, ty }
 }
 
-#[inline]
 pub const fn mk_expr(kind: ExprKind) -> Expr {
   Expr::new(kind)
 }
 
-#[inline]
 pub const fn mk_array(exprs: Vec<Box<Expr>>) -> ExprKind {
   ExprKind::Array(exprs)
 }
 
-#[inline]
 pub const fn mk_assign(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
   ExprKind::Assign(lhs, rhs)
 }
 
-#[inline]
 pub const fn mk_assign_op(
   op: BinopKind,
   lhs: Box<Expr>,
@@ -325,7 +301,6 @@ pub const fn mk_assign_op(
   ExprKind::AssignOp(op, lhs, rhs)
 }
 
-#[inline]
 pub const fn mk_binop(
   op: BinopKind,
   lhs: Box<Expr>,
@@ -334,52 +309,42 @@ pub const fn mk_binop(
   ExprKind::Binop(op, lhs, rhs)
 }
 
-#[inline]
 pub const fn mk_bool(value: bool) -> ExprKind {
   ExprKind::Bool(value)
 }
 
-#[inline]
 pub const fn mk_int(value: i64) -> ExprKind {
   ExprKind::Int(value)
 }
 
-#[inline]
 pub const fn mk_float(value: f64) -> ExprKind {
   ExprKind::Float(value)
 }
 
-#[inline]
 pub const fn mk_char(value: char) -> ExprKind {
   ExprKind::Char(value)
 }
 
-#[inline]
 pub const fn mk_str(value: Symbol) -> ExprKind {
   ExprKind::Str(value)
 }
 
-#[inline]
 pub const fn mk_ident(name: Symbol) -> ExprKind {
   ExprKind::Ident(name)
 }
 
-#[inline]
 pub const fn mk_closure(fun: Box<Fun>) -> ExprKind {
   ExprKind::Closure(fun)
 }
 
-#[inline]
 pub const fn mk_call(callee: Box<Expr>, args: Vec<Box<Expr>>) -> ExprKind {
   ExprKind::Call(callee, args)
 }
 
-#[inline]
 pub const fn mk_index(lhs: Box<Expr>, rhs: Box<Expr>) -> ExprKind {
   ExprKind::Index(lhs, rhs)
 }
 
-#[inline]
 pub const fn mk_if(
   condition: Box<Expr>,
   consequence: Box<Block>,
@@ -388,17 +353,14 @@ pub const fn mk_if(
   ExprKind::If(condition, consequence, alternative)
 }
 
-#[inline]
 pub const fn mk_loop(body: Box<Block>) -> ExprKind {
   ExprKind::Loop(body)
 }
 
-#[inline]
 pub const fn mk_while(condition: Box<Expr>, body: Box<Block>) -> ExprKind {
   ExprKind::While(condition, body)
 }
 
-#[inline]
 pub const fn mk_for(
   iterable: Box<Expr>,
   iterator: Box<Expr>,
@@ -407,7 +369,6 @@ pub const fn mk_for(
   ExprKind::For(iterable, iterator, body)
 }
 
-#[inline]
 pub const fn mk_range(
   start: Box<Expr>,
   end: Box<Expr>,
@@ -416,22 +377,18 @@ pub const fn mk_range(
   ExprKind::Range(start, end, body)
 }
 
-#[inline]
 pub const fn mk_struct_expr(struct_expr: Box<StructExpr>) -> ExprKind {
   ExprKind::StructExpr(struct_expr)
 }
 
-#[inline]
 pub const fn mk_field_expr(name: Box<Expr>, value: Box<Expr>) -> FieldExpr {
   FieldExpr { name, value }
 }
 
-#[inline]
 pub const fn mk_field_access(lhs: Box<Expr>, name: Box<Expr>) -> ExprKind {
   ExprKind::FieldAccess(lhs, name)
 }
 
-#[inline]
 pub const fn mk_unop(op: UnopKind, rhs: Box<Expr>) -> ExprKind {
   ExprKind::Unop(op, rhs)
 }

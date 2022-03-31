@@ -1,6 +1,5 @@
 // use super::interface::{LOG_INCOGNITO, LOG_NAME};
 
-#[inline]
 pub fn username() -> String {
   // tmp for demo time
   format!("{}", "incognito")

@@ -24,7 +24,6 @@ pub struct Codegen {
 }
 
 impl Codegen {
-  #[inline]
   pub fn new() -> Self {
     let flag_builder = settings::builder();
     let isa_builder = builder().unwrap();
@@ -44,7 +43,6 @@ impl Codegen {
     }
   }
 
-  #[inline]
   pub fn generate(mut self, program: &Program) -> Vec<u8> {
     self.translate(program);
 
@@ -62,7 +60,6 @@ impl Codegen {
     bytes
   }
 
-  #[inline]
   fn translate(&mut self, program: &Program) {
     self
       .ctx

@@ -26,7 +26,6 @@ pub struct Translator<'a> {
 }
 
 impl<'a> Translator<'a> {
-  #[inline]
   fn create_variable(&mut self, name: String) -> Variable {
     let var = Variable::new(self.index);
 
@@ -38,7 +37,6 @@ impl<'a> Translator<'a> {
     var
   }
 
-  #[inline]
   pub fn translate(&mut self, program: &Program) -> Value {
     let mut value = Value::new(0);
 
@@ -49,7 +47,6 @@ impl<'a> Translator<'a> {
     value
   }
 
-  #[inline]
   fn translate_stmt(&mut self, stmt: &Stmt) -> Value {
     match stmt.kind() {
       StmtKind::Ext(ref prototype) => self.translate_stmt_ext(prototype),
@@ -65,17 +62,14 @@ impl<'a> Translator<'a> {
     }
   }
 
-  #[inline]
   fn translate_stmt_ext(&mut self, _prototype: &Prototype) -> Value {
     todo!()
   }
 
-  #[inline]
   fn translate_stmt_fun(&mut self, _fun: &Box<Fun>) -> Value {
     todo!()
   }
 
-  #[inline]
   fn translate_stmt_var(&mut self, local: &Local) -> Value {
     let var = self.create_variable(local.name.to_string());
     let value = self.translate_stmt_expr(&local.value);
@@ -86,7 +80,6 @@ impl<'a> Translator<'a> {
   }
 
   // tmp
-  #[inline]
   fn translate_stmt_return(&mut self, expr: &Option<Box<Expr>>) -> Value {
     if let Some(ref e) = expr {
       return self.translate_stmt_expr(e);
@@ -95,7 +88,6 @@ impl<'a> Translator<'a> {
     self.builder.ins().iconst(self.ty, 0)
   }
 
-  #[inline]
   fn translate_stmt_break(&mut self, expr: &Option<Box<Expr>>) -> Value {
     let mut value = self.builder.ins().iconst(self.ty, 0);
     let end_block = *self.scope_map.blocks().last().unwrap();
@@ -115,7 +107,6 @@ impl<'a> Translator<'a> {
     value
   }
 
-  #[inline]
   fn translate_stmt_continue(&mut self, expr: &Option<Box<Expr>>) -> Value {
     let mut value = self.builder.ins().iconst(self.ty, 0);
     let end_block = *self.scope_map.blocks().last().unwrap();
@@ -135,12 +126,10 @@ impl<'a> Translator<'a> {
     value
   }
 
-  #[inline]
   fn translate_stmt_struct(&mut self, _def: &Box<Struct>) -> Value {
     todo!()
   }
 
-  #[inline]
   fn translate_stmt_expr(&mut self, expr: &Box<Expr>) -> Value {
     match expr.kind() {
       ExprKind::Bool(ref boolean) => self.translate_expr_bool(boolean),
@@ -185,29 +174,24 @@ impl<'a> Translator<'a> {
     }
   }
 
-  #[inline]
   fn translate_expr_bool(&mut self, boolean: &bool) -> Value {
     self.builder.ins().bconst(types::B1, *boolean)
   }
 
-  #[inline]
   fn translate_expr_int(&mut self, num: &i64) -> Value {
     self.builder.ins().iconst(self.ty, *num)
   }
 
   // TODO: how to support floats?
-  #[inline]
   fn translate_expr_float(&mut self, num: &f64) -> Value {
     self.builder.ins().f64const(*num)
   }
 
-  #[inline]
   fn translate_expr_char(&mut self, _ch: &char) -> Value {
     self.translate_global_data_addr(&_ch.to_string())
   }
 
   // FIXME: can only print the same string literal value once
-  #[inline]
   fn translate_expr_str(&mut self, buf: &Symbol) -> Value {
     let id = match self.scope_map.get_data(&buf.to_string()) {
       Some(data) => *data,
@@ -238,7 +222,6 @@ impl<'a> Translator<'a> {
   }
 
   // TODO: does global data can be used for `char` support?
-  #[inline]
   fn translate_global_data_addr(&mut self, name: &String) -> Value {
     let data_id = self
       .module
@@ -250,14 +233,12 @@ impl<'a> Translator<'a> {
     self.builder.ins().global_value(self.ty, str_ptr)
   }
 
-  #[inline]
   fn translate_expr_ident(&mut self, name: &Symbol) -> Value {
     let var = self.scope_map.get_variable(&name.to_string()).unwrap();
 
     self.builder.use_var(*var)
   }
 
-  #[inline]
   fn translate_expr_binop(
     &mut self,
     op: &BinopKind,
@@ -290,57 +271,46 @@ impl<'a> Translator<'a> {
     }
   }
 
-  #[inline]
   fn translate_add_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     self.builder.ins().iadd(lhs, rhs)
   }
 
-  #[inline]
   fn translate_sub_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     self.builder.ins().isub(lhs, rhs)
   }
 
-  #[inline]
   fn translate_mul_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     self.builder.ins().imul(lhs, rhs)
   }
 
-  #[inline]
   fn translate_div_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     self.builder.ins().sdiv(lhs, rhs)
   }
 
-  #[inline]
   fn translate_rem_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     self.builder.ins().srem(lhs, rhs)
   }
 
-  #[inline]
   fn translate_shl_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     self.builder.ins().ishl(lhs, rhs)
   }
 
-  #[inline]
   fn translate_shr_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     self.builder.ins().sshr(lhs, rhs)
   }
 
-  #[inline]
   fn translate_bit_and_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     self.builder.ins().band(lhs, rhs)
   }
 
-  #[inline]
   fn translate_bit_xor_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     self.builder.ins().bxor(lhs, rhs)
   }
 
-  #[inline]
   fn translate_bit_or_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     self.builder.ins().bor(lhs, rhs)
   }
 
-  #[inline]
   fn translate_logical_binop(
     &mut self,
     op: &BinopKind,
@@ -367,31 +337,26 @@ impl<'a> Translator<'a> {
     self.builder.block_params(merge_block)[0]
   }
 
-  #[inline]
   fn translate_and_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     self.translate_logical_binop(&BinopKind::And, lhs, rhs)
   }
 
-  #[inline]
   fn translate_or_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     self.translate_logical_binop(&BinopKind::Or, lhs, rhs)
   }
 
-  #[inline]
   fn translate_lt_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     let boolean = self.builder.ins().icmp(IntCC::SignedLessThan, lhs, rhs);
 
     self.builder.ins().bint(self.ty, boolean)
   }
 
-  #[inline]
   fn translate_gt_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     let boolean = self.builder.ins().icmp(IntCC::SignedGreaterThan, lhs, rhs);
 
     self.builder.ins().bint(self.ty, boolean)
   }
 
-  #[inline]
   fn translate_le_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     let boolean =
       self
@@ -402,7 +367,6 @@ impl<'a> Translator<'a> {
     self.builder.ins().bint(self.ty, boolean)
   }
 
-  #[inline]
   fn translate_ge_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     let boolean =
       self
@@ -413,21 +377,18 @@ impl<'a> Translator<'a> {
     self.builder.ins().bint(self.ty, boolean)
   }
 
-  #[inline]
   fn translate_eq_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     let boolean = self.builder.ins().icmp(IntCC::Equal, lhs, rhs);
 
     self.builder.ins().bint(self.ty, boolean)
   }
 
-  #[inline]
   fn translate_ne_binop(&mut self, lhs: Value, rhs: Value) -> Value {
     let boolean = self.builder.ins().icmp(IntCC::NotEqual, lhs, rhs);
 
     self.builder.ins().bint(self.ty, boolean)
   }
 
-  #[inline]
   fn translate_expr_unop(&mut self, op: &UnopKind, rhs: &Box<Expr>) -> Value {
     let rhs = self.translate_stmt_expr(rhs);
 
@@ -442,12 +403,10 @@ impl<'a> Translator<'a> {
     }
   }
 
-  #[inline]
   fn translate_expr_array(&mut self, _exprs: &Vec<Box<Expr>>) -> Value {
     todo!()
   }
 
-  #[inline]
   fn translate_expr_index(
     &mut self,
     _lhs: &Box<Expr>,
@@ -456,7 +415,6 @@ impl<'a> Translator<'a> {
     todo!()
   }
 
-  #[inline]
   fn translate_expr_assign(
     &mut self,
     lhs: &Box<Expr>,
@@ -476,7 +434,6 @@ impl<'a> Translator<'a> {
     rhs
   }
 
-  #[inline]
   fn translate_expr_assign_op(
     &mut self,
     op: &BinopKind,
@@ -510,12 +467,10 @@ impl<'a> Translator<'a> {
     }
   }
 
-  #[inline]
   fn translate_expr_closure(&mut self, _fun: &Box<Fun>) -> Value {
     todo!()
   }
 
-  #[inline]
   fn translate_expr_call(
     &mut self,
     callee: &Box<Expr>,
@@ -548,7 +503,6 @@ impl<'a> Translator<'a> {
     self.builder.inst_results(call)[0]
   }
 
-  #[inline]
   fn translate_expr_if(
     &mut self,
     condition: &Box<Expr>,
@@ -592,7 +546,6 @@ impl<'a> Translator<'a> {
     self.builder.block_params(merge_block)[0]
   }
 
-  #[inline]
   fn translate_expr_loop(&mut self, body: &Box<Block>) -> Value {
     let body_block = self.builder.create_block();
     let end_block = self.builder.create_block();
@@ -614,7 +567,6 @@ impl<'a> Translator<'a> {
     self.builder.ins().iconst(self.ty, 0)
   }
 
-  #[inline]
   fn translate_expr_while(
     &mut self,
     condition: &Box<Expr>,
@@ -647,7 +599,6 @@ impl<'a> Translator<'a> {
     self.builder.ins().iconst(self.ty, 0)
   }
 
-  #[inline]
   fn translate_expr_for(
     &mut self,
     _iterable: &Box<Expr>,
@@ -657,7 +608,6 @@ impl<'a> Translator<'a> {
     todo!()
   }
 
-  #[inline]
   fn translate_expr_range(
     &mut self,
     _start: &Box<Expr>,
@@ -667,12 +617,10 @@ impl<'a> Translator<'a> {
     todo!()
   }
 
-  #[inline]
   fn translate_expr_struct(&mut self, _struct_expr: &Box<StructExpr>) -> Value {
     todo!()
   }
 
-  #[inline]
   fn translate_expr_field_access(
     &mut self,
     _lhs: &Box<Expr>,
