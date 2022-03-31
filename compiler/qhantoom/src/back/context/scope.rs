@@ -9,7 +9,6 @@ pub struct Scope<D, V> {
 }
 
 impl<D, V> Scope<D, V> {
-  #[inline]
   fn new() -> Self {
     Self {
       data: HashMap::new(),
@@ -17,17 +16,14 @@ impl<D, V> Scope<D, V> {
     }
   }
 
-  #[inline]
   fn get_data(&self, name: &str) -> Option<&D> {
     self.data.get(name)
   }
 
-  #[inline]
   fn get_variable(&self, name: &str) -> Option<&V> {
     self.variables.get(name)
   }
 
-  #[inline]
   fn add_data(&mut self, name: String, var: D) -> Result<(), String> {
     match self.data.get(&name) {
       Some(_) => Err(format!("data value {} already exists", name)), // TODO: should be an error type
@@ -38,7 +34,6 @@ impl<D, V> Scope<D, V> {
     }
   }
 
-  #[inline]
   fn add_variable(&mut self, name: String, var: V) -> Result<(), String> {
     match self.variables.get(&name) {
       Some(_) => Err(format!("variable {} already exists", name)), // TODO: should be an error type
@@ -56,7 +51,6 @@ pub struct ScopeMap<D, V> {
 }
 
 impl<D, V> ScopeMap<D, V> {
-  #[inline]
   pub fn new() -> Self {
     Self {
       blocks: vec![],
@@ -64,12 +58,10 @@ impl<D, V> ScopeMap<D, V> {
     }
   }
 
-  #[inline]
   pub fn blocks(&mut self) -> &mut Vec<Block> {
     &mut self.blocks
   }
 
-  #[inline]
   pub fn get_data(&self, name: &str) -> Option<&D> {
     for map in self.maps.iter().rev() {
       if let Some(v) = map.get_data(name) {
@@ -80,7 +72,6 @@ impl<D, V> ScopeMap<D, V> {
     None
   }
 
-  #[inline]
   pub fn get_variable(&self, name: &str) -> Option<&V> {
     for map in self.maps.iter().rev() {
       if let Some(v) = map.get_variable(name) {
@@ -91,7 +82,6 @@ impl<D, V> ScopeMap<D, V> {
     None
   }
 
-  #[inline]
   pub fn add_data(&mut self, name: String, data: D) -> Result<(), String> {
     match self.maps.last_mut() {
       Some(map) => map.add_data(name, data),
@@ -99,7 +89,6 @@ impl<D, V> ScopeMap<D, V> {
     }
   }
 
-  #[inline]
   pub fn add_variable(&mut self, name: String, var: V) -> Result<(), String> {
     match self.maps.last_mut() {
       Some(map) => map.add_variable(name, var),
@@ -107,12 +96,10 @@ impl<D, V> ScopeMap<D, V> {
     }
   }
 
-  #[inline]
   pub fn bind(&mut self) {
     self.maps.push(Scope::new());
   }
 
-  #[inline]
   pub fn unbind(&mut self) {
     if self.maps.len() > 1 {
       self.maps.pop();

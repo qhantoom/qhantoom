@@ -20,7 +20,6 @@ pub enum Precedence {
 }
 
 impl From<&TokenKind> for Precedence {
-  #[inline]
   fn from(kind: &TokenKind) -> Precedence {
     match *kind {
       TokenKind::Dot => Precedence::Highest,

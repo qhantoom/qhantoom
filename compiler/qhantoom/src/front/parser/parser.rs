@@ -21,7 +21,6 @@ pub struct Parser {
 }
 
 impl Parser {
-  #[inline]
   pub fn new(tokens: Vec<Token>) -> Self {
     Self {
       current: TOKEN_EOF,
@@ -31,7 +30,6 @@ impl Parser {
     }
   }
 
-  #[inline]
   fn expect(&mut self, kind: &TokenKind) -> Result<()> {
     if self.first.is(kind) {
       return Ok(self.next());
@@ -42,7 +40,6 @@ impl Parser {
     ))
   }
 
-  #[inline]
   fn next(&mut self) {
     match self.tokens.next() {
       Some(token) => match token.kind() {
@@ -62,7 +59,6 @@ impl Parser {
     }
   }
 
-  #[inline]
   pub fn parse(&mut self) -> Program {
     let mut stmts = vec![];
 
@@ -88,7 +84,6 @@ impl Parser {
     ast::mk_program(stmts)
   }
 
-  #[inline]
   fn parse_block(&mut self) -> Result<Box<Block>> {
     let mut stmts = vec![];
 
@@ -114,7 +109,6 @@ impl Parser {
     Ok(box ast::mk_block(stmts))
   }
 
-  #[inline]
   fn parse_stmt(&mut self) -> Result<Stmt> {
     match self.current.kind() {
       TokenKind::Fun => self.parse_stmt_fun(),
@@ -127,7 +121,6 @@ impl Parser {
     }
   }
 
-  #[inline]
   fn parse_stmt_fun(&mut self) -> Result<Stmt> {
     let prototype = self.parse_prototype()?;
     let body = self.parse_block()?;
@@ -135,7 +128,6 @@ impl Parser {
     Ok(ast::mk_stmt(ast::mk_fun(box Fun { prototype, body })))
   }
 
-  #[inline]
   fn parse_prototype(&mut self) -> Result<Prototype> {
     self.next();
 
@@ -146,7 +138,6 @@ impl Parser {
     Ok(ast::mk_prototype(name, ty, args))
   }
 
-  #[inline]
   fn parse_args(&mut self) -> Result<Vec<Box<Arg>>> {
     let mut args = vec![];
 
@@ -169,7 +160,6 @@ impl Parser {
     Ok(args)
   }
 
-  #[inline]
   fn parse_arg(&mut self) -> Result<Box<Arg>> {
     self.next();
     let name = self.parse_ident_expr()?;
@@ -179,7 +169,6 @@ impl Parser {
     Ok(box ast::mk_arg(name, ty))
   }
 
-  #[inline]
   fn parse_stmt_var(&mut self) -> Result<Stmt> {
     let kw = self.current.to_owned();
 
@@ -206,7 +195,6 @@ impl Parser {
     Ok(ast::mk_stmt(kind))
   }
 
-  #[inline]
   fn parse_stmt_return(&mut self) -> Result<Stmt> {
     self.next();
 
@@ -225,7 +213,6 @@ impl Parser {
     Ok(ast::mk_stmt(ast::mk_return(Some(expr))))
   }
 
-  #[inline]
   fn parse_stmt_break(&mut self) -> Result<Stmt> {
     self.next();
 
@@ -242,7 +229,6 @@ impl Parser {
     Ok(ast::mk_stmt(ast::mk_break(Some(expr))))
   }
 
-  #[inline]
   fn parse_stmt_continue(&mut self) -> Result<Stmt> {
     self.next();
 
@@ -259,7 +245,6 @@ impl Parser {
     Ok(ast::mk_stmt(ast::mk_continue(Some(expr))))
   }
 
-  #[inline]
   fn parse_stmt_struct(&mut self) -> Result<Stmt> {
     self.next();
 
@@ -272,7 +257,6 @@ impl Parser {
     })))
   }
 
-  #[inline]
   fn parse_fields(&mut self) -> Result<Vec<Box<Field>>> {
     let mut fields = vec![];
 
@@ -295,7 +279,6 @@ impl Parser {
     Ok(fields)
   }
 
-  #[inline]
   fn parse_field(&mut self) -> Result<Box<Field>> {
     self.next();
 
@@ -305,7 +288,6 @@ impl Parser {
     Ok(box ast::mk_field(name, ty))
   }
 
-  #[inline]
   fn parse_stmt_expr(&mut self) -> Result<Stmt> {
     let expr = self.parse_expr_by_precedence(&Precedence::Lowest)?;
 
@@ -316,7 +298,6 @@ impl Parser {
     Ok(ast::mk_stmt(StmtKind::Expr(expr)))
   }
 
-  #[inline]
   fn parse_expr_by_precedence(
     &mut self,
     precedence: &Precedence,
@@ -334,7 +315,6 @@ impl Parser {
     Ok(lhs)
   }
 
-  #[inline]
   fn parse_binop_rhs(&mut self, lhs: Box<Expr>) -> Result<Box<Expr>> {
     match self.current.kind() {
       TokenKind::Assign => self.parse_expr_assign(lhs),
@@ -351,7 +331,6 @@ impl Parser {
     }
   }
 
-  #[inline]
   fn parse_expr_assign(&mut self, lhs: Box<Expr>) -> Result<Box<Expr>> {
     self.next();
 
@@ -362,7 +341,6 @@ impl Parser {
     Ok(box ast::mk_expr(ast::mk_assign(lhs, rhs)))
   }
 
-  #[inline]
   fn parse_expr_assign_op(&mut self, lhs: Box<Expr>) -> Result<Box<Expr>> {
     let op = self.binop();
 
@@ -375,7 +353,6 @@ impl Parser {
     Ok(box ast::mk_expr(ast::mk_assign_op(op, lhs, rhs)))
   }
 
-  #[inline]
   fn parse_expr_index(&mut self, lhs: Box<Expr>) -> Result<Box<Expr>> {
     self.next();
 
@@ -386,14 +363,12 @@ impl Parser {
     Ok(box ast::mk_expr(ast::mk_index(lhs, rhs)))
   }
 
-  #[inline]
   fn parse_expr_call(&mut self, lhs: Box<Expr>) -> Result<Box<Expr>> {
     let args = self.parse_until(&TokenKind::CloseParen)?;
 
     Ok(box ast::mk_expr(ast::mk_call(lhs, args)))
   }
 
-  #[inline]
   fn parse_expr_struct(&mut self, lhs: Box<Expr>) -> Result<Box<Expr>> {
     let fields = self.parse_field_exprs()?;
 
@@ -403,7 +378,6 @@ impl Parser {
     })))
   }
 
-  #[inline]
   fn parse_field_exprs(&mut self) -> Result<Vec<Box<FieldExpr>>> {
     let mut fields = vec![];
 
@@ -427,7 +401,6 @@ impl Parser {
     Ok(fields)
   }
 
-  #[inline]
   fn parse_field_expr(&mut self) -> Result<Box<FieldExpr>> {
     let name = self.parse_ident_expr()?;
 
@@ -439,7 +412,6 @@ impl Parser {
     Ok(box FieldExpr { name, value })
   }
 
-  #[inline]
   fn parse_expr_field_access(&mut self, lhs: Box<Expr>) -> Result<Box<Expr>> {
     self.next();
 
@@ -453,7 +425,6 @@ impl Parser {
     }
   }
 
-  #[inline]
   fn parse_expr_binop(&mut self, lhs: Box<Expr>) -> Result<Box<Expr>> {
     let precedence = self.precedence();
     let op = self.binop();
@@ -465,7 +436,6 @@ impl Parser {
     Ok(box ast::mk_expr(ast::mk_binop(op, lhs, rhs)))
   }
 
-  #[inline]
   fn parse_expr(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
       TokenKind::True | TokenKind::False => self.parse_expr_bool(),
@@ -484,7 +454,6 @@ impl Parser {
     }
   }
 
-  #[inline]
   fn parse_expr_bool(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
       TokenKind::True => Ok(box ast::mk_expr(ast::mk_bool(true))),
@@ -496,7 +465,6 @@ impl Parser {
     }
   }
 
-  #[inline]
   fn parse_expr_int(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
       TokenKind::Int(ref num) => Ok(box ast::mk_expr(ast::mk_int(*num))),
@@ -507,7 +475,6 @@ impl Parser {
     }
   }
 
-  #[inline]
   fn parse_expr_float(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
       TokenKind::Float(ref num) => Ok(box ast::mk_expr(ast::mk_float(*num))),
@@ -518,7 +485,6 @@ impl Parser {
     }
   }
 
-  #[inline]
   fn parse_expr_char(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
       TokenKind::CharAscii(ref ascii) => {
@@ -531,7 +497,6 @@ impl Parser {
     }
   }
 
-  #[inline]
   fn parse_expr_str(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
       TokenKind::StrBuffer(ref buf) => Ok(box ast::mk_expr(ast::mk_str(*buf))),
@@ -542,7 +507,6 @@ impl Parser {
     }
   }
 
-  #[inline]
   fn parse_ident_expr(&mut self) -> Result<Box<Expr>> {
     match self.current.kind() {
       TokenKind::Identifier(ref name) => {
@@ -555,7 +519,6 @@ impl Parser {
     }
   }
 
-  #[inline]
   fn parse_expr_unop(&mut self) -> Result<Box<Expr>> {
     let op = self.unop();
 
@@ -566,7 +529,6 @@ impl Parser {
     Ok(box ast::mk_expr(ast::mk_unop(op, rhs)))
   }
 
-  #[inline]
   fn parse_expr_group(&mut self) -> Result<Box<Expr>> {
     self.next();
 
@@ -577,14 +539,12 @@ impl Parser {
     Ok(expr)
   }
 
-  #[inline]
   fn parse_expr_array(&mut self) -> Result<Box<Expr>> {
     let exprs = self.parse_until(&TokenKind::CloseBracket)?;
 
     Ok(box ast::mk_expr(ast::mk_array(exprs)))
   }
 
-  #[inline]
   fn parse_expr_if(&mut self) -> Result<Box<Expr>> {
     self.next();
 
@@ -605,14 +565,12 @@ impl Parser {
     )))
   }
 
-  #[inline]
   fn parse_expr_loop(&mut self) -> Result<Box<Expr>> {
     let block = self.parse_block()?;
 
     Ok(box ast::mk_expr(ast::mk_loop(block)))
   }
 
-  #[inline]
   fn parse_expr_while(&mut self) -> Result<Box<Expr>> {
     self.next();
 
@@ -623,7 +581,6 @@ impl Parser {
   }
 
   // TODO: implement a dynamic type system
-  #[inline]
   fn parse_ty_expr(&mut self) -> Result<Box<Ty>> {
     if self.first.is(&TokenKind::ColonAssign) {
       self.next();
@@ -649,14 +606,12 @@ impl Parser {
     Ok(box ast::mk_ty(kind))
   }
 
-  #[inline]
   fn parse_dynamic_ty(&mut self) -> Result<Box<Ty>> {
     self.next();
 
     Ok(box ast::mk_ty(TyKind::Dynamic))
   }
 
-  #[inline]
   fn parse_until(&mut self, kind: &TokenKind) -> Result<Vec<Box<Expr>>> {
     let mut exprs = vec![];
 
@@ -679,27 +634,22 @@ impl Parser {
     Ok(exprs)
   }
 
-  #[inline]
   fn binop(&mut self) -> BinopKind {
     BinopKind::from(self.current.kind())
   }
 
-  #[inline]
   fn precedence(&mut self) -> Precedence {
     Precedence::from(self.current.kind())
   }
 
-  #[inline]
   fn ty(&mut self) -> TyKind {
     TyKind::from(self.current.kind())
   }
 
-  #[inline]
   fn unop(&mut self) -> UnopKind {
     UnopKind::from(self.current.kind())
   }
 
-  #[inline]
   fn should_precedence_has_priority(&mut self, p: &Precedence) -> bool {
     *p < Precedence::from(self.first.kind())
   }

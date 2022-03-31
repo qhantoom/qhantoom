@@ -141,17 +141,14 @@ pub enum TokenKind {
 }
 
 impl TokenKind {
-  #[inline]
   pub fn is(&self, k: &TokenKind) -> bool {
     self == k
   }
 
-  #[inline]
   pub fn is_eof(&self) -> bool {
     *self == Self::EOF
   }
 
-  #[inline]
   pub fn keywords(ident: &str) -> Option<Self> {
     match ident {
       // keywords

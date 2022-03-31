@@ -10,7 +10,6 @@ use super::ty::{Ty, TyKind};
 pub struct Sep<'a, T: 'a>(pub &'a [T], pub &'a str);
 
 impl<'a, T: fmt::Display> fmt::Display for Sep<'a, T> {
-  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let exprs = self
       .0
@@ -30,49 +29,42 @@ impl fmt::Display for Program {
 }
 
 impl fmt::Display for Fun {
-  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "fun {} {}", self.prototype, self.body)
   }
 }
 
 impl fmt::Display for Prototype {
-  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "{} ({}) : {}", self.name, Sep(&self.args, ", "), self.ty,)
   }
 }
 
 impl fmt::Display for Arg {
-  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "{} : {}", self.name, self.ty)
   }
 }
 
 impl fmt::Display for Block {
-  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "{{ {} }}", Sep(&self.stmts, "\n"))
   }
 }
 
 impl fmt::Display for Struct {
-  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "struct {} {}", self.name, Sep(&self.fields, "\n"))
   }
 }
 
 impl fmt::Display for Field {
-  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "{} : {}", self.name, self.ty)
   }
 }
 
 impl fmt::Display for Stmt {
-  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match self.kind() {
       StmtKind::Ext(ref prototype) => {
@@ -121,21 +113,18 @@ impl fmt::Display for Stmt {
 }
 
 impl fmt::Display for StructExpr {
-  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "{} {{ {} }}", self.name, Sep(&self.fields, ",\n"))
   }
 }
 
 impl fmt::Display for FieldExpr {
-  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     write!(f, "{} : {}", self.name, self.value)
   }
 }
 
 impl fmt::Display for Expr {
-  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match self.kind() {
       ExprKind::Bool(ref boolean) => write!(f, "{}", boolean),
@@ -186,7 +175,6 @@ impl fmt::Display for Expr {
 }
 
 impl fmt::Display for Ty {
-  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match self.kind() {
       TyKind::S8 => write!(f, "s8"),
@@ -211,7 +199,6 @@ impl fmt::Display for Ty {
 }
 
 impl fmt::Display for BinopKind {
-  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match *self {
       Self::Add => write!(f, "+"),
@@ -245,7 +232,6 @@ impl fmt::Display for BinopKind {
 }
 
 impl fmt::Display for UnopKind {
-  #[inline]
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match *self {
       Self::Neg => write!(f, "-"),

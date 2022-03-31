@@ -1,4 +1,3 @@
-#[inline]
 pub fn date_time() -> String {
   use chrono::{DateTime, FixedOffset, Utc};
 
