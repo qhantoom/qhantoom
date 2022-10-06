@@ -1,0 +1,4 @@
+type Status {
+  Success: u32,
+  Failure: s32,
+}

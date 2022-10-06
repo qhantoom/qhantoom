@@ -1,0 +1,4 @@
+fun main() {
+  imu x: bool = !true;
+  imu y: bool = -1;
+}

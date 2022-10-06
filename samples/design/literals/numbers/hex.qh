@@ -1,0 +1,3 @@
+val hex: uint = 0xfff_fff;
+
+fun main() {}

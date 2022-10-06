@@ -1,0 +1,9 @@
+fun main() {
+  imu foo: uint = 3;
+  imu bar: uint = 10;
+  mut foobar;
+
+  foobar = foo + bar;
+
+  foobar
+}

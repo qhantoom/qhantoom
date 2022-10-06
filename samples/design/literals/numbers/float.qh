@@ -1,0 +1,5 @@
+val x: f64 = 0.0;
+val y: f32 = 1.0E+77;
+val z: f64 = 1e4;
+
+fun main() {}

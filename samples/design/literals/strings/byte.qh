@@ -1,0 +1,3 @@
+val x: str = `y`;
+
+fun main() {}

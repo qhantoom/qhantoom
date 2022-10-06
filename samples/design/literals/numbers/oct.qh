@@ -1,0 +1,3 @@
+val oct: uint = 0o77;
+
+fun main() {}

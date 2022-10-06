@@ -1,0 +1,7 @@
+pub ext foo();
+ext foo();
+ext foo(x: uint);
+
+ext foo(x: uint): uint {
+  0
+}

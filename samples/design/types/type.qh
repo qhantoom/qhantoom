@@ -1,0 +1,5 @@
+type Index = s32;
+
+fun main() {
+  imu x: Index = 0;
+}

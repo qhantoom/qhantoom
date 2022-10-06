@@ -1,0 +1,3 @@
+val bin: uint = 0b11110000;
+
+fun main() {}

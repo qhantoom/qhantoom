@@ -1,0 +1,7 @@
+fun main() {
+  imu a : uint = 1 + 1;
+  imu b : uint = 1 - 1;
+  imu c : uint = 1 * 1;
+  imu d : uint = 1 / 1;
+  imu e : uint = 1 % 1;
+}

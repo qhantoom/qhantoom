@@ -1,0 +1,8 @@
+fun main() {
+  imu x: uint = 1;
+  imu y: uint = 2;
+
+  puts("hello hello");
+
+  return x + y;
+}

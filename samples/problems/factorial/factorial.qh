@@ -1,0 +1,11 @@
+fun factorial(x: uint): uint {
+  if x == 0 {
+    return 1;
+  } else {
+    return x * factorial(x-1);
+  }
+}
+
+fun main() {
+  return factorial(23);
+}

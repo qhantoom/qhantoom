@@ -1,0 +1,3 @@
+val FOO: uint = 0;
+
+fun main() {}

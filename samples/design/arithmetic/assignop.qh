@@ -1,0 +1,15 @@
+fun main() {
+  mut x: uint = 0;
+
+  x += 1;
+  x -= 1;
+  x *= 1;
+  x /= 1;
+  x %= 1;
+  x ^= 1;
+
+  mut y: bool = true;
+
+  y &= false;
+  y |= true;
+}

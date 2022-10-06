@@ -1,0 +1,4 @@
+val foo: bool = true;
+val bar: bool = false;
+
+fun main() {}

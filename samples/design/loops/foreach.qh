@@ -1,0 +1,7 @@
+fun main() {
+  for each [1, 2, 3] {
+    println(it);
+  }
+
+  for each [1, 2, 3] -> println(it);
+}

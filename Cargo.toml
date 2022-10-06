@@ -1,8 +1,12 @@
 [workspace]
 members = [
-  "src/bootstrap",
+  # "src/bootstrap",
   "compiler/qhantoom",
+  "compiler/qhantoom-driver",
 ]
+
+[workspace.package]
+version = "0.0.0"
 
 [profile.release]
 codegen-units = 1

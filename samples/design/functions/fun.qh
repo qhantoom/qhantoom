@@ -1,0 +1,5 @@
+fun foo() {}
+
+fun bar(x: s64, y: s64): s64 {
+  x + y
+}

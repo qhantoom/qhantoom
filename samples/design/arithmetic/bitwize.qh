@@ -1,0 +1,7 @@
+fun main() {
+  imu a: uint = 5;
+  imu b: uint = 10;
+  imu c: uint = a | b;
+  imu d: uint = a ^ b;
+  imu e: bool = true & true;
+}

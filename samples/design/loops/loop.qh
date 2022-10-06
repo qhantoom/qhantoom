@@ -1,0 +1,8 @@
+fun main() {
+  mut x: uint = 0;
+
+  loop {
+    x += 1;
+    println("{x}");
+  }
+}

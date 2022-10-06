@@ -1,0 +1,18 @@
+data Foo {
+  id: uint,
+  name: str,
+}
+
+impl Foo {
+  pub fun new(name: str): Self {
+    Self { name }
+  }
+
+  pub fun name(.): str {
+    return .name;
+  }
+}
+
+fun main() {
+  imu x: Foo = Foo::new("foo");
+}
