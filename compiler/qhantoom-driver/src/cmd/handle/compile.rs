@@ -51,8 +51,7 @@ fn compiling(settings: Settings) {
   let program = parser::parse(settings.input);
   println!("{:?}", program);
 
-  // uncomment to run semantic analysis
-  // let _ = analyzer::analyze(&program);
+  let _ = analyzer::analyze(&program);
 
   // uncomment to run code generation
   // let codegen = codegen::cranelift::aot::generate(&program);

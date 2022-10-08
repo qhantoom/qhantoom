@@ -1,28 +1,28 @@
-use crate::front::parser::ast::Ty;
+use crate::front::parser::ast::{PBox, Ty};
 
 use std::collections::HashMap;
 
 #[derive(Debug, Default)]
 struct Scope {
-  decls: HashMap<String, Ty>,
-  funs: HashMap<String, (Ty, Vec<Ty>)>,
-  tys: HashMap<String, Ty>,
+  decls: HashMap<String, PBox<Ty>>,
+  funs: HashMap<String, (PBox<Ty>, Vec<PBox<Ty>>)>,
+  tys: HashMap<String, PBox<Ty>>,
 }
 
 impl Scope {
-  fn decl(&self, name: &str) -> Option<&Ty> {
+  fn decl(&self, name: &str) -> Option<&PBox<Ty>> {
     self.decls.get(name)
   }
 
-  fn fun(&self, name: &str) -> Option<&(Ty, Vec<Ty>)> {
+  fn fun(&self, name: &str) -> Option<&(PBox<Ty>, Vec<PBox<Ty>>)> {
     self.funs.get(name)
   }
 
-  fn ty(&self, name: &str) -> Option<&Ty> {
+  fn ty(&self, name: &str) -> Option<&PBox<Ty>> {
     self.tys.get(name)
   }
 
-  fn set_decl(&mut self, name: String, ty: Ty) -> Result<(), String> {
+  fn set_decl(&mut self, name: String, ty: PBox<Ty>) -> Result<(), String> {
     match self.decls.get(&name) {
       Some(_) => Err(format!("variable `{}` already exists", name)),
       None => {
@@ -32,7 +32,11 @@ impl Scope {
     }
   }
 
-  fn set_fun(&mut self, name: String, ty: (Ty, Vec<Ty>)) -> Result<(), String> {
+  fn set_fun(
+    &mut self,
+    name: String,
+    ty: (PBox<Ty>, Vec<PBox<Ty>>),
+  ) -> Result<(), String> {
     match self.funs.get(&name) {
       Some(_) => Err(format!("function `{}` already exists", name)),
       None => {
@@ -42,7 +46,7 @@ impl Scope {
     }
   }
 
-  fn set_ty(&mut self, name: String, ty: Ty) -> Result<(), String> {
+  fn set_ty(&mut self, name: String, ty: PBox<Ty>) -> Result<(), String> {
     match self.tys.get(&name) {
       Some(_) => Err(format!("type `{}` already exists", name)),
       None => {
@@ -69,7 +73,7 @@ impl ScopeMap {
     }
   }
 
-  pub fn decl(&self, name: &str) -> Option<&Ty> {
+  pub fn decl(&self, name: &str) -> Option<&PBox<Ty>> {
     for map in self.maps.iter().rev() {
       if let Some(decl) = map.decl(name) {
         return Some(decl);
@@ -79,7 +83,7 @@ impl ScopeMap {
     None
   }
 
-  pub fn fun(&self, name: &str) -> Option<&(Ty, Vec<Ty>)> {
+  pub fn fun(&self, name: &str) -> Option<&(PBox<Ty>, Vec<PBox<Ty>>)> {
     for map in self.maps.iter().rev() {
       if let Some(fun) = map.fun(name) {
         return Some(fun);
@@ -89,7 +93,7 @@ impl ScopeMap {
     None
   }
 
-  pub fn ty(&self, name: &str) -> Option<&Ty> {
+  pub fn ty(&self, name: &str) -> Option<&PBox<Ty>> {
     for map in self.maps.iter().rev() {
       if let Some(ty) = map.ty(name) {
         return Some(ty);
@@ -99,7 +103,7 @@ impl ScopeMap {
     None
   }
 
-  pub fn set_decl(&mut self, name: String, ty: Ty) -> Result<(), String> {
+  pub fn set_decl(&mut self, name: String, ty: PBox<Ty>) -> Result<(), String> {
     match self.maps.last_mut() {
       Some(map) => map.set_decl(name, ty),
       None => Err(format!("variable {} value do not exist", name)),
@@ -109,7 +113,7 @@ impl ScopeMap {
   pub fn set_fun(
     &mut self,
     name: String,
-    ty: (Ty, Vec<Ty>),
+    ty: (PBox<Ty>, Vec<PBox<Ty>>),
   ) -> Result<(), String> {
     match self.maps.last_mut() {
       Some(map) => map.set_fun(name, ty),
@@ -117,7 +121,7 @@ impl ScopeMap {
     }
   }
 
-  pub fn set_ty(&mut self, name: String, ty: Ty) -> Result<(), String> {
+  pub fn set_ty(&mut self, name: String, ty: PBox<Ty>) -> Result<(), String> {
     match self.maps.last_mut() {
       Some(map) => map.set_ty(name, ty),
       None => Err(format!("type {} value do not exist", name)),

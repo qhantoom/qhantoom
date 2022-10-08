@@ -1,6 +1,6 @@
 use super::scope::ScopeMap;
 
-use crate::front::parser::ast::{Program, Ty};
+use crate::front::parser::ast::{pbox, Program, Ty};
 
 #[derive(Debug)]
 pub struct Context<'a> {
@@ -16,7 +16,7 @@ impl<'a> Context<'a> {
 
     // TODO: tmp
     scope_map
-      .set_fun("puts".to_string(), (Ty::VOID, vec![Ty::STR]))
+      .set_fun("puts".to_string(), (pbox(Ty::VOID), vec![pbox(Ty::STR)]))
       .unwrap();
 
     Self {

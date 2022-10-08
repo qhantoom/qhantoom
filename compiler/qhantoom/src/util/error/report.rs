@@ -116,17 +116,27 @@ impl fmt::Display for ReportCode {
 }
 
 pub enum ReportMessage {
+  DuplicateDeclaration(String),
   MainHasInputs,
   MainNotFound,
   NamingConvention(String, String),
+  TypeMismatch,
 }
 
 impl fmt::Display for ReportMessage {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match self {
+      Self::DuplicateDeclaration(name) => {
+        write!(f, "{}", "variable".fg(Color::BLUE_100)).ok();
+        write!(f, " `{}` ", name.fg(Color::GREEN_100)).ok();
+        write!(f, "{}", "already exist".fg(Color::BLUE_100))
+      }
       Self::MainHasInputs => write!(f, ""),
       Self::MainNotFound => write!(f, ""),
-      _ => unimplemented!(),
+      Self::NamingConvention(_, _) => write!(f, ""),
+      Self::TypeMismatch => {
+        write!(f, "{}", "type mismatch".fg(Color::BLUE_100))
+      }
     }
   }
 }
@@ -152,7 +162,7 @@ impl Label {
     Self {
       kind,
       source,
-      message: LabelMessage::Default,
+      message: LabelMessage::UnrecognizedToken,
       order: 0,
     }
   }
@@ -197,19 +207,24 @@ impl From<LabelKind> for ariadne::Color {
 }
 
 pub enum LabelMessage {
-  Default,
-
+  DuplicateDeclaration,
   MainHasInputs,
   MainNotFound(String),
   NameClash,
   NamingConvention(String, String),
+  TypeMismatch(String, String),
+  TypeMismatchDefinedAs(String),
   UnrecognizedToken,
-  DeclAlreadyExist,
 }
 
 impl fmt::Display for LabelMessage {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match self {
+      Self::DuplicateDeclaration => write!(
+        f,
+        "{}",
+        "this name is already declared in the scope".fg(Color::RED_100)
+      ),
       Self::MainNotFound(source_entry) => write!(
         f,
         "{}",
@@ -224,6 +239,16 @@ impl fmt::Display for LabelMessage {
         "{}",
         "`main` function should not take any arguments".fg(Color::RED_100)
       ),
+      Self::TypeMismatch(t1, t2) => {
+        write!(
+          f,
+          "{}",
+          format!("expected `{}`, found `{}`", t1, t2).fg(Color::RED_100)
+        )
+      }
+      Self::TypeMismatchDefinedAs(ty) => {
+        write!(f, "{}", format!("defined as `{}`", ty).fg(Color::BLUE_200))
+      }
       _ => unimplemented!(),
     }
   }
