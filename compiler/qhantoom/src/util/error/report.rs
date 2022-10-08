@@ -120,6 +120,7 @@ pub enum ReportMessage {
   MainHasInputs,
   MainNotFound,
   NamingConvention(String, String),
+  UndefinedName(String),
   TypeMismatch,
 }
 
@@ -134,6 +135,11 @@ impl fmt::Display for ReportMessage {
       Self::MainHasInputs => write!(f, ""),
       Self::MainNotFound => write!(f, ""),
       Self::NamingConvention(_, _) => write!(f, ""),
+      Self::UndefinedName(name) => {
+        write!(f, "{}", "the name".fg(Color::BLUE_100)).ok();
+        write!(f, " `{}` ", name.fg(Color::GREEN_100)).ok();
+        write!(f, "{}", "does not exist in this scope".fg(Color::BLUE_100))
+      }
       Self::TypeMismatch => {
         write!(f, "{}", "type mismatch".fg(Color::BLUE_100))
       }
@@ -214,6 +220,7 @@ pub enum LabelMessage {
   NamingConvention(String, String),
   TypeMismatch(String, String),
   TypeMismatchDefinedAs(String),
+  UndefinedName,
   UnrecognizedToken,
 }
 
@@ -249,6 +256,14 @@ impl fmt::Display for LabelMessage {
       Self::TypeMismatchDefinedAs(ty) => {
         write!(f, "{}", format!("defined as `{}`", ty).fg(Color::BLUE_200))
       }
+      Self::UndefinedName => write!(
+        f,
+        "{}",
+        format!(
+          "I don't know this id. are your sure you defined it correctly?",
+        )
+        .fg(Color::RED_100)
+      ),
       _ => unimplemented!(),
     }
   }

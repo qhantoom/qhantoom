@@ -74,14 +74,17 @@ fn check_stmt_expr(context: &mut Context, expr: &Expr) {
   check_expr(context, expr);
 }
 
-fn check_expr(context: &mut Context, expr: &Expr) -> Ty {
+fn check_expr(context: &mut Context, expr: &Expr) -> PBox<Ty> {
   match &expr.kind {
     ExprKind::Lit(lit) => check_expr_lit(context, lit),
+    ExprKind::Identifier(identifier) => {
+      check_expr_identifier(context, identifier, expr.span)
+    }
     _ => unimplemented!("{}", expr),
   }
 }
 
-fn check_expr_lit(_context: &mut Context, lit: &Lit) -> Ty {
+fn check_expr_lit(_context: &mut Context, lit: &Lit) -> PBox<Ty> {
   match &lit.kind {
     LitKind::Bool(_) => check_expr_lit_bool(lit),
     LitKind::Int(_) => check_expr_lit_int(lit),
@@ -90,20 +93,36 @@ fn check_expr_lit(_context: &mut Context, lit: &Lit) -> Ty {
   }
 }
 
-fn check_expr_lit_bool(lit: &Lit) -> Ty {
-  Ty::with_bool(lit.span)
+fn check_expr_lit_bool(lit: &Lit) -> PBox<Ty> {
+  pbox(Ty::with_bool(lit.span))
 }
 
-fn check_expr_lit_int(lit: &Lit) -> Ty {
-  Ty::with_uint(lit.span)
+fn check_expr_lit_int(lit: &Lit) -> PBox<Ty> {
+  pbox(Ty::with_uint(lit.span))
 }
 
-fn check_expr_lit_float(lit: &Lit) -> Ty {
-  Ty::with_f64(lit.span)
+fn check_expr_lit_float(lit: &Lit) -> PBox<Ty> {
+  pbox(Ty::with_f64(lit.span))
 }
 
-fn check_expr_lit_str(lit: &Lit) -> Ty {
-  Ty::with_str(lit.span)
+fn check_expr_lit_str(lit: &Lit) -> PBox<Ty> {
+  pbox(Ty::with_str(lit.span))
+}
+
+fn check_expr_identifier(
+  context: &mut Context,
+  identifier: &String,
+  span: Span,
+) -> PBox<Ty> {
+  if let Some(ty) = context.scope_map.decl(identifier) {
+    return ty.to_owned();
+  } else if let Some(ty) = context.scope_map.fun(identifier) {
+    return ty.0.to_owned();
+  } else if let Some(ty) = context.scope_map.ty(identifier) {
+    return ty.to_owned();
+  } else {
+    add_report_undefined_name_error(&context.program, identifier, span)
+  }
 }
 
 fn check_equality(context: &mut Context, t1: &Ty, t2: &Ty) -> bool {
@@ -180,4 +199,30 @@ fn add_report_type_mismatch_error(t1: &Ty, t2: &Ty, program: &Program) {
     path.display().to_string(),
     code,
   );
+}
+
+fn add_report_undefined_name_error(
+  program: &Program,
+  identifier: &String,
+  span: Span,
+) -> ! {
+  let source_id = program.reporter.source(span);
+  let code = program.reporter.code(source_id);
+  let path = program.reporter.path(span);
+
+  program.reporter.raise(
+    Report::new(
+      ReportKind::Error,
+      path.display().to_string(),
+      ReportOffset(span.lo),
+    )
+    .with_code(ReportCode(3))
+    .with_message(ReportMessage::UndefinedName(identifier.into()))
+    .with_label(
+      Label::new(LabelKind::Error, (path.display().to_string(), span.into()))
+        .with_message(LabelMessage::UndefinedName),
+    ),
+    path.display().to_string(),
+    code,
+  )
 }
