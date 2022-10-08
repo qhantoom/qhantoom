@@ -2,7 +2,7 @@ use super::scope::ScopeMap;
 
 use crate::front::parser::ast::{pbox, Program, Ty};
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Context<'a> {
   pub scope_map: ScopeMap,
   pub loops: u32,

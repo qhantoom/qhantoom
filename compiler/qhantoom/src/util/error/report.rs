@@ -119,6 +119,7 @@ pub enum ReportMessage {
   DuplicateDeclaration(String),
   MainHasInputs,
   MainNotFound,
+  MissingInputs,
   NamingConvention(String, String),
   UndefinedName(String),
   TypeMismatch,
@@ -134,6 +135,9 @@ impl fmt::Display for ReportMessage {
       }
       Self::MainHasInputs => write!(f, ""),
       Self::MainNotFound => write!(f, ""),
+      Self::MissingInputs => {
+        write!(f, "{}", "missing input arguments".fg(Color::BLUE_100))
+      }
       Self::NamingConvention(_, _) => write!(f, ""),
       Self::UndefinedName(name) => {
         write!(f, "{}", "the name".fg(Color::BLUE_100)).ok();
@@ -216,6 +220,7 @@ pub enum LabelMessage {
   DuplicateDeclaration,
   MainHasInputs,
   MainNotFound(String),
+  MissingInputs(String),
   NameClash,
   NamingConvention(String, String),
   TypeMismatch(String, String),
@@ -232,6 +237,11 @@ impl fmt::Display for LabelMessage {
         "{}",
         "this name is already declared in the scope".fg(Color::RED_100)
       ),
+      Self::MainHasInputs => write!(
+        f,
+        "{}",
+        "`main` function should not take any arguments".fg(Color::RED_100)
+      ),
       Self::MainNotFound(source_entry) => write!(
         f,
         "{}",
@@ -241,10 +251,11 @@ impl fmt::Display for LabelMessage {
         )
         .fg(Color::RED_100)
       ),
-      Self::MainHasInputs => write!(
+      Self::MissingInputs(inputs) => write!(
         f,
         "{}",
-        "`main` function should not take any arguments".fg(Color::RED_100)
+        format!("the input argument(s) of type {} are required", inputs)
+          .fg(Color::RED_100)
       ),
       Self::TypeMismatch(t1, t2) => {
         write!(
@@ -288,6 +299,7 @@ impl fmt::Display for Note {
 pub enum NoteKind {
   MainHasInputs(String),
   MainNotFound,
+  MissingInputs(usize, usize),
   NameClash,
   UnrecognizedToken,
 }
@@ -304,6 +316,11 @@ impl fmt::Display for NoteKind {
         f,
         "add the following code {} to your entry file",
         "`fun main() {}`".fg(Color::GREEN_200)
+      ),
+      Self::MissingInputs(expected, actual) => write!(
+        f,
+        "this function takes {} argument but {} arguments were supplied",
+        expected, actual
       ),
       _ => unimplemented!(),
     }
@@ -326,12 +343,19 @@ impl fmt::Display for Help {
   }
 }
 
-pub enum HelpKind {}
+pub enum HelpKind {
+  MissingInputs(String),
+}
 
 impl fmt::Display for HelpKind {
-  fn fmt(&self, _f: &mut fmt::Formatter) -> fmt::Result {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match self {
-      _ => unimplemented!(),
+      Self::MissingInputs(callee) => write!(
+        f,
+        "{}",
+        format!("This is how you should call this function: {}", callee)
+          .fg(Color::YELLOW_100)
+      ),
     }
   }
 }

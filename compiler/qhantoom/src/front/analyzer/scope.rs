@@ -2,7 +2,7 @@ use crate::front::parser::ast::{PBox, Ty};
 
 use std::collections::HashMap;
 
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 struct Scope {
   decls: HashMap<String, PBox<Ty>>,
   funs: HashMap<String, (PBox<Ty>, Vec<PBox<Ty>>)>,
@@ -57,7 +57,7 @@ impl Scope {
   }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct ScopeMap {
   maps: Vec<Scope>,
 }

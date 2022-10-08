@@ -1,12 +1,21 @@
 use crate::front::analyzer::context::Context;
 use crate::front::parser::ast::*;
+use crate::util::error::{Help, HelpKind};
 use crate::util::error::{Label, LabelKind, LabelMessage};
+use crate::util::error::{Note, NoteKind};
 
 use crate::util::error::{
   Report, ReportCode, ReportKind, ReportMessage, ReportOffset,
 };
 
 use crate::util::span::Span;
+
+// FIXME #1
+//
+// too much error panic. The functions should return a result type.
+// in case of an error, an error report is returned. this way,
+// i collect all possible errors in a vector. and once the
+// verification phase is over, i display all the errors connected.
 
 pub fn check(program: &Program) {
   let mut context = Context::new(program);
@@ -80,6 +89,7 @@ fn check_expr(context: &mut Context, expr: &Expr) -> PBox<Ty> {
     ExprKind::Identifier(identifier) => {
       check_expr_identifier(context, identifier, expr.span)
     }
+    ExprKind::Call(callee, args) => check_expr_call(context, callee, args),
     _ => unimplemented!("{}", expr),
   }
 }
@@ -123,6 +133,37 @@ fn check_expr_identifier(
   } else {
     add_report_undefined_name_error(&context.program, identifier, span)
   }
+}
+
+fn check_expr_call(
+  context: &mut Context,
+  callee: &Expr,
+  inputs: &Vec<PBox<Expr>>,
+) -> PBox<Ty> {
+  let (fun_return_ty, fun_input_tys) =
+    match context.scope_map.fun(&callee.to_string()) {
+      Some(fun_ty) => fun_ty,
+      None => panic!("calling not defined function"), // FIXME #1
+    };
+
+  if inputs.len() != fun_input_tys.len() {
+    add_report_wrong_input_count_error(
+      &context.program,
+      callee,
+      inputs,
+      fun_input_tys,
+    );
+  }
+
+  for (x, input) in inputs.iter().enumerate() {
+    if x < fun_input_tys.len() {
+      check_verify(&mut context.to_owned(), input, &fun_input_tys[x]);
+    }
+  }
+
+  check_verify(&mut context.to_owned(), callee, fun_return_ty);
+
+  fun_return_ty.clone()
 }
 
 fn check_equality(context: &mut Context, t1: &Ty, t2: &Ty) -> bool {
@@ -225,4 +266,48 @@ fn add_report_undefined_name_error(
     path.display().to_string(),
     code,
   )
+}
+
+fn add_report_wrong_input_count_error(
+  program: &Program,
+  callee: &Expr,
+  actual_inputs: &Vec<PBox<Expr>>,
+  expected_inputs: &Vec<PBox<Ty>>,
+) {
+  let source_id = program.reporter.source(callee.span);
+  let code = program.reporter.code(source_id);
+  let path = program.reporter.path(callee.span);
+
+  let expected_inputs_fmt = expected_inputs
+    .iter()
+    .map(|input| format!("`{}`", input.to_string()))
+    .collect::<Vec<_>>()
+    .join(", ");
+
+  let actual_callee =
+    format!("{}({})", callee.to_string(), expected_inputs_fmt);
+
+  program.reporter.add_report(
+    Report::new(
+      ReportKind::Error,
+      path.display().to_string(),
+      ReportOffset(callee.span.lo),
+    )
+    .with_code(ReportCode(3))
+    .with_message(ReportMessage::MissingInputs)
+    .with_label(
+      Label::new(
+        LabelKind::Error,
+        (path.display().to_string(), callee.span.into()),
+      )
+      .with_message(LabelMessage::MissingInputs(expected_inputs_fmt)),
+    )
+    .with_note(Note::new(NoteKind::MissingInputs(
+      expected_inputs.len(),
+      actual_inputs.len(),
+    )))
+    .with_help(Help::new(HelpKind::MissingInputs(actual_callee))),
+    path.display().to_string(),
+    code,
+  );
 }
