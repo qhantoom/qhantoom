@@ -1,5 +1,9 @@
 # qhantoom
 
+<p align="center">
+  <img width="500" height="auto" src="./src/misc/qhantoom-banner.png" />
+</p>
+
 ...
 
 ## community
