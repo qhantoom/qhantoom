@@ -32,9 +32,29 @@ pub fn check(program: &Program) {
 
 fn check_item(context: &mut Context, item: &Item) {
   match &item.kind {
+    ItemKind::Ext(ext) => check_item_ext(context, ext),
     ItemKind::Val(decl) => check_item_val(context, decl),
     ItemKind::Fun(fun) => check_item_fun(context, fun),
-    _ => unimplemented!("{}", item),
+    _ => todo!("{}", item),
+  }
+}
+
+fn check_item_ext(context: &mut Context, ext: &Ext) {
+  match context.scope_map.set_fun(
+    ext.prototype.name.to_string(),
+    (ext.prototype.as_ty(), ext.prototype.as_inputs_tys()),
+  ) {
+    Ok(_) => {
+      context.scope_map.enter_scope();
+      check_prototype(context, &ext.prototype);
+
+      if let Some(body) = &ext.body {
+        check_block(context, body);
+      };
+
+      context.scope_map.exit_scope();
+    }
+    Err(_) => todo!(),
   }
 }
 
@@ -65,7 +85,7 @@ fn check_item_fun(context: &mut Context, fun: &Fun) {
       check_block(context, &fun.body);
       context.scope_map.exit_scope();
     }
-    Err(_error) => unimplemented!(),
+    Err(_error) => todo!(),
   }
 }
 
@@ -95,7 +115,7 @@ fn check_stmt(context: &mut Context, stmt: &Stmt) {
   match &stmt.kind {
     StmtKind::Decl(decl) => check_stmt_decl(context, decl),
     StmtKind::Expr(expr) => check_stmt_expr(context, expr),
-    _ => unimplemented!("{}", stmt),
+    _ => todo!("{}", stmt),
   }
 }
 
@@ -119,7 +139,7 @@ fn check_decl(context: &mut Context, decl: &Decl) {
     identifier
   } else {
     // TODO: report error?
-    unimplemented!();
+    todo!();
   };
 
   let t1 = check_expr(context, name);
@@ -144,7 +164,7 @@ fn check_expr(context: &mut Context, expr: &Expr) -> PBox<Ty> {
     ExprKind::Return(maybe_expr) => {
       check_expr_return(context, maybe_expr, expr.span)
     }
-    _ => unimplemented!("\n\n{:?}\n\n", expr.kind),
+    _ => todo!("\n\n{:?}\n\n", expr.kind),
   }
 }
 
