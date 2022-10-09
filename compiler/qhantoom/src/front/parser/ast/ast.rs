@@ -361,6 +361,22 @@ pub enum BinOpKind {
   Range,  // ..
 }
 
+impl BinOpKind {
+  pub fn is_assign_op(&self) -> bool {
+    matches!(
+      self,
+      Self::Add
+        | Self::Sub
+        | Self::Mul
+        | Self::Div
+        | Self::Rem
+        | Self::BitXor
+        | Self::BitAnd
+        | Self::BitOr
+    )
+  }
+}
+
 pub type UnOp = Spanned<UnOpKind>;
 
 #[derive(Debug)]

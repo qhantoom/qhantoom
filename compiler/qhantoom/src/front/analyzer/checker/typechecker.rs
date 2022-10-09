@@ -166,6 +166,9 @@ fn check_expr(context: &mut Context, expr: &Expr) -> PBox<Ty> {
     ExprKind::UnOp(op, rhs) => check_expr_un_op(context, op, rhs),
     ExprKind::BinOp(lhs, op, rhs) => check_expr_bin_op(context, lhs, op, rhs),
     ExprKind::Assign(lhs, op, rhs) => check_expr_assign(context, lhs, op, rhs),
+    ExprKind::AssignOp(lhs, op, rhs) => {
+      check_expr_assign_op(context, lhs, op, rhs)
+    }
     ExprKind::Return(maybe_expr) => {
       check_expr_return(context, maybe_expr, expr.span)
     }
@@ -315,6 +318,23 @@ fn check_expr_assign(
   let t1 = check_expr(context, lhs);
 
   check_verify(context, rhs, &t1);
+  Ty::with_void(Span::merge(&lhs.span, &rhs.span)).into()
+}
+
+fn check_expr_assign_op(
+  context: &mut Context,
+  lhs: &Expr,
+  op: &BinOp,
+  rhs: &Expr,
+) -> PBox<Ty> {
+  let t1 = check_expr(context, lhs);
+  let t2 = check_expr(context, rhs);
+
+  if !op.node.is_assign_op() {
+    raise_report_wrong_assign_op_error(context.program, op, &t1, &t2)
+  }
+
+  check_equality(context, &t1, &t2);
   Ty::with_void(Span::merge(&lhs.span, &rhs.span)).into()
 }
 
@@ -552,6 +572,39 @@ fn raise_report_wrong_bin_op_error(
         (path.display().to_string(), op.span.into()),
       )
       .with_message(LabelMessage::WrongBinOp(t1.to_string(), t2.to_string())),
+    ),
+    path.display().to_string(),
+    code,
+  )
+}
+
+fn raise_report_wrong_assign_op_error(
+  program: &Program,
+  op: &BinOp,
+  t1: &Ty,
+  t2: &Ty,
+) -> ! {
+  let source_id = program.reporter.source(op.span);
+  let code = program.reporter.code(source_id);
+  let path = program.reporter.path(op.span);
+
+  program.reporter.raise(
+    Report::new(
+      ReportKind::Error,
+      path.display().to_string(),
+      ReportOffset(op.span.lo),
+    )
+    .with_code(ReportCode(7)) // FIXME #2
+    .with_message(ReportMessage::WrongAssignOp)
+    .with_label(
+      Label::new(
+        LabelKind::Error,
+        (path.display().to_string(), op.span.into()),
+      )
+      .with_message(LabelMessage::WrongAssignOp(
+        t1.to_string(),
+        t2.to_string(),
+      )),
     ),
     path.display().to_string(),
     code,
