@@ -116,7 +116,7 @@ impl Display for Ext {
       Public::Yes(_) => write!(f, "pub "),
     };
 
-    write!(f, "ext {}", self.prototype).ok();
+    write!(f, "ext {}", self.prototype)?;
 
     let Some(body) = &self.body else { return write!(f, ""); };
 

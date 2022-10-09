@@ -131,16 +131,16 @@ impl fmt::Display for ReportMessage {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match self {
       Self::DuplicateDeclaration(name) => {
-        write!(f, "{}", "variable".fg(Color::BLUE_100)).ok();
-        write!(f, " `{}` ", name.fg(Color::GREEN_100)).ok();
+        write!(f, "{}", "variable".fg(Color::BLUE_100))?;
+        write!(f, " `{}` ", name.fg(Color::GREEN_100))?;
         write!(f, "{}", "already exist".fg(Color::BLUE_100))
       }
       Self::MainHasInputs => {
-        write!(f, "{} ", "`main`".fg(Color::GREEN_100)).ok();
+        write!(f, "{} ", "`main`".fg(Color::GREEN_100))?;
         write!(f, "{}", "function defined with args".fg(Color::BLUE_100))
       }
       Self::MainNotFound => {
-        write!(f, "{} ", "`main`".fg(Color::GREEN_100)).ok();
+        write!(f, "{} ", "`main`".fg(Color::GREEN_100))?;
         write!(f, "{} ", "function not found".fg(Color::BLUE_100))
       }
       Self::MissingInputs => {
@@ -148,21 +148,21 @@ impl fmt::Display for ReportMessage {
       }
       Self::NameClash => write!(f, "{}", "name clash".fg(Color::BLUE_100)),
       Self::NamingConvention(name, convention) => {
-        write!(f, "{}", "variable".fg(Color::BLUE_100)).ok();
-        write!(f, " {} ", format!("`{}`", name).fg(Color::GREEN_100)).ok();
-        write!(f, "{}", "should have a".fg(Color::BLUE_100)).ok();
+        write!(f, "{}", "variable".fg(Color::BLUE_100))?;
+        write!(f, " {} ", format!("`{}`", name).fg(Color::GREEN_100))?;
+        write!(f, "{}", "should have a".fg(Color::BLUE_100))?;
         write!(f, " {} ", convention.fg(Color::BLUE_100))
       }
       Self::UndefinedName(name) => {
-        write!(f, "{}", "the name".fg(Color::BLUE_100)).ok();
-        write!(f, " {} ", format!("`{}`", name).fg(Color::GREEN_100)).ok();
+        write!(f, "{}", "the name".fg(Color::BLUE_100))?;
+        write!(f, " {} ", format!("`{}`", name).fg(Color::GREEN_100))?;
         write!(f, "{}", "does not exist in this scope".fg(Color::BLUE_100))
       }
       Self::TypeMismatch => {
         write!(f, "{}", "type mismatch".fg(Color::BLUE_100))
       }
       Self::WrongUnOp(op) => {
-        write!(f, "{}", "wrong unary op expression".fg(Color::BLUE_100)).ok();
+        write!(f, "{}", "wrong unary op expression".fg(Color::BLUE_100))?;
         write!(f, " {}", format!("`{}`", op).fg(Color::GREEN_100))
       }
     }
