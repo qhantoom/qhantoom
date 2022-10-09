@@ -174,7 +174,9 @@ fn check_expr(context: &mut Context, expr: &Expr) -> PBox<Ty> {
     }
     ExprKind::Block(body) => check_expr_block(context, body),
     ExprKind::Loop(body) => check_expr_loop(context, body),
-    _ => todo!("\n\n{:?}\n\n", expr.kind),
+    ExprKind::While(condition, body) => {
+      check_expr_while(context, condition, body)
+    }
   }
 }
 
@@ -365,6 +367,19 @@ fn check_expr_block(context: &mut Context, body: &Block) -> PBox<Ty> {
 }
 
 fn check_expr_loop(context: &mut Context, body: &Block) -> PBox<Ty> {
+  context.loops += 1;
+  check_block(context, body);
+  context.loops -= 1;
+
+  Ty::with_void(body.span).into()
+}
+
+fn check_expr_while(
+  context: &mut Context,
+  condition: &Expr,
+  body: &Block,
+) -> PBox<Ty> {
+  check_verify(context, condition, &Ty::with_bool(condition.span));
   context.loops += 1;
   check_block(context, body);
   context.loops -= 1;
