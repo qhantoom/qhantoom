@@ -153,9 +153,9 @@ fn check_expr(_context: &mut Context, expr: &Expr) {
 }
 
 fn verify_pascal_case(name: String, span: Span, program: &Program) {
-  if !is_pascal_case(&name.to_string()) {
+  if !is_pascal_case(&name) {
     emit_report_wrong_naming_convention(
-      name.to_string(),
+      name,
       span,
       NamingConvention::Pascal,
       program,
@@ -164,9 +164,9 @@ fn verify_pascal_case(name: String, span: Span, program: &Program) {
 }
 
 fn verify_snake_case(name: String, span: Span, program: &Program) {
-  if !is_snake_case(&name.to_string()) {
+  if !is_snake_case(&name) {
     emit_report_wrong_naming_convention(
-      name.to_string(),
+      name,
       span,
       NamingConvention::Snake,
       program,
@@ -175,9 +175,9 @@ fn verify_snake_case(name: String, span: Span, program: &Program) {
 }
 
 fn verify_screaming_snake_case(name: String, span: Span, program: &Program) {
-  if !is_screaming_snake_case(&name.to_string()) {
+  if !is_screaming_snake_case(&name) {
     emit_report_wrong_naming_convention(
-      name.to_string(),
+      name,
       span,
       NamingConvention::SnakeScreaming,
       program,

@@ -285,10 +285,8 @@ impl fmt::Display for LabelMessage {
       Self::UndefinedName => write!(
         f,
         "{}",
-        format!(
-          "I don't know this id. are your sure you defined it correctly?",
-        )
-        .fg(Color::RED_100)
+        "i don't know this id. are your sure you defined it correctly?"
+          .fg(Color::RED_100)
       ),
       Self::WrongUnOp(ty) => {
         write!(
@@ -348,7 +346,6 @@ impl fmt::Display for NoteKind {
       Self::NameClash => {
         write!(
           f,
-          "{}",
           "i'm not sure which one you want to use? rename one of them!"
         )
       }

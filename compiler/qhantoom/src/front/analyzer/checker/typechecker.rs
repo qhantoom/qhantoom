@@ -55,11 +55,12 @@ fn check_item_fun(context: &mut Context, fun: &Fun) {
 fn check_prototype(context: &mut Context, prototype: &Prototype) {
   // register inputs to the function scope
   for input in &prototype.inputs {
-    if let Err(_) = context
+    if context
       .scope_map
       .set_decl(input.pattern.to_string(), input.ty.to_owned())
+      .is_err()
     {
-      add_report_name_clash_if_error(&context.program, input);
+      add_report_name_clash_if_error(context.program, input);
     }
   }
 
@@ -161,13 +162,13 @@ fn check_expr_identifier(
   span: Span,
 ) -> PBox<Ty> {
   if let Some(ty) = context.scope_map.decl(identifier) {
-    return ty.to_owned();
+    ty.to_owned()
   } else if let Some(ty) = context.scope_map.fun(identifier) {
-    return ty.0.to_owned();
+    ty.0.to_owned()
   } else if let Some(ty) = context.scope_map.ty(identifier) {
-    return ty.to_owned();
+    ty.to_owned()
   } else {
-    raise_report_undefined_name_error(&context.program, identifier, span)
+    raise_report_undefined_name_error(context.program, identifier, span)
   }
 }
 
@@ -184,7 +185,7 @@ fn check_expr_call(
 
   if inputs.len() != fun_input_tys.len() {
     add_report_wrong_input_count_error(
-      &context.program,
+      context.program,
       callee,
       inputs,
       fun_input_tys,
@@ -208,14 +209,14 @@ fn check_expr_un_op(context: &mut Context, op: &UnOp, rhs: &Expr) -> PBox<Ty> {
   match &op.node {
     UnOpKind::Neg => {
       if !t1.is_numeric() {
-        add_report_wrong_un_op_error(&context.program, op, &Ty::UINT);
+        add_report_wrong_un_op_error(context.program, op, &Ty::UINT);
       }
 
       pbox(Ty::with_uint(Span::merge(&op.span, &rhs.span)))
     }
     UnOpKind::Not => {
       if !t1.is_boolean() {
-        add_report_wrong_un_op_error(&context.program, op, &Ty::BOOL);
+        add_report_wrong_un_op_error(context.program, op, &Ty::BOOL);
       }
 
       pbox(Ty::with_bool(Span::merge(&op.span, &rhs.span)))
@@ -241,7 +242,7 @@ fn check_expr_bin_op(
         ); // FIXME #1
       }
 
-      return t1;
+      t1
     }
   }
 }
@@ -376,12 +377,11 @@ fn add_report_wrong_input_count_error(
 
   let expected_inputs_fmt = expected_inputs
     .iter()
-    .map(|input| format!("`{}`", input.to_string()))
+    .map(|input| format!("`{}`", input))
     .collect::<Vec<_>>()
     .join(", ");
 
-  let actual_callee =
-    format!("{}({})", callee.to_string(), expected_inputs_fmt);
+  let actual_callee = format!("{}({})", callee, expected_inputs_fmt);
 
   program.reporter.add_report(
     Report::new(

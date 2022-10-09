@@ -14,7 +14,7 @@ pub fn check(program: &Program) {
   let context = Context::new(program);
 
   if !context.program.items.iter().any(has_main(&context)) {
-    add_report_main_not_found_error(&context.program);
+    add_report_main_not_found_error(context.program);
   }
 
   context.program.reporter.abort_if_has_error()
@@ -27,7 +27,7 @@ fn has_main<'a>(
     if let ItemKind::Fun(fun) = &item.kind {
       if fun.prototype.name.to_string() == PROGRAM_ENTRY {
         if !fun.prototype.inputs.is_empty() {
-          add_report_main_has_inputs(&context.program, fun);
+          add_report_main_has_inputs(context.program, fun);
         }
 
         return true;
@@ -64,7 +64,7 @@ fn add_report_main_not_found_error(program: &Program) {
   )
 }
 
-fn add_report_main_has_inputs<'a>(program: &Program, fun: &Fun) {
+fn add_report_main_has_inputs(program: &Program, fun: &Fun) {
   let inputs = &fun.prototype.inputs;
   let single_span = fun.prototype.inputs[0].span;
 
@@ -96,7 +96,7 @@ fn add_report_main_has_inputs<'a>(program: &Program, fun: &Fun) {
         .prototype
         .inputs
         .iter()
-        .map(|input| format!("{}", input.ty.to_string()))
+        .map(|input| format!("{}", input.ty))
         .collect::<Vec<_>>()
         .join(", "),
     ))),

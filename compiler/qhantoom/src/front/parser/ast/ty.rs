@@ -100,28 +100,25 @@ pub enum TyKind {
 
 impl TyKind {
   fn is_boolean(&self) -> bool {
-    match self {
-      Self::Bool => true,
-      _ => false,
-    }
+    matches!(self, Self::Bool)
   }
 
   fn is_numeric(&self) -> bool {
-    match self {
+    matches!(
+      self,
       Self::U8
-      | Self::U16
-      | Self::U32
-      | Self::U64
-      | Self::UInt
-      | Self::S8
-      | Self::S16
-      | Self::S32
-      | Self::S64
-      | Self::SInt
-      | Self::F32
-      | Self::F64 => true,
-      _ => false,
-    }
+        | Self::U16
+        | Self::U32
+        | Self::U64
+        | Self::UInt
+        | Self::S8
+        | Self::S16
+        | Self::S32
+        | Self::S64
+        | Self::SInt
+        | Self::F32
+        | Self::F64
+    )
   }
 }
 
