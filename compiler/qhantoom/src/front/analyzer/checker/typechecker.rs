@@ -113,10 +113,14 @@ fn check_block(context: &mut Context, block: &Block) {
 
 fn check_stmt(context: &mut Context, stmt: &Stmt) {
   match &stmt.kind {
+    StmtKind::Item(item) => check_stmt_item(context, item),
     StmtKind::Decl(decl) => check_stmt_decl(context, decl),
     StmtKind::Expr(expr) => check_stmt_expr(context, expr),
-    _ => todo!("{}", stmt),
   }
+}
+
+fn check_stmt_item(context: &mut Context, item: &Item) {
+  check_item(context, item)
 }
 
 fn check_stmt_decl(context: &mut Context, decl: &Decl) {
