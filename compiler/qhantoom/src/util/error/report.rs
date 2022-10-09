@@ -124,6 +124,7 @@ pub enum ReportMessage {
   NamingConvention(String, String),
   UndefinedName(String),
   TypeMismatch,
+  WrongBinOp,
   WrongUnOp(String),
 }
 
@@ -161,6 +162,7 @@ impl fmt::Display for ReportMessage {
       Self::TypeMismatch => {
         write!(f, "{}", "type mismatch".fg(Color::BLUE_100))
       }
+      Self::WrongBinOp => write!(f, "wrong binary operation expression"),
       Self::WrongUnOp(op) => {
         write!(f, "{}", "wrong unary op expression".fg(Color::BLUE_100))?;
         write!(f, " {}", format!("`{}`", op).fg(Color::GREEN_100))
@@ -245,6 +247,7 @@ pub enum LabelMessage {
   TypeMismatchDefinedAs(String),
   UndefinedName,
   UnrecognizedToken,
+  WrongBinOp(String, String),
   WrongUnOp(String),
 }
 
@@ -310,6 +313,18 @@ impl fmt::Display for LabelMessage {
         "i don't know this id. are your sure you defined it correctly?"
           .fg(Color::RED_100)
       ),
+
+      Self::WrongBinOp(t1, t2) => {
+        write!(
+          f,
+          "{}",
+          format!(
+            "lhs and rhs should have the same type, got `{}` and `{}`",
+            t1, t2
+          )
+          .fg(Color::RED_100)
+        )
+      }
       Self::WrongUnOp(ty) => {
         write!(
           f,

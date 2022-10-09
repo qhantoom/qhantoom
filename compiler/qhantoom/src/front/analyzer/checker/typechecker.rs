@@ -272,16 +272,35 @@ fn check_expr_bin_op(
   let t1 = check_expr(context, lhs);
   let t2 = check_expr(context, rhs);
 
+  // TODO: ugly stuff, this will be improve later
   match &op.node {
-    _ => {
-      if t1.kind != t2.kind {
-        panic!(
-          "lhs and rhs should have the same type, got {} and {}",
-          t1, t2
-        ); // FIXME #1
+    BinOpKind::Lt | BinOpKind::Le | BinOpKind::Gt | BinOpKind::Ge => {
+      if t1.kind != TyKind::Bool || t2.kind != TyKind::Bool {
+        raise_report_wrong_bin_op_error(context.program, op, &t1, &t2);
       }
 
-      t1
+      Ty::with_bool(Span::merge(&lhs.span, &rhs.span)).into()
+    }
+    BinOpKind::And | BinOpKind::Or => {
+      if t1.kind != t2.kind {
+        raise_report_wrong_bin_op_error(context.program, op, &t1, &t2);
+      }
+
+      Ty::with_bool(Span::merge(&lhs.span, &rhs.span)).into()
+    }
+    BinOpKind::Eq | BinOpKind::Ne => {
+      if t1.kind != t2.kind {
+        raise_report_wrong_bin_op_error(context.program, op, &t1, &t2);
+      }
+
+      Ty::with_bool(Span::merge(&lhs.span, &rhs.span)).into()
+    }
+    _ => {
+      if t1.kind != t2.kind {
+        raise_report_wrong_bin_op_error(context.program, op, &t1, &t2);
+      }
+
+      Ty::with_uint(Span::merge(&lhs.span, &rhs.span)).into()
     }
   }
 }
@@ -484,13 +503,43 @@ fn add_report_name_clash_if_error(program: &Program, input: &Arg) {
       path.display().to_string(),
       ReportOffset(span.lo),
     )
-    .with_code(ReportCode(7))
+    .with_code(ReportCode(7)) // FIXME #2
     .with_message(ReportMessage::NameClash)
     .with_label(
       Label::new(LabelKind::Error, (path.display().to_string(), span.into()))
         .with_message(LabelMessage::NameClash),
     )
     .with_note(Note::new(NoteKind::NameClash)),
+    path.display().to_string(),
+    code,
+  )
+}
+
+fn raise_report_wrong_bin_op_error(
+  program: &Program,
+  op: &BinOp,
+  t1: &Ty,
+  t2: &Ty,
+) -> ! {
+  let source_id = program.reporter.source(op.span);
+  let code = program.reporter.code(source_id);
+  let path = program.reporter.path(op.span);
+
+  program.reporter.raise(
+    Report::new(
+      ReportKind::Error,
+      path.display().to_string(),
+      ReportOffset(op.span.lo),
+    )
+    .with_code(ReportCode(7)) // FIXME #2
+    .with_message(ReportMessage::WrongBinOp)
+    .with_label(
+      Label::new(
+        LabelKind::Error,
+        (path.display().to_string(), op.span.into()),
+      )
+      .with_message(LabelMessage::WrongBinOp(t1.to_string(), t2.to_string())),
+    ),
     path.display().to_string(),
     code,
   )
