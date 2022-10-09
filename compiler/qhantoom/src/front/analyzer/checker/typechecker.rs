@@ -177,6 +177,7 @@ fn check_expr(context: &mut Context, expr: &Expr) -> PBox<Ty> {
     ExprKind::While(condition, body) => {
       check_expr_while(context, condition, body)
     }
+    ExprKind::Break(maybe_expr) => check_expr_break(context, maybe_expr, expr),
   }
 }
 
@@ -385,6 +386,26 @@ fn check_expr_while(
   context.loops -= 1;
 
   Ty::with_void(body.span).into()
+}
+
+fn check_expr_break(
+  context: &mut Context,
+  maybe_expr: &Option<PBox<Expr>>,
+  origin: &Expr,
+) -> PBox<Ty> {
+  if context.loops == 0 {
+    add_report_out_of_loop(context.program, origin.to_string(), origin.span);
+  }
+
+  if let Some(expr) = maybe_expr {
+    let t1 = check_expr(context, expr);
+
+    check_equality(context, &t1, &context.return_ty.clone());
+
+    return t1;
+  }
+
+  Ty::with_void(origin.span).into()
 }
 
 fn check_verify(context: &mut Context, expr: &Expr, t1: &Ty) -> bool {
@@ -642,4 +663,26 @@ fn raise_report_wrong_assign_op_error(
     path.display().to_string(),
     code,
   )
+}
+
+fn add_report_out_of_loop(program: &Program, name: String, span: Span) {
+  let source_id = program.reporter.source(span);
+  let code = program.reporter.code(source_id);
+  let path = program.reporter.path(span);
+
+  program.reporter.add_report(
+    Report::new(
+      ReportKind::Error,
+      path.display().to_string(),
+      ReportOffset(span.lo),
+    )
+    .with_code(ReportCode(4))
+    .with_message(ReportMessage::OutOfLoop(name))
+    .with_label(
+      Label::new(LabelKind::Error, (path.display().to_string(), span.into()))
+        .with_message(LabelMessage::OutOfLoop(name)),
+    ),
+    path.display().to_string(),
+    code,
+  );
 }

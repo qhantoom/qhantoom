@@ -122,8 +122,9 @@ pub enum ReportMessage {
   MissingInputs,
   NameClash,
   NamingConvention(String, String),
-  UndefinedName(String),
+  OutOfLoop(String),
   TypeMismatch,
+  UndefinedName(String),
   WrongAssignOp,
   WrongBinOp,
   WrongUnOp(String),
@@ -134,7 +135,7 @@ impl fmt::Display for ReportMessage {
     match self {
       Self::DuplicateDeclaration(name) => {
         write!(f, "{}", "variable".fg(Color::BLUE_100))?;
-        write!(f, " `{}` ", name.fg(Color::GREEN_100))?;
+        write!(f, " `{}` ", name.fg(Color::GREEN_100))?; // TODO: backticks should be in colour too
         write!(f, "{}", "already exist".fg(Color::BLUE_100))
       }
       Self::MainHasInputs => {
@@ -155,13 +156,17 @@ impl fmt::Display for ReportMessage {
         write!(f, "{}", "should have a".fg(Color::BLUE_100))?;
         write!(f, " {} ", convention.fg(Color::BLUE_100))
       }
+      Self::OutOfLoop(behavior) => {
+        write!(f, "{} ", format!("`{}`", behavior).fg(Color::GREEN_100)).ok();
+        write!(f, "{}", "outside of the loop".fg(Color::BLUE_100))
+      }
+      Self::TypeMismatch => {
+        write!(f, "{}", "type mismatch".fg(Color::BLUE_100))
+      }
       Self::UndefinedName(name) => {
         write!(f, "{}", "the name".fg(Color::BLUE_100))?;
         write!(f, " {} ", format!("`{}`", name).fg(Color::GREEN_100))?;
         write!(f, "{}", "does not exist in this scope".fg(Color::BLUE_100))
-      }
-      Self::TypeMismatch => {
-        write!(f, "{}", "type mismatch".fg(Color::BLUE_100))
       }
       Self::WrongAssignOp => write!(
         f,
@@ -249,6 +254,7 @@ pub enum LabelMessage {
   MissingInputs(String),
   NameClash,
   NamingConvention(String, String),
+  OutOfLoop(String),
   TypeMismatch(String, String),
   TypeMismatchDefinedAs(String),
   UndefinedName,
@@ -302,6 +308,13 @@ impl fmt::Display for LabelMessage {
             convention, name,
           )
           .fg(Color::YELLOW_100)
+        )
+      }
+      Self::OutOfLoop(behavior) => {
+        write!(
+          f,
+          "{}",
+          format!("cannot `{}` out of the loop", behavior).fg(Color::RED_100)
         )
       }
       Self::TypeMismatch(t1, t2) => {
