@@ -38,7 +38,33 @@ fn check_item(context: &mut Context, item: &Item) {
 }
 
 fn check_item_fun(context: &mut Context, fun: &Fun) {
-  check_block(context, &fun.body)
+  match context.scope_map.set_fun(
+    fun.prototype.name.to_string(),
+    (fun.prototype.as_ty(), fun.prototype.as_inputs_tys()),
+  ) {
+    Ok(_) => {
+      context.scope_map.enter_scope();
+      check_prototype(context, &fun.prototype);
+      check_block(context, &fun.body);
+      context.scope_map.exit_scope();
+    }
+    Err(_error) => unimplemented!(),
+  }
+}
+
+fn check_prototype(context: &mut Context, prototype: &Prototype) {
+  // register inputs to the function scope
+  for input in &prototype.inputs {
+    if let Err(_) = context
+      .scope_map
+      .set_decl(input.pattern.to_string(), input.ty.to_owned())
+    {
+      add_report_name_clash_if_error(&context.program, input);
+    }
+  }
+
+  // preserve the return type
+  context.return_ty = prototype.as_ty();
 }
 
 fn check_block(context: &mut Context, block: &Block) {
@@ -359,6 +385,30 @@ fn add_report_wrong_un_op_error(program: &Program, op: &UnOp, ty: &Ty) {
       )
       .with_message(LabelMessage::WrongUnOp(ty.to_string())),
     ),
+    path.display().to_string(),
+    code,
+  )
+}
+
+fn add_report_name_clash_if_error(program: &Program, input: &Arg) {
+  let span = input.span;
+  let source_id = program.reporter.source(span);
+  let code = program.reporter.code(source_id);
+  let path = program.reporter.path(span);
+
+  program.reporter.add_report(
+    Report::new(
+      ReportKind::Error,
+      path.display().to_string(),
+      ReportOffset(span.lo),
+    )
+    .with_code(ReportCode(7))
+    .with_message(ReportMessage::NameClash)
+    .with_label(
+      Label::new(LabelKind::Error, (path.display().to_string(), span.into()))
+        .with_message(LabelMessage::NameClash),
+    )
+    .with_note(Note::new(NoteKind::NameClash)),
     path.display().to_string(),
     code,
   )

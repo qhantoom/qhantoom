@@ -182,6 +182,16 @@ impl Fun {
       span,
     }
   }
+
+  pub fn as_inputs_tys(&self) -> Vec<PBox<Ty>> {
+    self.prototype.as_inputs_tys()
+  }
+}
+
+impl AsTy for Fun {
+  fn as_ty(&self) -> PBox<Ty> {
+    self.prototype.as_ty()
+  }
 }
 
 #[derive(Debug)]
@@ -202,6 +212,20 @@ impl Prototype {
       inputs,
       output,
     }
+  }
+
+  pub fn as_inputs_tys(&self) -> Vec<PBox<Ty>> {
+    self
+      .inputs
+      .iter()
+      .map(|input| input.ty.to_owned())
+      .collect::<Vec<_>>()
+  }
+}
+
+impl AsTy for Prototype {
+  fn as_ty(&self) -> PBox<Ty> {
+    self.output.as_ty()
   }
 }
 

@@ -1,13 +1,13 @@
 use super::scope::ScopeMap;
 
-use crate::front::parser::ast::{pbox, Program, Ty};
+use crate::front::parser::ast::{pbox, PBox, Program, Ty};
 
 #[derive(Clone, Debug)]
 pub struct Context<'a> {
   pub scope_map: ScopeMap,
   pub loops: u32,
   pub program: &'a Program,
-  pub return_ty: Box<Ty>,
+  pub return_ty: PBox<Ty>,
 }
 
 impl<'a> Context<'a> {
@@ -23,7 +23,7 @@ impl<'a> Context<'a> {
       scope_map,
       loops: 0,
       program,
-      return_ty: Box::new(Ty::VOID),
+      return_ty: pbox(Ty::VOID),
     }
   }
 }

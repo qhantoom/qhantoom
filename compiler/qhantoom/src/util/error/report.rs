@@ -120,6 +120,7 @@ pub enum ReportMessage {
   MainHasInputs,
   MainNotFound,
   MissingInputs,
+  NameClash,
   NamingConvention(String, String),
   UndefinedName(String),
   TypeMismatch,
@@ -139,6 +140,7 @@ impl fmt::Display for ReportMessage {
       Self::MissingInputs => {
         write!(f, "{}", "missing input arguments".fg(Color::BLUE_100))
       }
+      Self::NameClash => write!(f, "{}", "name clash".fg(Color::BLUE_100)),
       Self::NamingConvention(_, _) => write!(f, ""),
       Self::UndefinedName(name) => {
         write!(f, "{}", "the name".fg(Color::BLUE_100)).ok();
@@ -263,6 +265,13 @@ impl fmt::Display for LabelMessage {
         format!("the input argument(s) of type {} are required", inputs)
           .fg(Color::RED_100)
       ),
+      Self::NameClash => {
+        write!(
+          f,
+          "{}",
+          "this argument is defined multiple times".fg(Color::RED_100)
+        )
+      }
       Self::TypeMismatch(t1, t2) => {
         write!(
           f,
@@ -336,6 +345,13 @@ impl fmt::Display for NoteKind {
         "this function takes {} argument but {} arguments were supplied",
         expected, actual
       ),
+      Self::NameClash => {
+        write!(
+          f,
+          "{}",
+          "i'm not sure which one you want to use? rename one of them!"
+        )
+      }
       _ => unimplemented!(),
     }
   }
