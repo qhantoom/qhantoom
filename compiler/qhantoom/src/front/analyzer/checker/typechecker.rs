@@ -178,6 +178,7 @@ fn check_expr(context: &mut Context, expr: &Expr) -> PBox<Ty> {
       check_expr_while(context, condition, body)
     }
     ExprKind::Break(maybe_expr) => check_expr_break(context, maybe_expr, expr),
+    ExprKind::Continue => check_expr_continue(context, expr),
   }
 }
 
@@ -403,6 +404,14 @@ fn check_expr_break(
     check_equality(context, &t1, &context.return_ty.clone());
 
     return t1;
+  }
+
+  Ty::with_void(origin.span).into()
+}
+
+fn check_expr_continue(context: &mut Context, origin: &Expr) -> PBox<Ty> {
+  if context.loops == 0 {
+    add_report_out_of_loop(context.program, origin.to_string(), origin.span);
   }
 
   Ty::with_void(origin.span).into()

@@ -314,6 +314,7 @@ pub enum ExprKind {
   Loop(PBox<Block>),
   While(PBox<Expr>, PBox<Block>),
   Break(Option<PBox<Expr>>),
+  Continue,
 }
 
 #[derive(Debug)]

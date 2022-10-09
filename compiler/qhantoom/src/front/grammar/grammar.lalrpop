@@ -179,6 +179,7 @@ Expr: PBox<Expr> = {
 ExprControl: PBox<Expr> = {
   <lo:@L> "return" <expr:Expr?> <hi:@R> => pbox(Expr::new(ExprKind::Return(expr), Span::new(lo, hi))),
   <lo:@L> "break" <expr:Expr?> <hi:@R> => Box::new(Expr::new(ExprKind::Break(expr), Span::new(lo, hi))),
+  <lo:@L> "continue" <hi:@R> => Box::new(Expr::new(ExprKind::Continue, Span::new(lo, hi))),
 };
 
 ExprAssign: PBox<Expr> = {
