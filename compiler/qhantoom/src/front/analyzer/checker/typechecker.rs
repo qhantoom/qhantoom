@@ -122,6 +122,9 @@ fn check_expr(context: &mut Context, expr: &Expr) -> PBox<Ty> {
     }
     ExprKind::Call(callee, args) => check_expr_call(context, callee, args),
     ExprKind::UnOp(op, rhs) => check_expr_un_op(context, op, rhs),
+    ExprKind::Return(maybe_expr) => {
+      check_expr_return(context, maybe_expr, expr.span)
+    }
     _ => unimplemented!("{}", expr),
   }
 }
@@ -217,6 +220,22 @@ fn check_expr_un_op(context: &mut Context, op: &UnOp, rhs: &Expr) -> PBox<Ty> {
       pbox(Ty::with_bool(Span::merge(&op.span, &rhs.span)))
     }
   }
+}
+
+fn check_expr_return(
+  context: &mut Context,
+  maybe_expr: &Option<PBox<Expr>>,
+  return_span: Span,
+) -> PBox<Ty> {
+  if let Some(expr) = maybe_expr {
+    let t1 = self::check_expr(context, expr);
+
+    check_equality(context, &t1, &context.return_ty.clone());
+
+    return t1;
+  };
+
+  pbox(Ty::with_void(return_span))
 }
 
 fn check_verify(context: &mut Context, expr: &Expr, t1: &Ty) -> bool {
