@@ -78,6 +78,12 @@ impl From<PBox<Expr>> for Ty {
   }
 }
 
+impl From<Ty> for PBox<Ty> {
+  fn from(ty: Ty) -> Self {
+    PBox(Box::new(ty))
+  }
+}
+
 #[derive(Clone, Debug)]
 pub enum TyKind {
   Void,

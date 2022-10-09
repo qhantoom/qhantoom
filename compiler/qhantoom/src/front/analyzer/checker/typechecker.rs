@@ -182,19 +182,19 @@ fn check_expr_lit(_context: &mut Context, lit: &Lit) -> PBox<Ty> {
 }
 
 fn check_expr_lit_bool(lit: &Lit) -> PBox<Ty> {
-  pbox(Ty::with_bool(lit.span))
+  Ty::with_bool(lit.span).into()
 }
 
 fn check_expr_lit_int(lit: &Lit) -> PBox<Ty> {
-  pbox(Ty::with_uint(lit.span))
+  Ty::with_uint(lit.span).into()
 }
 
 fn check_expr_lit_float(lit: &Lit) -> PBox<Ty> {
-  pbox(Ty::with_f64(lit.span))
+  Ty::with_f64(lit.span).into()
 }
 
 fn check_expr_lit_str(lit: &Lit) -> PBox<Ty> {
-  pbox(Ty::with_str(lit.span))
+  Ty::with_str(lit.span).into()
 }
 
 fn check_expr_identifier(
@@ -251,14 +251,14 @@ fn check_expr_un_op(context: &mut Context, op: &UnOp, rhs: &Expr) -> PBox<Ty> {
         add_report_wrong_un_op_error(context.program, op, &Ty::UINT);
       }
 
-      pbox(Ty::with_uint(Span::merge(&op.span, &rhs.span)))
+      Ty::with_uint(Span::merge(&op.span, &rhs.span)).into()
     }
     UnOpKind::Not => {
       if !t1.is_boolean() {
         add_report_wrong_un_op_error(context.program, op, &Ty::BOOL);
       }
 
-      pbox(Ty::with_bool(Span::merge(&op.span, &rhs.span)))
+      Ty::with_bool(Span::merge(&op.span, &rhs.span)).into()
     }
   }
 }

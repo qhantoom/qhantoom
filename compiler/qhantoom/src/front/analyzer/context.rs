@@ -16,7 +16,7 @@ impl<'a> Context<'a> {
 
     // TODO: tmp
     scope_map
-      .set_fun("puts".to_string(), (pbox(Ty::VOID), vec![pbox(Ty::STR)]))
+      .set_fun("puts".to_string(), (Ty::VOID.into(), vec![Ty::STR.into()]))
       .unwrap();
 
     Self {
