@@ -172,6 +172,7 @@ fn check_expr(context: &mut Context, expr: &Expr) -> PBox<Ty> {
     ExprKind::Return(maybe_expr) => {
       check_expr_return(context, maybe_expr, expr.span)
     }
+    ExprKind::Block(body) => check_expr_block(context, body),
     _ => todo!("\n\n{:?}\n\n", expr.kind),
   }
 }
@@ -351,7 +352,15 @@ fn check_expr_return(
     return t1;
   };
 
-  pbox(Ty::with_void(return_span))
+  Ty::with_void(return_span).into()
+}
+
+fn check_expr_block(context: &mut Context, body: &Block) -> PBox<Ty> {
+  for stmt in &body.stmts {
+    check_stmt(context, stmt);
+  }
+
+  Ty::with_void(body.span).into()
 }
 
 fn check_verify(context: &mut Context, expr: &Expr, t1: &Ty) -> bool {
