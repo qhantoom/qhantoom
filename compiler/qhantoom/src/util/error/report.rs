@@ -135,16 +135,27 @@ impl fmt::Display for ReportMessage {
         write!(f, " `{}` ", name.fg(Color::GREEN_100)).ok();
         write!(f, "{}", "already exist".fg(Color::BLUE_100))
       }
-      Self::MainHasInputs => write!(f, ""),
-      Self::MainNotFound => write!(f, ""),
+      Self::MainHasInputs => {
+        write!(f, "{} ", "`main`".fg(Color::GREEN_100)).ok();
+        write!(f, "{}", "function defined with args".fg(Color::BLUE_100))
+      }
+      Self::MainNotFound => {
+        write!(f, "{} ", "`main`".fg(Color::GREEN_100)).ok();
+        write!(f, "{} ", "function not found".fg(Color::BLUE_100))
+      }
       Self::MissingInputs => {
         write!(f, "{}", "missing input arguments".fg(Color::BLUE_100))
       }
       Self::NameClash => write!(f, "{}", "name clash".fg(Color::BLUE_100)),
-      Self::NamingConvention(_, _) => write!(f, ""),
+      Self::NamingConvention(name, convention) => {
+        write!(f, "{}", "variable".fg(Color::BLUE_100)).ok();
+        write!(f, " {} ", format!("`{}`", name).fg(Color::GREEN_100)).ok();
+        write!(f, "{}", "should have a".fg(Color::BLUE_100)).ok();
+        write!(f, " {} ", convention.fg(Color::BLUE_100))
+      }
       Self::UndefinedName(name) => {
         write!(f, "{}", "the name".fg(Color::BLUE_100)).ok();
-        write!(f, " `{}` ", name.fg(Color::GREEN_100)).ok();
+        write!(f, " {} ", format!("`{}`", name).fg(Color::GREEN_100)).ok();
         write!(f, "{}", "does not exist in this scope".fg(Color::BLUE_100))
       }
       Self::TypeMismatch => {
@@ -272,6 +283,17 @@ impl fmt::Display for LabelMessage {
           "this argument is defined multiple times".fg(Color::RED_100)
         )
       }
+      Self::NamingConvention(name, convention) => {
+        write!(
+          f,
+          "{}",
+          format!(
+            "change this identifier to {} convention: `{}`",
+            convention, name,
+          )
+          .fg(Color::YELLOW_100)
+        )
+      }
       Self::TypeMismatch(t1, t2) => {
         write!(
           f,
@@ -296,7 +318,7 @@ impl fmt::Display for LabelMessage {
             .fg(Color::RED_100)
         )
       }
-      _ => unimplemented!(),
+      Self::UnrecognizedToken => write!(f, ""),
     }
   }
 }
@@ -349,7 +371,7 @@ impl fmt::Display for NoteKind {
           "i'm not sure which one you want to use? rename one of them!"
         )
       }
-      _ => unimplemented!(),
+      Self::UnrecognizedToken => write!(f, ""),
     }
   }
 }
