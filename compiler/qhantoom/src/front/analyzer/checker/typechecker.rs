@@ -206,8 +206,6 @@ fn check_expr_identifier(
     ty.to_owned()
   } else if let Some(ty) = context.scope_map.fun(identifier) {
     ty.0.to_owned()
-  } else if let Some(ty) = context.scope_map.ty(identifier) {
-    ty.to_owned()
   } else {
     raise_report_undefined_name_error(context.program, identifier, span)
   }

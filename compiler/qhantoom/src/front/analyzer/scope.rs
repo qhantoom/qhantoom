@@ -6,7 +6,6 @@ use std::collections::HashMap;
 struct Scope {
   decls: HashMap<String, PBox<Ty>>,
   funs: HashMap<String, (PBox<Ty>, Vec<PBox<Ty>>)>,
-  tys: HashMap<String, PBox<Ty>>,
 }
 
 impl Scope {
@@ -16,10 +15,6 @@ impl Scope {
 
   fn fun(&self, name: &str) -> Option<&(PBox<Ty>, Vec<PBox<Ty>>)> {
     self.funs.get(name)
-  }
-
-  fn ty(&self, name: &str) -> Option<&PBox<Ty>> {
-    self.tys.get(name)
   }
 
   fn set_decl(&mut self, name: String, ty: PBox<Ty>) -> Result<(), String> {
@@ -41,16 +36,6 @@ impl Scope {
       Some(_) => Err(format!("function `{}` already exists", name)),
       None => {
         self.funs.insert(name, ty);
-        Ok(())
-      }
-    }
-  }
-
-  fn set_ty(&mut self, name: String, ty: PBox<Ty>) -> Result<(), String> {
-    match self.tys.get(&name) {
-      Some(_) => Err(format!("type `{}` already exists", name)),
-      None => {
-        self.tys.insert(name, ty);
         Ok(())
       }
     }
@@ -93,16 +78,6 @@ impl ScopeMap {
     None
   }
 
-  pub fn ty(&self, name: &str) -> Option<&PBox<Ty>> {
-    for map in self.maps.iter().rev() {
-      if let Some(ty) = map.ty(name) {
-        return Some(ty);
-      }
-    }
-
-    None
-  }
-
   pub fn set_decl(&mut self, name: String, ty: PBox<Ty>) -> Result<(), String> {
     match self.maps.last_mut() {
       Some(map) => map.set_decl(name, ty),
@@ -118,13 +93,6 @@ impl ScopeMap {
     match self.maps.last_mut() {
       Some(map) => map.set_fun(name, ty),
       None => Err(format!("function {} value do not exist", name)),
-    }
-  }
-
-  pub fn set_ty(&mut self, name: String, ty: PBox<Ty>) -> Result<(), String> {
-    match self.maps.last_mut() {
-      Some(map) => map.set_ty(name, ty),
-      None => Err(format!("type {} value do not exist", name)),
     }
   }
 }
