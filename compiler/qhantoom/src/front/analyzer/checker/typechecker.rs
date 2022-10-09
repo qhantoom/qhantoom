@@ -32,8 +32,25 @@ pub fn check(program: &Program) {
 
 fn check_item(context: &mut Context, item: &Item) {
   match &item.kind {
+    ItemKind::Val(decl) => check_item_val(context, decl),
     ItemKind::Fun(fun) => check_item_fun(context, fun),
     _ => unimplemented!("{}", item),
+  }
+}
+
+fn check_item_val(context: &mut Context, decl: &Decl) {
+  match context
+    .scope_map
+    .set_decl(decl.pattern.to_string(), decl.ty.clone())
+  {
+    Ok(_) => {
+      check_verify(context, &decl.value, &decl.ty);
+    }
+    Err(_) => add_report_variable_already_exist_error(
+      decl.pattern.to_string(),
+      decl.span,
+      context.program,
+    ),
   }
 }
 
