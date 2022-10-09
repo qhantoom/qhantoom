@@ -1,7 +1,7 @@
 -- this should handle a name clash error
-fun foo(x: uint, x:uint) {}
+-- fun foo(x: uint, x:uint) {}
 
-fun main() {
+fun main(): uint {
   imu x: uint = 1;
   imu y: uint = 2;
 

@@ -122,10 +122,11 @@ fn check_expr(context: &mut Context, expr: &Expr) -> PBox<Ty> {
     }
     ExprKind::Call(callee, args) => check_expr_call(context, callee, args),
     ExprKind::UnOp(op, rhs) => check_expr_un_op(context, op, rhs),
+    ExprKind::BinOp(lhs, op, rhs) => check_expr_bin_op(context, lhs, op, rhs),
     ExprKind::Return(maybe_expr) => {
       check_expr_return(context, maybe_expr, expr.span)
     }
-    _ => unimplemented!("{}", expr),
+    _ => unimplemented!("\n\n{:?}\n\n", expr.kind),
   }
 }
 
@@ -218,6 +219,29 @@ fn check_expr_un_op(context: &mut Context, op: &UnOp, rhs: &Expr) -> PBox<Ty> {
       }
 
       pbox(Ty::with_bool(Span::merge(&op.span, &rhs.span)))
+    }
+  }
+}
+
+fn check_expr_bin_op(
+  context: &mut Context,
+  lhs: &Expr,
+  op: &BinOp,
+  rhs: &Expr,
+) -> PBox<Ty> {
+  let t1 = check_expr(context, lhs);
+  let t2 = check_expr(context, rhs);
+
+  match &op.node {
+    _ => {
+      if t1.kind != t2.kind {
+        panic!(
+          "lhs and rhs should have the same type, got {} and {}",
+          t1, t2
+        ); // FIXME #1
+      }
+
+      return t1;
     }
   }
 }
