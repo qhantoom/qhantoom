@@ -165,6 +165,7 @@ fn check_expr(context: &mut Context, expr: &Expr) -> PBox<Ty> {
     ExprKind::Call(callee, args) => check_expr_call(context, callee, args),
     ExprKind::UnOp(op, rhs) => check_expr_un_op(context, op, rhs),
     ExprKind::BinOp(lhs, op, rhs) => check_expr_bin_op(context, lhs, op, rhs),
+    ExprKind::Assign(lhs, op, rhs) => check_expr_assign(context, lhs, op, rhs),
     ExprKind::Return(maybe_expr) => {
       check_expr_return(context, maybe_expr, expr.span)
     }
@@ -305,13 +306,25 @@ fn check_expr_bin_op(
   }
 }
 
+fn check_expr_assign(
+  context: &mut Context,
+  lhs: &Expr,
+  _: &BinOp,
+  rhs: &Expr,
+) -> PBox<Ty> {
+  let t1 = check_expr(context, lhs);
+
+  check_verify(context, rhs, &t1);
+  Ty::with_void(Span::merge(&lhs.span, &rhs.span)).into()
+}
+
 fn check_expr_return(
   context: &mut Context,
   maybe_expr: &Option<PBox<Expr>>,
   return_span: Span,
 ) -> PBox<Ty> {
   if let Some(expr) = maybe_expr {
-    let t1 = self::check_expr(context, expr);
+    let t1 = check_expr(context, expr);
 
     check_equality(context, &t1, &context.return_ty.clone());
 
