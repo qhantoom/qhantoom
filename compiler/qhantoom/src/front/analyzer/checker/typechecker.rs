@@ -16,6 +16,11 @@ use crate::util::span::Span;
 // in case of an error, an error report is returned. this way,
 // i collect all possible errors in a vector. and once the
 // verification phase is over, i display all the errors connected.
+//
+// FIXME #2
+//
+// define an error classification to assign the corresponding code
+// to each error report
 
 pub fn check(program: &Program) {
   let mut context = Context::new(program);
@@ -90,6 +95,7 @@ fn check_expr(context: &mut Context, expr: &Expr) -> PBox<Ty> {
       check_expr_identifier(context, identifier, expr.span)
     }
     ExprKind::Call(callee, args) => check_expr_call(context, callee, args),
+    ExprKind::UnOp(op, rhs) => check_expr_un_op(context, op, rhs),
     _ => unimplemented!("{}", expr),
   }
 }
@@ -131,7 +137,7 @@ fn check_expr_identifier(
   } else if let Some(ty) = context.scope_map.ty(identifier) {
     return ty.to_owned();
   } else {
-    add_report_undefined_name_error(&context.program, identifier, span)
+    raise_report_undefined_name_error(&context.program, identifier, span)
   }
 }
 
@@ -166,12 +172,24 @@ fn check_expr_call(
   fun_return_ty.clone()
 }
 
-fn check_equality(context: &mut Context, t1: &Ty, t2: &Ty) -> bool {
-  if t1.kind != t2.kind {
-    add_report_type_mismatch_error(t1, t2, context.program);
-    false
-  } else {
-    true
+fn check_expr_un_op(context: &mut Context, op: &UnOp, rhs: &Expr) -> PBox<Ty> {
+  let t1 = check_expr(context, rhs);
+
+  match &op.node {
+    UnOpKind::Neg => {
+      if !t1.is_numeric() {
+        add_report_wrong_un_op_error(&context.program, op, &Ty::UINT);
+      }
+
+      pbox(Ty::with_uint(Span::merge(&op.span, &rhs.span)))
+    }
+    UnOpKind::Not => {
+      if !t1.is_boolean() {
+        add_report_wrong_un_op_error(&context.program, op, &Ty::BOOL);
+      }
+
+      pbox(Ty::with_bool(Span::merge(&op.span, &rhs.span)))
+    }
   }
 }
 
@@ -179,6 +197,15 @@ fn check_verify(context: &mut Context, expr: &Expr, t1: &Ty) -> bool {
   let t2 = check_expr(context, expr);
 
   check_equality(context, t1, &t2)
+}
+
+fn check_equality(context: &mut Context, t1: &Ty, t2: &Ty) -> bool {
+  if t1.kind != t2.kind {
+    add_report_type_mismatch_error(t1, t2, context.program);
+    false
+  } else {
+    true
+  }
 }
 
 fn add_report_variable_already_exist_error(
@@ -196,7 +223,7 @@ fn add_report_variable_already_exist_error(
       path.display().to_string(),
       ReportOffset(span.lo),
     )
-    .with_code(ReportCode(3))
+    .with_code(ReportCode(3)) // FIXME #2
     .with_message(ReportMessage::DuplicateDeclaration(name))
     .with_label(
       Label::new(LabelKind::Error, (path.display().to_string(), span.into()))
@@ -219,7 +246,7 @@ fn add_report_type_mismatch_error(t1: &Ty, t2: &Ty, program: &Program) {
       ReportOffset(t2.span.lo),
     )
     .with_message(ReportMessage::TypeMismatch)
-    .with_code(ReportCode(5))
+    .with_code(ReportCode(5)) // FIXME #2
     .with_label(
       Label::new(
         LabelKind::Error,
@@ -242,7 +269,7 @@ fn add_report_type_mismatch_error(t1: &Ty, t2: &Ty, program: &Program) {
   );
 }
 
-fn add_report_undefined_name_error(
+fn raise_report_undefined_name_error(
   program: &Program,
   identifier: &String,
   span: Span,
@@ -257,7 +284,7 @@ fn add_report_undefined_name_error(
       path.display().to_string(),
       ReportOffset(span.lo),
     )
-    .with_code(ReportCode(3))
+    .with_code(ReportCode(3)) // FIXME #2
     .with_message(ReportMessage::UndefinedName(identifier.into()))
     .with_label(
       Label::new(LabelKind::Error, (path.display().to_string(), span.into()))
@@ -293,7 +320,7 @@ fn add_report_wrong_input_count_error(
       path.display().to_string(),
       ReportOffset(callee.span.lo),
     )
-    .with_code(ReportCode(3))
+    .with_code(ReportCode(3)) // FIXME #2
     .with_message(ReportMessage::MissingInputs)
     .with_label(
       Label::new(
@@ -310,4 +337,29 @@ fn add_report_wrong_input_count_error(
     path.display().to_string(),
     code,
   );
+}
+
+fn add_report_wrong_un_op_error(program: &Program, op: &UnOp, ty: &Ty) {
+  let source_id = program.reporter.source(op.span);
+  let code = program.reporter.code(source_id);
+  let path = program.reporter.path(op.span);
+
+  program.reporter.add_report(
+    Report::new(
+      ReportKind::Error,
+      path.display().to_string(),
+      ReportOffset(op.span.lo),
+    )
+    .with_code(ReportCode(3)) // FIXME #2
+    .with_message(ReportMessage::WrongUnOp(op.node.to_string()))
+    .with_label(
+      Label::new(
+        LabelKind::Error,
+        (path.display().to_string(), op.span.into()),
+      )
+      .with_message(LabelMessage::WrongUnOp(ty.to_string())),
+    ),
+    path.display().to_string(),
+    code,
+  )
 }

@@ -123,6 +123,7 @@ pub enum ReportMessage {
   NamingConvention(String, String),
   UndefinedName(String),
   TypeMismatch,
+  WrongUnOp(String),
 }
 
 impl fmt::Display for ReportMessage {
@@ -146,6 +147,10 @@ impl fmt::Display for ReportMessage {
       }
       Self::TypeMismatch => {
         write!(f, "{}", "type mismatch".fg(Color::BLUE_100))
+      }
+      Self::WrongUnOp(op) => {
+        write!(f, "{}", "wrong unary op expression".fg(Color::BLUE_100)).ok();
+        write!(f, " {}", format!("`{}`", op).fg(Color::GREEN_100))
       }
     }
   }
@@ -227,6 +232,7 @@ pub enum LabelMessage {
   TypeMismatchDefinedAs(String),
   UndefinedName,
   UnrecognizedToken,
+  WrongUnOp(String),
 }
 
 impl fmt::Display for LabelMessage {
@@ -275,6 +281,14 @@ impl fmt::Display for LabelMessage {
         )
         .fg(Color::RED_100)
       ),
+      Self::WrongUnOp(ty) => {
+        write!(
+          f,
+          "{}",
+          format!("this unary operator expects a `{}` expression", ty)
+            .fg(Color::RED_100)
+        )
+      }
       _ => unimplemented!(),
     }
   }

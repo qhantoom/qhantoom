@@ -14,6 +14,10 @@ pub struct Ty {
 }
 
 impl Ty {
+  pub const BOOL: Self = Self::new(TyKind::Bool, Span::ZERO);
+
+  pub const UINT: Self = Self::new(TyKind::UInt, Span::ZERO);
+
   pub const STR: Self = Self::new(TyKind::Str, Span::ZERO);
 
   pub const VOID: Self = Self::new(TyKind::Void, Span::ZERO);
@@ -48,6 +52,14 @@ impl Ty {
     span: Span,
   ) -> Self {
     Self::new(TyKind::Fn(args, return_ty), span)
+  }
+
+  pub fn is_numeric(&self) -> bool {
+    self.kind.is_numeric()
+  }
+
+  pub fn is_boolean(&self) -> bool {
+    self.kind.is_boolean()
   }
 }
 
@@ -84,6 +96,33 @@ pub enum TyKind {
   F64,
   Str,
   Fn(Vec<PBox<Ty>>, PBox<Ty>),
+}
+
+impl TyKind {
+  fn is_boolean(&self) -> bool {
+    match self {
+      Self::Bool => true,
+      _ => false,
+    }
+  }
+
+  fn is_numeric(&self) -> bool {
+    match self {
+      Self::U8
+      | Self::U16
+      | Self::U32
+      | Self::U64
+      | Self::UInt
+      | Self::S8
+      | Self::S16
+      | Self::S32
+      | Self::S64
+      | Self::SInt
+      | Self::F32
+      | Self::F64 => true,
+      _ => false,
+    }
+  }
 }
 
 impl PartialEq for TyKind {
