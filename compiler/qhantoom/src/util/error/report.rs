@@ -171,7 +171,7 @@ impl fmt::Display for ReportMessage {
       Self::WrongAssignOp => write!(
         f,
         "{}",
-        format!("wrong assignment operator expression").fg(Color::BLUE_100)
+        "wrong assignment operator expression".fg(Color::BLUE_100)
       ),
       Self::WrongBinOp => write!(f, "wrong binary operation expression"),
       Self::WrongUnOp(op) => {

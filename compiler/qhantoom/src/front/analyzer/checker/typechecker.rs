@@ -715,7 +715,7 @@ fn add_report_out_of_loop(program: &Program, name: String, span: Span) {
     .with_message(ReportMessage::OutOfLoop(name.to_string()))
     .with_label(
       Label::new(LabelKind::Error, (path.display().to_string(), span.into()))
-        .with_message(LabelMessage::OutOfLoop(name.to_string())),
+        .with_message(LabelMessage::OutOfLoop(name)),
     ),
     path.display().to_string(),
     code,
