@@ -219,14 +219,23 @@ impl Display for ExprKind {
       Self::BinOp(lhs, op, rhs) => write!(f, "({lhs} {op} {rhs})"),
       Self::Assign(lhs, op, rhs) => write!(f, "{lhs} {op} {rhs}"),
       Self::AssignOp(lhs, op, rhs) => write!(f, "{lhs} {op} {rhs}"),
-      Self::Return(value) => {
-        let Some(value) = value else { return write!(f, ""); };
+      Self::Return(maybe_expr) => {
+        let Some(expr) = maybe_expr else { return write!(f, "return;"); };
 
-        write!(f, "{value}")
+        write!(f, "return {expr};")
       }
       Self::Block(block) => write!(f, "{block}"),
       Self::Loop(body) => write!(f, "for {body}"),
       Self::While(condition, body) => write!(f, "while {condition} {body}"),
+      Self::Break(maybe_expr) => {
+        let Some(expr) = maybe_expr else { return write!(f, "break;"); };
+
+        write!(f, "break {expr};")
+      }
+      Self::Continue => write!(f, "continue"),
+      Self::When(condition, consequence, alternative) => {
+        write!(f, "when {condition} ? {consequence} : {alternative}")
+      }
     }
   }
 }

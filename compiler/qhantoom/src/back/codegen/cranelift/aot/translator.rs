@@ -85,6 +85,7 @@ impl<'a> Translator<'a> {
       }
       ExprKind::Return(value) => self.translate_expr_return(value),
       ExprKind::Block(block) => self.translate_expr_block(block),
+      _ => todo!(),
     }
   }
 
