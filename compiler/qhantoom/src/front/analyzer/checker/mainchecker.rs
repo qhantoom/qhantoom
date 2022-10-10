@@ -96,7 +96,7 @@ fn add_report_main_has_inputs(program: &Program, fun: &Fun) {
         .prototype
         .inputs
         .iter()
-        .map(|input| format!("{}", input.ty))
+        .map(|input| input.ty.to_string())
         .collect::<Vec<_>>()
         .join(", "),
     ))),

@@ -27,7 +27,7 @@ impl SourceMap {
   pub fn add(&mut self, path: PathBuf) -> io::Result<u32> {
     let id = self.sources.len() as u32;
     let offset = self.code.len();
-    let mut f = File::open(path.clone())?;
+    let mut f = File::open(&path)?;
 
     f.read_to_string(&mut self.code)?;
     self.sources.push(Box::new(Source::new(offset, path)));

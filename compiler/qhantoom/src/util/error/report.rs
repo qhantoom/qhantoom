@@ -135,7 +135,7 @@ impl fmt::Display for ReportMessage {
     match self {
       Self::DuplicateDeclaration(name) => {
         write!(f, "{}", "variable".fg(Color::BLUE_100))?;
-        write!(f, " `{}` ", name.fg(Color::GREEN_100))?; // TODO: backticks should be in colour too
+        write!(f, " {} ", format!("`{name}`").fg(Color::GREEN_100))?; // TODO: backticks should be in colour too
         write!(f, "{}", "already exist".fg(Color::BLUE_100))
       }
       Self::MainHasInputs => {
@@ -152,12 +152,12 @@ impl fmt::Display for ReportMessage {
       Self::NameClash => write!(f, "{}", "name clash".fg(Color::BLUE_100)),
       Self::NamingConvention(name, convention) => {
         write!(f, "{}", "variable".fg(Color::BLUE_100))?;
-        write!(f, " {} ", format!("`{}`", name).fg(Color::GREEN_100))?;
+        write!(f, " {} ", format!("`{name}`").fg(Color::GREEN_100))?;
         write!(f, "{}", "should have a".fg(Color::BLUE_100))?;
         write!(f, " {} ", convention.fg(Color::BLUE_100))
       }
       Self::OutOfLoop(behavior) => {
-        write!(f, "{} ", format!("`{}`", behavior).fg(Color::GREEN_100)).ok();
+        write!(f, "{} ", format!("`{behavior}`").fg(Color::GREEN_100)).ok();
         write!(f, "{}", "outside of the loop".fg(Color::BLUE_100))
       }
       Self::TypeMismatch => {
@@ -165,7 +165,7 @@ impl fmt::Display for ReportMessage {
       }
       Self::UndefinedName(name) => {
         write!(f, "{}", "the name".fg(Color::BLUE_100))?;
-        write!(f, " {} ", format!("`{}`", name).fg(Color::GREEN_100))?;
+        write!(f, " {} ", format!("`{name}`").fg(Color::GREEN_100))?;
         write!(f, "{}", "does not exist in this scope".fg(Color::BLUE_100))
       }
       Self::WrongAssignOp => write!(
@@ -176,7 +176,7 @@ impl fmt::Display for ReportMessage {
       Self::WrongBinOp => write!(f, "wrong binary operation expression"),
       Self::WrongUnOp(op) => {
         write!(f, "{}", "wrong unary op expression".fg(Color::BLUE_100))?;
-        write!(f, " {}", format!("`{}`", op).fg(Color::GREEN_100))
+        write!(f, " {}", format!("`{op}`").fg(Color::GREEN_100))
       }
     }
   }
@@ -281,15 +281,14 @@ impl fmt::Display for LabelMessage {
         f,
         "{}",
         format!(
-          "you need to add a `{}` function to `{}`",
-          PROGRAM_ENTRY, source_entry
+          "you need to add a `{PROGRAM_ENTRY}` function to `{source_entry}`",
         )
         .fg(Color::RED_100)
       ),
       Self::MissingInputs(inputs) => write!(
         f,
         "{}",
-        format!("the input argument(s) of type {} are required", inputs)
+        format!("the input argument(s) of type {inputs} are required")
           .fg(Color::RED_100)
       ),
       Self::NameClash => {
@@ -304,8 +303,7 @@ impl fmt::Display for LabelMessage {
           f,
           "{}",
           format!(
-            "change this identifier to {} convention: `{}`",
-            convention, name,
+            "change this identifier to {convention} convention: `{name}`",
           )
           .fg(Color::YELLOW_100)
         )
@@ -314,18 +312,18 @@ impl fmt::Display for LabelMessage {
         write!(
           f,
           "{}",
-          format!("cannot `{}` out of the loop", behavior).fg(Color::RED_100)
+          format!("cannot `{behavior}` out of the loop").fg(Color::RED_100)
         )
       }
       Self::TypeMismatch(t1, t2) => {
         write!(
           f,
           "{}",
-          format!("expected `{}`, found `{}`", t1, t2).fg(Color::RED_100)
+          format!("expected `{t1}`, found `{t2}`").fg(Color::RED_100)
         )
       }
       Self::TypeMismatchDefinedAs(ty) => {
-        write!(f, "{}", format!("defined as `{}`", ty).fg(Color::BLUE_200))
+        write!(f, "{}", format!("defined as `{ty}`").fg(Color::BLUE_200))
       }
       Self::UndefinedName => write!(
         f,
@@ -338,8 +336,7 @@ impl fmt::Display for LabelMessage {
           f,
           "{}",
           format!(
-            "lhs and rhs should have the same type, got `{}` and `{}`",
-            t1, t2
+            "lhs and rhs should have the same type, got `{t1}` and `{t2}`",
           )
           .fg(Color::RED_100)
         )
@@ -349,8 +346,7 @@ impl fmt::Display for LabelMessage {
           f,
           "{}",
           format!(
-            "lhs and rhs should have the same type, got `{}` and `{}`",
-            t1, t2
+            "lhs and rhs should have the same type, got `{t1}` and `{t2}`",
           )
           .fg(Color::RED_100)
         )
@@ -359,7 +355,7 @@ impl fmt::Display for LabelMessage {
         write!(
           f,
           "{}",
-          format!("this unary operator expects a `{}` expression", ty)
+          format!("this unary operator expects a `{ty}` expression")
             .fg(Color::RED_100)
         )
       }
@@ -407,8 +403,7 @@ impl fmt::Display for NoteKind {
       ),
       Self::MissingInputs(expected, actual) => write!(
         f,
-        "this function takes {} argument but {} arguments were supplied",
-        expected, actual
+        "this function takes {expected} argument but {actual} arguments were supplied",
       ),
       Self::NameClash => {
         write!(
@@ -447,7 +442,7 @@ impl fmt::Display for HelpKind {
       Self::MissingInputs(callee) => write!(
         f,
         "{}",
-        format!("This is how you should call this function: {}", callee)
+        format!("This is how you should call this function: {callee}")
           .fg(Color::YELLOW_100)
       ),
     }

@@ -118,9 +118,9 @@ impl Display for Ext {
 
     write!(f, "ext {}", self.prototype)?;
 
-    let Some(body) = &self.body else { return write!(f, ""); };
+    let Some(body) = &self.body else { return write!(f, ";"); };
 
-    write!(f, "{}", body)
+    write!(f, " {}", body)
   }
 }
 
@@ -128,7 +128,7 @@ impl Display for Decl {
   fn fmt(&self, f: &mut Formatter) -> Result {
     write!(
       f,
-      "{} {}: {} = {}",
+      "{} {}: {} = {};",
       self.kind, self.pattern, self.ty, self.value
     )
   }

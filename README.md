@@ -11,7 +11,7 @@
 
 ### fresh syntax
 
-qhantoom's syntax is compact, elegant and cames with nice features. keywords are clear, their use is unique, no doubt about the choice of implementation.
+qhantoom's syntax is compact, elegant and cames with nice features. keywords are clear and have only one role. no doubt about the choice of implementation.
 
 <p align="center">
   <img src="./src/misc/overview/qhantoom-syntax.png" />
@@ -19,7 +19,7 @@ qhantoom's syntax is compact, elegant and cames with nice features. keywords are
 
 ### embedded unit testing
 
-a good way to do unit tests with functionality adapted to the comfort of the programmer. logic and testing in the same file, to change files as little as possible: *very useful when doing tdd.*
+a good way to do unit tests with functionality adapted to the comfort of the programmer. logic and testing in the same file, to change files as little as possible: *very useful for tdd enthusiasts.*
 
 <p align="center">
   <img src="./src/misc/overview/qhantoom-unit-testing.png" />

@@ -12,7 +12,7 @@ pub fn make_dir(path_directory: &str) {
 
   match fs::create_dir(path_directory) {
     Ok(_) => println!("│ [make] dir: `{path_directory}`"),
-    Err(error) => panic!("ERROR: {:?}", error),
+    Err(error) => panic!("ERROR: {error}"),
   }
 }
 
@@ -20,9 +20,9 @@ pub fn make_file(path_file: &str, bytes_buf: &[u8]) {
   match File::create(path_file) {
     Ok(mut file) => match file.write_all(bytes_buf) {
       Ok(_) => println!("⋮ [make] obj: `{path_file}`"),
-      Err(error) => panic!("ERROR: {:?}", error),
+      Err(error) => panic!("ERROR: {error}"),
     },
-    Err(error) => panic!("ERROR: {:?}", error),
+    Err(error) => panic!("ERROR: {error}"),
   }
 }
 
@@ -35,7 +35,7 @@ pub fn make_exe(path_input: &str, path_output: &str) {
       println!("│ [make] exe: `{path_output}`",);
       println!("╰");
     }
-    Err(error) => panic!("ERROR: {:?}", error),
+    Err(error) => panic!("ERROR: {error}"),
   }
 }
 

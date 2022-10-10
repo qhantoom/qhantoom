@@ -19,7 +19,7 @@ impl Scope {
 
   fn set_decl(&mut self, name: String, ty: PBox<Ty>) -> Result<(), String> {
     match self.decls.get(&name) {
-      Some(_) => Err(format!("variable `{}` already exists", name)),
+      Some(_) => Err(format!("variable `{name}` already exists")),
       None => {
         self.decls.insert(name, ty);
         Ok(())
@@ -33,7 +33,7 @@ impl Scope {
     ty: (PBox<Ty>, Vec<PBox<Ty>>),
   ) -> Result<(), String> {
     match self.funs.get(&name) {
-      Some(_) => Err(format!("function `{}` already exists", name)),
+      Some(_) => Err(format!("function `{name}` already exists")),
       None => {
         self.funs.insert(name, ty);
         Ok(())
@@ -81,7 +81,7 @@ impl ScopeMap {
   pub fn set_decl(&mut self, name: String, ty: PBox<Ty>) -> Result<(), String> {
     match self.maps.last_mut() {
       Some(map) => map.set_decl(name, ty),
-      None => Err(format!("variable {} value do not exist", name)),
+      None => Err(format!("variable {name} value do not exist")),
     }
   }
 
@@ -92,7 +92,7 @@ impl ScopeMap {
   ) -> Result<(), String> {
     match self.maps.last_mut() {
       Some(map) => map.set_fun(name, ty),
-      None => Err(format!("function {} value do not exist", name)),
+      None => Err(format!("function {name} value do not exist")),
     }
   }
 }
