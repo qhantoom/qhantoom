@@ -316,6 +316,7 @@ pub enum ExprKind {
   Break(Option<PBox<Expr>>),
   Continue,
   When(PBox<Expr>, PBox<Expr>, PBox<Expr>),
+  IfElse(PBox<Expr>, PBox<Expr>, Option<PBox<Expr>>),
 }
 
 #[derive(Debug)]

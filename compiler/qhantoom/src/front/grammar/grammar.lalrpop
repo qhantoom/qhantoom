@@ -128,6 +128,7 @@ Stmts: Vec<PBox<Stmt>> = {
 StmtIntermediary: PBox<Stmt> = {
   <lo:@L> <item:Item> <hi:@R> => pbox(Stmt::new(StmtKind::Item(item), Span::new(lo, hi))),
   <stmt:Stmt> ";" => stmt,
+  <lo:@L> <expr:ExprStmtNoSemi> <hi:@R> => pbox(Stmt::new(StmtKind::Expr(expr), Span::new(lo, hi))),
   <lo:@L> <expr:ExprStmtSemi> ";" <hi:@R> => pbox(Stmt::new(StmtKind::Expr(expr), Span::new(lo, hi))),
 };
 
@@ -166,6 +167,10 @@ ExprUntil: PBox<Expr> = {
   <lo:@L> "until" <condition:Expr> <block:BlockOrExprArrow> <hi:@R> => pbox(Expr::new(ExprKind::While(condition, block), Span::new(lo, hi))),
 };
 
+ExprStmtNoSemi: PBox<Expr> = {
+  ExprIf,
+};
+
 ExprStmtSemi: PBox<Expr> = {
   Expr,
   ExprControl,
@@ -180,6 +185,18 @@ ExprControl: PBox<Expr> = {
   <lo:@L> "return" <expr:Expr?> <hi:@R> => pbox(Expr::new(ExprKind::Return(expr), Span::new(lo, hi))),
   <lo:@L> "break" <expr:Expr?> <hi:@R> => pbox(Expr::new(ExprKind::Break(expr), Span::new(lo, hi))),
   <lo:@L> "continue" <hi:@R> => pbox(Expr::new(ExprKind::Continue, Span::new(lo, hi))),
+};
+
+ExprIf: PBox<Expr> = {
+  <lo:@L> "if" <condition:Expr> <consequence:ExprBlock> <hi:@R> => pbox(Expr::new(ExprKind::IfElse(condition, consequence, None), Span::new(lo, hi))),
+  <lo:@L> "if" <condition:Expr> <consequence:ExprBlock> "else" <alternative:BlockOrIf> <hi:@R> => pbox(Expr::new(ExprKind::IfElse(condition, consequence, Some(alternative)), Span::new(lo, hi))),
+};
+BlockOrIf: PBox<Expr> = {
+  ExprBlock,
+  ExprIf,
+};
+ExprBlock: PBox<Expr> = {
+  <lo:@L> <block:Block> <hi:@R> => pbox(Expr::new(ExprKind::Block(block), Span::new(lo, hi))),
 };
 
 ExprWhen: PBox<Expr> = {

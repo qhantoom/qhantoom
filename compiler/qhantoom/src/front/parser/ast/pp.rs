@@ -224,7 +224,7 @@ impl Display for ExprKind {
 
         write!(f, "return {expr};")
       }
-      Self::Block(block) => write!(f, "{block}"),
+      Self::Block(body) => write!(f, "{body}"),
       Self::Loop(body) => write!(f, "for {body}"),
       Self::While(condition, body) => write!(f, "while {condition} {body}"),
       Self::Break(maybe_expr) => {
@@ -235,6 +235,13 @@ impl Display for ExprKind {
       Self::Continue => write!(f, "continue"),
       Self::When(condition, consequence, alternative) => {
         write!(f, "when {condition} ? {consequence} : {alternative}")
+      }
+      Self::IfElse(condition, consequence, maybe_alternative) => {
+        write!(f, "if {condition} {consequence}")?;
+
+        let Some(alternative) = maybe_alternative else { return write!(f, ""); };
+
+        write!(f, " {alternative}")
       }
     }
   }

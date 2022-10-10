@@ -182,6 +182,9 @@ fn check_expr(context: &mut Context, expr: &Expr) -> PBox<Ty> {
     ExprKind::When(condition, consequence, alternative) => {
       check_expr_when(context, condition, consequence, alternative)
     }
+    ExprKind::IfElse(condition, consequence, maybe_alternative) => {
+      check_expr_if_else(context, condition, consequence, maybe_alternative)
+    }
   }
 }
 
@@ -433,6 +436,29 @@ fn check_expr_when(
 
   check_equality(context, &t1, &boolean);
   unify_tys(context, &t2, &t3)
+}
+
+fn check_expr_if_else(
+  context: &mut Context,
+  condition: &Expr,
+  consequence: &Expr,
+  maybe_alternative: &Option<PBox<Expr>>,
+) -> PBox<Ty> {
+  let t1 = check_expr(context, condition);
+  let t2 = check_expr(context, consequence);
+  let Some(alternative) = maybe_alternative else { return t2; };
+  let t3 = check_expr(context, alternative);
+
+  match &t1.kind {
+    TyKind::Bool => {
+      check_equality(context, &t2, &t3);
+      t2
+    }
+    _ => {
+      let boolean = Ty::with_bool(condition.span);
+      raise_report_type_mismatch_error(context.program, &t1, &boolean) // FIXME #1
+    }
+  }
 }
 
 fn check_verify(context: &mut Context, expr: &Expr, t1: &Ty) -> bool {
