@@ -179,6 +179,9 @@ fn check_expr(context: &mut Context, expr: &Expr) -> PBox<Ty> {
     }
     ExprKind::Break(maybe_expr) => check_expr_break(context, maybe_expr, expr),
     ExprKind::Continue => check_expr_continue(context, expr),
+    ExprKind::When(condition, consequence, alternative) => {
+      check_expr_when(context, condition, consequence, alternative)
+    }
   }
 }
 
@@ -417,6 +420,21 @@ fn check_expr_continue(context: &mut Context, origin: &Expr) -> PBox<Ty> {
   Ty::with_void(origin.span).into()
 }
 
+fn check_expr_when(
+  context: &mut Context,
+  condition: &Expr,
+  consequence: &Expr,
+  alternative: &Expr,
+) -> PBox<Ty> {
+  let t1 = check_expr(context, condition);
+  let t2 = check_expr(context, consequence);
+  let t3 = check_expr(context, alternative);
+  let boolean = Ty::with_bool(condition.span);
+
+  check_equality(context, &t1, &boolean);
+  unify_tys(context, &t2, &t3)
+}
+
 fn check_verify(context: &mut Context, expr: &Expr, t1: &Ty) -> bool {
   let t2 = check_expr(context, expr);
 
@@ -430,6 +448,14 @@ fn check_equality(context: &mut Context, t1: &Ty, t2: &Ty) -> bool {
   } else {
     true
   }
+}
+
+fn unify_tys(context: &mut Context, t1: &Ty, t2: &Ty) -> PBox<Ty> {
+  if t1.kind != t2.kind {
+    raise_report_type_mismatch_error(context.program, t1, t2); // FIXME #1
+  }
+
+  t1.into()
 }
 
 fn add_report_variable_already_exist_error(
@@ -686,12 +712,47 @@ fn add_report_out_of_loop(program: &Program, name: String, span: Span) {
       ReportOffset(span.lo),
     )
     .with_code(ReportCode(4))
-    .with_message(ReportMessage::OutOfLoop(name))
+    .with_message(ReportMessage::OutOfLoop(name.to_string()))
     .with_label(
       Label::new(LabelKind::Error, (path.display().to_string(), span.into()))
-        .with_message(LabelMessage::OutOfLoop(name)),
+        .with_message(LabelMessage::OutOfLoop(name.to_string())),
     ),
     path.display().to_string(),
     code,
   );
+}
+
+fn raise_report_type_mismatch_error(program: &Program, t1: &Ty, t2: &Ty) -> ! {
+  let source_id = program.reporter.source(t1.span);
+  let code = program.reporter.code(source_id);
+  let path = program.reporter.path(t1.span);
+
+  program.reporter.raise(
+    Report::new(
+      ReportKind::Error,
+      path.display().to_string(),
+      ReportOffset(t2.span.lo),
+    )
+    .with_message(ReportMessage::TypeMismatch)
+    .with_code(ReportCode(5)) // FIXME #2
+    .with_label(
+      Label::new(
+        LabelKind::Error,
+        (path.display().to_string(), t2.span.into()),
+      )
+      .with_message(LabelMessage::TypeMismatch(t1.to_string(), t2.to_string())),
+    )
+    .with_label(
+      Label::new(
+        LabelKind::Hint,
+        (
+          path.display().to_string(),
+          t1.span.lo as usize..t1.span.hi as usize,
+        ),
+      )
+      .with_message(LabelMessage::TypeMismatchDefinedAs(t1.to_string())),
+    ),
+    path.display().to_string(),
+    code,
+  )
 }
